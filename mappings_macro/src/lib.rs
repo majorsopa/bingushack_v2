@@ -41,7 +41,7 @@ macro_rules! mappings_block {
 
         $mappings_to_add;
 
-        __internal_mappings_manager
+        __internal_mappings_manager;
     }};
 }
 
@@ -80,16 +80,23 @@ macro_rules! call_method_or_get_field {
                 method.get_name(),
                 method.get_sig(),
                 $method_args,
-            )
+            );
         } else {
             $env.call_method(
                 $cm.get_object().unwrap(),
                 method.get_name(),
                 method.get_sig(),
                 $method_args,
-            )
+            );
         }
     }};
 }
 
-// todo: call_method_or_get_field block macro to define jnienv and shit
+// put all uses of the above macro in here so the variables work
+#[macro_export]
+macro_rules! use_jni_env_block {
+    ($jni_env:ident, $block:block) => {{
+        let __internal_jni_env = $jni_env;
+        $block;
+    }};
+}
