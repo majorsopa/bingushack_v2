@@ -2,4 +2,7 @@
 
 members = [
     "bingushack",
+    "jni_mappings",
+    "mappings_macro",
+    "module_macro",
 ]
