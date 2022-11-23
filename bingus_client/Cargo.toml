@@ -1,7 +1,7 @@
 [package]
-name = "jni_mappings"
+name = "bingus_client"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-jni = "0.20.0"
+enum_dispatch = "0.3.8"

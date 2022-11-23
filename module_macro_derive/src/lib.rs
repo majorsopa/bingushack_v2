@@ -1,26 +1,39 @@
-use darling::FromDeriveInput;
+use darling::{FromDeriveInput, FromMeta};
 use proc_macro::{self, TokenStream};
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
 
 
+
+
+struct StringHelper {
+    inner: &'static str,
+}
+
+impl FromMeta for StringHelper {
+    fn from_string(value: &str) -> Result<Self, darling::Error> {
+        let value = unsafe { std::mem::transmute::<&str, &'static str>(value) };
+        Ok(StringHelper { inner: value })
+    }
+}
+
 #[derive(FromDeriveInput)]
 #[darling(attributes(bingus_module))]
 struct Opts {
-    name: String,
+    name: StringHelper,
 }
 
-#[proc_macro_derive(BingusModule, attributes(bingus_module))]
+#[proc_macro_derive(BingusModuleTrait, attributes(bingus_module))]
 pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input);
     let opts = Opts::from_derive_input(&input).expect("error with macro derive inputs");
     let DeriveInput { ident, .. } = input;
 
     // todo: settings
-    let name = opts.name;
+    let name = opts.name.inner;
 
     let get_name = quote! {
-        fn get_name() -> String {
+        fn get_name(&self) -> &'static str {
             #name
         }
     };
@@ -41,7 +54,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     };
 
     let output = quote! {
-        impl BingusModule for #ident {
+        impl BingusModuleTrait for #ident {
             #get_name
             #defaults
         }

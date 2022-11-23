@@ -19,6 +19,7 @@ macro_rules! obf_mappings {
     }};
 }
 
+
 #[macro_export]
 macro_rules! add_mapping {
     (

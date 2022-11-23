@@ -4,5 +4,8 @@ members = [
     "bingushack",
     "jni_mappings",
     "mappings_macro",
-    "module_macro",
+    "bingus_modules",
+    "module_macro_derive",
+    "bingus_ui",
+    "bingus_client",
 ]
