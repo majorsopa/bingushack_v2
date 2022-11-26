@@ -1,0 +1,12 @@
+[package]
+name = "setting_macro_derive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+syn = "1.0.103"
+quote = "1.0.21"
+darling = "0.14.2"
+
+[lib]
+proc-macro = true

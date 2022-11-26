@@ -8,4 +8,6 @@ members = [
     "module_macro_derive",
     "bingus_ui",
     "bingus_client",
+    "bingus_settings",
+    "setting_macro_derive",
 ]
