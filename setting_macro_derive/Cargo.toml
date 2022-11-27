@@ -7,6 +7,7 @@ edition = "2021"
 syn = "1.0.103"
 quote = "1.0.21"
 darling = "0.14.2"
+macro_common = { path = "../macro_common" }
 
 [lib]
 proc-macro = true

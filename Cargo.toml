@@ -10,4 +10,5 @@ members = [
     "bingus_client",
     "bingus_settings",
     "setting_macro_derive",
+    "macro_common",
 ]

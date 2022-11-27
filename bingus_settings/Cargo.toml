@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 enum_dispatch = "0.3.8"
+setting_macro_derive = { path = "../setting_macro_derive" }

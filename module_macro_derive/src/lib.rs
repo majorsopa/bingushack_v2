@@ -1,48 +1,13 @@
-use darling::{FromDeriveInput, FromMeta};
+use darling::FromDeriveInput;
 use proc_macro::{self, TokenStream};
-use quote::{quote, __private::TokenStream as TokenStream2};
+use quote::quote;
 use syn::{parse_macro_input, DeriveInput};
+use macro_common::*;
 
 
 
 
 
-struct StringHelper {
-    inner: &'static str,
-}
-
-impl Default for StringHelper {
-    fn default() -> Self {
-        Self { inner: "you forgot to give me a name :'(" }
-    }
-}
-
-impl FromMeta for StringHelper {
-    fn from_string(value: &str) -> Result<Self, darling::Error> {
-        let value = unsafe { std::mem::transmute::<&str, &'static str>(value) };
-        Ok(StringHelper { inner: value })
-    }
-}
-
-#[derive(Default)]
-struct FnHelper {
-    inner: TokenStream2,
-}
-
-impl FromMeta for FnHelper {
-    /*fn from_string(value: &str) -> Result<Self, darling::Error> {
-        let value: TokenStream = value.parse().unwrap();
-        Ok(FnPointerHelper { inner: value.into() })
-    }*/
-    fn from_value(value: &syn::Lit) -> darling::Result<Self> {
-        let value = match value {
-            syn::Lit::Str(lit_str) => lit_str.value(),
-            _ => panic!("expected an actual string literal"),
-        };
-        let value: TokenStream = value.parse().unwrap();
-        Ok(FnHelper { inner: value.into() })
-    }
-}
 
 #[derive(FromDeriveInput, Default)]
 #[darling(attributes(bingus_module), default)]
