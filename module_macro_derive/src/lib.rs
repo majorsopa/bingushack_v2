@@ -1,6 +1,6 @@
 use darling::FromDeriveInput;
 use proc_macro::{self, TokenStream};
-use quote::quote;
+use quote::{quote, TokenStreamExt};
 use syn::{parse_macro_input, DeriveInput};
 use macro_common::*;
 
@@ -18,8 +18,7 @@ struct Opts {
     on_disable_method: FnHelper,
     on_load_method: FnHelper,
     on_unload_method: FnHelper,
-
-    settings: Vec<BingusS>,
+    settings_list_field_names: SettingsListHelper,
 }
 
 #[proc_macro_derive(BingusModuleTrait, attributes(bingus_module))]
@@ -94,10 +93,41 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         defaults
     };
 
+    let settings = {
+        let get = quote! {&self};
+        let mut all_settings_fns = quote! {};
+
+        let mut settings_list = quote! {};
+
+        let settings_list_field_names = opts.settings_list_field_names.inner.into_iter().map(|x| x.inner).collect::<Vec<_>>();
+
+        for setting in settings_list_field_names {
+            all_settings_fns.extend(quote! {
+                fn #setting(parent: #ident) -> Setting {
+                    parent.#setting
+                }
+            });
+
+            settings_list.extend(quote! {#setting,});
+        }
+
+        let settings = {
+            quote!{
+                fn get_settings(#get) -> Vec<BingusSetting> {
+                    #all_settings_fns
+                    vec![#settings_list]
+                }
+            }
+        };
+
+        settings
+    };
+
     let output = quote! {
         impl BingusModuleTrait for #ident {
             #get_name
             #defaults
+            #settings
         }
     };
 

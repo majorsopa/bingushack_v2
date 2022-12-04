@@ -8,3 +8,4 @@ jni = "0.20.0"
 enum_dispatch = "0.3.8"
 module_macro_derive = { path = "../module_macro_derive" }
 jni_mappings = { path = "../jni_mappings" }
+bingus_setting = { path = "../bingus_setting" }

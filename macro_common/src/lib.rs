@@ -49,3 +49,40 @@ impl FromMeta for TypeHelper {
         Ok(TypeHelper { inner: value })
     }
 }
+
+
+
+#[derive(Default)]
+pub struct SettingsListHelper {
+    pub inner: Vec<StringHelper>,
+}
+
+impl FromMeta for SettingsListHelper {
+    fn from_value(value: &syn::Lit) -> darling::Result<Self> {
+        let value_string = match value {
+            syn::Lit::Str(lit_str) => lit_str.value(),
+            _ => panic!("expected an actual string"),
+        };
+
+        // parse it like `[a, b, c]`
+        let mut inner_vec = Vec::new();
+        let mut value_string = value_string.trim();
+        if value_string.starts_with('[') {
+            value_string = &value_string[1..];
+        } else {
+            panic!("expected a list");
+        }
+        if value_string.ends_with(']') {
+            value_string = &value_string[..value_string.len() - 1];
+        } else {
+            panic!("expected a closing bracket");
+        }
+        for value in value_string.split(',') {
+            let value = value.trim();
+            let value = StringHelper::from_string(value)?;
+            inner_vec.push(value);
+        }
+
+        Ok(SettingsListHelper { inner: inner_vec })
+    }
+}

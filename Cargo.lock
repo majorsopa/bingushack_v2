@@ -219,6 +219,7 @@ dependencies = [
 name = "bingus_module"
 version = "0.1.0"
 dependencies = [
+ "bingus_setting",
  "enum_dispatch",
  "jni 0.20.0",
  "jni_mappings",
@@ -1560,7 +1561,6 @@ dependencies = [
 name = "module_macro_derive"
 version = "0.1.0"
 dependencies = [
- "bingus_setting",
  "darling 0.14.2",
  "macro_common",
  "quote",
