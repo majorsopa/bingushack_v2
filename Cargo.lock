@@ -211,6 +211,7 @@ dependencies = [
 name = "bingus_client"
 version = "0.1.0"
 dependencies = [
+ "bingus_module",
  "enum_dispatch",
  "event_feed",
 ]
