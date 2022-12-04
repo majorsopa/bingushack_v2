@@ -8,6 +8,7 @@ syn = "1.0.103"
 quote = "1.0.21"
 darling = "0.14.2"
 macro_common = { path = "../macro_common" }
+bingus_setting = { path = "../bingus_setting" }
 
 [lib]
 proc-macro = true

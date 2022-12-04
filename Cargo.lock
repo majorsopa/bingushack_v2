@@ -212,7 +212,6 @@ name = "bingus_client"
 version = "0.1.0"
 dependencies = [
  "bingus_module",
- "enum_dispatch",
  "event_feed",
 ]
 
@@ -227,7 +226,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "bingus_settings"
+name = "bingus_setting"
 version = "0.1.0"
 dependencies = [
  "enum_dispatch",
@@ -1561,6 +1560,7 @@ dependencies = [
 name = "module_macro_derive"
 version = "0.1.0"
 dependencies = [
+ "bingus_setting",
  "darling 0.14.2",
  "macro_common",
  "quote",

@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-enum_dispatch = "0.3.8"
+#enum_dispatch = "0.3.8"
 event_feed = "0.1.0"
 bingus_module = { path = "../bingus_module" }

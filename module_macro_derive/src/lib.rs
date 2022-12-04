@@ -18,6 +18,8 @@ struct Opts {
     on_disable_method: FnHelper,
     on_load_method: FnHelper,
     on_unload_method: FnHelper,
+
+    settings: Vec<BingusS>,
 }
 
 #[proc_macro_derive(BingusModuleTrait, attributes(bingus_module))]
