@@ -1,7 +1,7 @@
 use darling::FromDeriveInput;
 use proc_macro::{self, TokenStream};
 use quote::{quote, TokenStreamExt};
-use syn::{parse_macro_input, DeriveInput};
+use syn::{parse_macro_input, DeriveInput, parse::Parser};
 use macro_common::*;
 
 
@@ -34,6 +34,13 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     let get_name = quote! {
         fn get_name(&self) -> &'static str {
             #name
+        }
+    };
+
+    let toggle_method= quote! {
+        fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>) {
+            let new_val = !self.__enabled_bool_setting.get_value();
+            *self.__enabled_bool_setting.get_value_mut() = new_val;
         }
     };
 
@@ -95,26 +102,18 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
     let settings = {
         let get = quote! {&self};
-        let mut all_settings_fns = quote! {};
 
         let mut settings_list = quote! {};
 
         let settings_list_field_names = opts.settings_list_field_names.inner.into_iter().map(|x| x.inner).collect::<Vec<_>>();
 
         for setting in settings_list_field_names {
-            all_settings_fns.extend(quote! {
-                fn #setting(parent: #ident) -> Setting {
-                    parent.#setting
-                }
-            });
-
-            settings_list.extend(quote! {#setting,});
+            settings_list.extend(quote! {self.#setting,});
         }
 
         let settings = {
             quote!{
                 fn get_settings(#get) -> Vec<BingusSetting> {
-                    #all_settings_fns
                     vec![#settings_list]
                 }
             }
@@ -124,12 +123,41 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     };
 
     let output = quote! {
-        impl BingusModuleTrait for #ident {
+        impl<T> BingusModuleTrait<T> for #ident {
             #get_name
+            #toggle_method
             #defaults
             #settings
         }
     };
 
     output.into()
+}
+
+#[proc_macro_attribute]
+pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let mut ast = parse_macro_input!(input as DeriveInput);
+    match &mut ast.data {
+        syn::Data::Struct(ref mut struct_data) => {
+            match &mut struct_data.fields {
+                syn::Fields::Named(fields) => {
+                    fields
+                        .named
+                        .push(syn::Field::parse_named.parse2(
+                            quote! {
+                                __enabled_bool_setting: BingusSetting
+                            }
+                        ).unwrap());
+                }   
+                _ => {
+                    ()
+                }
+            }              
+            
+            return quote! {
+                #ast
+            }.into();
+        }
+        _ => panic!("`add_bingus_fields` has to be used with structs "),
+    }
 }

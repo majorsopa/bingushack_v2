@@ -7,5 +7,8 @@ fn tick() {
 
 
 #[derive(BingusModuleTrait)]
-#[bingus_module(name = "ChatSender", tick_method = "tick()")]
-pub struct ChatSender;
+#[add_bingus_fields]
+#[bingus_module(name = "ChatSender", tick_method = "tick()", settings_list_field_names = "[bool_setting]")]
+pub struct ChatSender {
+    bool_setting: BingusSetting,
+}

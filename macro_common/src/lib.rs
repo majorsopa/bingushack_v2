@@ -1,5 +1,9 @@
 use darling::FromMeta;
-use quote::__private::TokenStream as TokenStream2;
+use quote::{
+    quote,
+    __private::TokenStream as TokenStream2
+};
+use syn::LitStr;
 
 
 #[derive(Default)]
@@ -20,10 +24,6 @@ pub struct FnHelper {
 }
 
 impl FromMeta for FnHelper {
-    /*fn from_string(value: &str) -> Result<Self, darling::Error> {
-        let value: TokenStream = value.parse().unwrap();
-        Ok(FnPointerHelper { inner: value.into() })
-    }*/
     fn from_value(value: &syn::Lit) -> darling::Result<Self> {
         let value = match value {
             syn::Lit::Str(lit_str) => lit_str.value(),
@@ -54,7 +54,7 @@ impl FromMeta for TypeHelper {
 
 #[derive(Default)]
 pub struct SettingsListHelper {
-    pub inner: Vec<StringHelper>,
+    pub inner: Vec<FnHelper>,
 }
 
 impl FromMeta for SettingsListHelper {
@@ -79,8 +79,7 @@ impl FromMeta for SettingsListHelper {
         }
         for value in value_string.split(',') {
             let value = value.trim();
-            let value = StringHelper::from_string(value)?;
-            inner_vec.push(value);
+            inner_vec.push(FnHelper { inner: value.parse().unwrap() });
         }
 
         Ok(SettingsListHelper { inner: inner_vec })
