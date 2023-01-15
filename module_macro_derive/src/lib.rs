@@ -1,6 +1,6 @@
 use darling::FromDeriveInput;
 use proc_macro::{self, TokenStream};
-use quote::{quote, TokenStreamExt};
+use quote::{quote};
 use syn::{parse_macro_input, DeriveInput, parse::Parser};
 use macro_common::*;
 
@@ -111,15 +111,15 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             settings_list.extend(quote! {self.#setting,});
         }
 
-        let settings = {
+        
+
+        {
             quote!{
                 fn get_settings(#get) -> Vec<BingusSetting> {
                     vec![#settings_list]
                 }
             }
-        };
-
-        settings
+        }
     };
 
     let output = quote! {
@@ -150,13 +150,13 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         ).unwrap());
                 }   
                 _ => {
-                    ()
+                    
                 }
             }              
             
-            return quote! {
+            quote! {
                 #ast
-            }.into();
+            }.into()
         }
         _ => panic!("`add_bingus_fields` has to be used with structs "),
     }

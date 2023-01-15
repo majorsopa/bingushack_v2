@@ -1,9 +1,8 @@
 use darling::FromMeta;
 use quote::{
-    quote,
     __private::TokenStream as TokenStream2
 };
-use syn::LitStr;
+
 
 
 #[derive(Default)]
@@ -30,7 +29,7 @@ impl FromMeta for FnHelper {
             _ => panic!("expected an actual string literal"),
         };
         let value: TokenStream2 = value.parse().unwrap();
-        Ok(FnHelper { inner: value.into() })
+        Ok(FnHelper { inner: value })
     }
 }
 
