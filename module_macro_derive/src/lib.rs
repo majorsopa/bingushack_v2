@@ -39,8 +39,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
     let toggle_method= quote! {
         fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>) {
-            let new_val = !self.__enabled_bool_setting.get_value();
-            *self.__enabled_bool_setting.get_value_mut() = new_val;
+            let new_val = !<SettingsType as Into<bool>>::into(self.__enabled_bool_setting.get_value().into());
+            *self.__enabled_bool_setting.get_value_mut() = new_val.into();
         }
     };
 
@@ -123,7 +123,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     };
 
     let output = quote! {
-        impl<T> BingusModuleTrait<T> for #ident {
+        impl BingusModuleTrait for #ident {
             #get_name
             #toggle_method
             #defaults

@@ -2,7 +2,7 @@ use crate::crate_prelude::*;
 
 
 #[enum_dispatch]
-pub trait BingusModuleTrait<T> {
+pub trait BingusModuleTrait {
     fn get_name(&self) -> &'static str;
 
     fn tick(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
