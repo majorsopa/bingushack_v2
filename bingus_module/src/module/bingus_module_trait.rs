@@ -15,3 +15,7 @@ pub trait BingusModuleTrait {
 
     fn get_settings(&self) -> Vec<BingusSetting>;
 }
+
+pub trait MakeNewBingusModule {
+    fn new() -> Self;
+}

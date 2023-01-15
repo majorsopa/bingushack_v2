@@ -238,8 +238,8 @@ dependencies = [
 name = "bingus_ui"
 version = "0.1.0"
 dependencies = [
+ "bingus_module",
  "eframe",
- "event_feed",
 ]
 
 [[package]]

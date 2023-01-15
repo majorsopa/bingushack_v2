@@ -5,7 +5,7 @@ pub use settings_types::*;
 #[derive(Clone, Copy)]
 #[enum_dispatch(BingusSettingTrait)]
 pub enum BingusSetting {
-    BoolSetting(BoolSetting),
+    BoolSetting,
 }
 
 impl BingusSetting {
@@ -163,15 +163,39 @@ mod settings {
     #[bingus_setting(setting_type = "bool")]
     pub struct BoolSetting(bool);
 
+    impl From<bool> for BoolSetting {
+        fn from(value: bool) -> Self {
+            Self(value)
+        }
+    }
+
     #[derive(BingusSettingTrait, Clone, Copy)]
     #[bingus_setting(setting_type = "u32")]
     pub struct IntSetting(u32);
+
+    impl From<u32> for IntSetting {
+        fn from(value: u32) -> Self {
+            Self(value)
+        }
+    }
 
     #[derive(BingusSettingTrait, Clone, Copy)]
     #[bingus_setting(setting_type = "f32")]
     pub struct FloatSetting(f32);
 
+    impl From<f32> for FloatSetting {
+        fn from(value: f32) -> Self {
+            Self(value)
+        }
+    }
+
     #[derive(BingusSettingTrait, Clone, Copy)]
     #[bingus_setting(setting_type = "[f32; 2]")]
     pub struct RangeSetting([f32; 2]);
+
+    impl From<[f32; 2]> for RangeSetting {
+        fn from(value: [f32; 2]) -> Self {
+            Self(value)
+        }
+    }
 }
