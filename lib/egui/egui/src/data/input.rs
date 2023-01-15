@@ -126,7 +126,7 @@ impl RawInput {
 }
 
 /// A file about to be dropped into egui.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct HoveredFile {
     /// Set by the `egui-winit` backend.
@@ -136,7 +136,7 @@ pub struct HoveredFile {
 }
 
 /// A file dropped into egui.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct DroppedFile {
     /// Set by the `egui-winit` backend.
@@ -262,7 +262,7 @@ pub const NUM_POINTER_BUTTONS: usize = 3;
 /// State of the modifier keys. These must be fed to egui.
 ///
 /// The best way to compare [`Modifiers`] is by using [`Modifiers::matches`].
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub struct Modifiers {
     /// Either of the alt keys are down (option ⌥ on Mac).

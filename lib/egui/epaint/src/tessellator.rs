@@ -585,7 +585,7 @@ pub mod path {
 
 // ----------------------------------------------------------------------------
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum PathType {
     Open,
     Closed,

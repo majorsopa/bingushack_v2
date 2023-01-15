@@ -211,7 +211,7 @@ fn color_slider_2d(
 }
 
 /// What options to show for alpha
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Alpha {
     // Set alpha to 1.0, and show no option for it.
     Opaque,

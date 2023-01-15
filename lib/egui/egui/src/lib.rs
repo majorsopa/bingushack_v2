@@ -492,7 +492,7 @@ pub mod special_emojis {
 }
 
 /// The different types of built-in widgets in egui
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 pub enum WidgetType {
     Label, // TODO: emit Label events
