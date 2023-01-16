@@ -7,3 +7,5 @@ edition = "2021"
 #enum_dispatch = "0.3.8"
 event_feed = "0.1.0"
 bingus_module = { path = "../bingus_module" }
+eframe = { path = "../lib/egui/eframe" }
+bingus_ui = { path = "../bingus_ui" }
