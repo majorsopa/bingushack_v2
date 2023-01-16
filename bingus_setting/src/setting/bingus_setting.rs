@@ -6,18 +6,21 @@ pub use settings_types::*;
 #[enum_dispatch(BingusSettingTrait)]
 pub enum BingusSetting {
     BoolSetting,
+    IntSetting,
 }
 
 impl BingusSetting {
     pub fn get_value(&self) -> SettingsType {
         match self {
             BingusSetting::BoolSetting(setting) => setting.get_value().into(),
+            BingusSetting::IntSetting(setting) => setting.get_value().into(),
         }
     }
 
     pub fn get_value_mut(&mut self) -> &mut SettingsType {
         match self {
             BingusSetting::BoolSetting(setting) => setting.get_value_mut().into(),
+            BingusSetting::IntSetting(setting) => setting.get_value_mut().into(),
         }
     }
 }

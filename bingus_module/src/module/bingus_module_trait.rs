@@ -13,7 +13,11 @@ pub trait BingusModuleTrait {
 
     fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
 
+    fn get_enabled(&self) -> BingusSetting;
+    fn get_enabled_mut(&mut self) -> &mut BingusSetting;
+
     fn get_settings(&self) -> Vec<BingusSetting>;
+    fn get_settings_mut(&mut self) -> Vec<&mut BingusSetting>;
 }
 
 pub trait MakeNewBingusModule {

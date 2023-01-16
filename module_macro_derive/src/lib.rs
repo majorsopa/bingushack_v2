@@ -104,19 +104,33 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         let get = quote! {&self};
 
         let mut settings_list = quote! {};
+        let mut mut_settings_list = quote! {};
 
         let settings_list_field_names = opts.settings_list_field_names.inner.into_iter().map(|x| x.inner).collect::<Vec<_>>();
 
         for setting in settings_list_field_names {
             settings_list.extend(quote! {self.#setting,});
+            mut_settings_list.extend(quote! {&mut self.#setting,});
         }
 
         
 
         {
             quote!{
+                fn get_enabled(&self) -> BingusSetting {
+                    self.__enabled_bool_setting
+                }
+
+                fn get_enabled_mut(&mut self) -> &mut BingusSetting {
+                    &mut self.__enabled_bool_setting
+                }
+
                 fn get_settings(#get) -> Vec<BingusSetting> {
                     vec![#settings_list]
+                }
+
+                fn get_settings_mut(&mut self) -> Vec<&mut BingusSetting> {
+                    vec![#mut_settings_list]
                 }
             }
         }

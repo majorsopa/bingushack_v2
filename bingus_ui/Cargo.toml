@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 eframe = { path = "../lib/egui/eframe" }
 bingus_module = { path = "../bingus_module" }
+bingus_setting = { path = "../bingus_setting" }
