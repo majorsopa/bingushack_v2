@@ -1,2 +1,2 @@
-pub mod ui;
 mod widgets;
+pub use widgets::*;

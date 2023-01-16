@@ -1,4 +1,4 @@
-use bingus_module::prelude::{BingusModule, ChatSender, populate_modules};
+use bingus_module::prelude::{BingusModule, populate_modules};
 
 pub struct BingusClient {
     modules: Vec<BingusModule>,
