@@ -248,6 +248,7 @@ dependencies = [
 name = "bingushack"
 version = "0.1.0"
 dependencies = [
+ "bingus_client",
  "winapi",
 ]
 

@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-jni = "0.20.0"
+jni = { version = "0.20.0", features = ["invocation"] }
