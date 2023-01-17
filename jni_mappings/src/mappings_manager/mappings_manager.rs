@@ -47,6 +47,7 @@ impl MappingsManager<'_> {
                 $class_path:literal,            // path to the class or the obfuscated class name
                 $fields_and_methods:block       // the fields and methods of the class (using the `add_field_or_method!` macro)
             ) => {{
+                #[allow(unused_mut)]
                 let mut cm = ClassMapping::new_from_class(env.find_class($class_path).unwrap());
 
                 adds!(cm);
@@ -60,9 +61,21 @@ impl MappingsManager<'_> {
 
         add_mapping!(new_self, "MinecraftClient", "ejf", {
             add_field!("player", "t", "Lfcz;", false);
+            add_field!("inGameHud", "l", "Lekn;", false);
+
+            add_method!("getInstance", "N", "()Lejf;", true);
         });
         add_mapping!(new_self, "PlayerEntity", "bwp", {
-            add_method!("sendChatMessage", "b", "(Ljava/lang/String;)V", false);
+            
+        });
+        add_mapping!(new_self, "InGameHud", "ekn", {
+            add_method!("chatHud", "d", "()Lela;", false);
+        });
+        add_mapping!(new_self, "ChatHud", "ela", {
+            add_method!("addMessage", "a", "(Lss;Ltd;ILejb;Z)V", false);  // Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh
+        });
+        add_mapping!(new_self, "Text", "ss", {
+            add_method!("of", "a", "(Ljava/lang/String;)Lss;", true);
         });
 
         new_self

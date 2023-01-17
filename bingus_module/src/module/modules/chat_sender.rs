@@ -1,3 +1,4 @@
+use jni::objects::JValue;
 use mappings_macro::{apply_object, call_method_or_get_field};
 
 use crate::{crate_prelude::*, module::bingus_module_trait::MakeNewBingusModule};
@@ -9,6 +10,32 @@ fn tick(env: JNIEnv, mappings_manager: Rc<MappingsManager>) {
         minecraft_client,
         call_method_or_get_field!(env, minecraft_client, "getInstance", true, &[]).unwrap().l().unwrap()
     );
+
+    let in_game_hud = mappings_manager.get("InGameHud").unwrap();
+    apply_object!(
+        in_game_hud,
+        call_method_or_get_field!(env, minecraft_client, "inGameHud", false).unwrap().l().unwrap()
+    );
+
+    let chat_hud = mappings_manager.get("ChatHud").unwrap();
+    apply_object!(
+        chat_hud,
+        call_method_or_get_field!(env, in_game_hud, "chatHud", false, &[]).unwrap().l().unwrap()
+    );
+
+    let bingus_text = mappings_manager.get("Text").unwrap();
+    apply_object!(
+        bingus_text,
+        call_method_or_get_field!(env, bingus_text, "of", true, &[JValue::from(env.new_string("bingus").unwrap())]).unwrap().l().unwrap()
+    );
+
+    call_method_or_get_field!(env, chat_hud, "addMessage", false, &[
+        JValue::from(bingus_text.get_object().unwrap()),
+        JValue::Void,
+        JValue::from(200),
+        JValue::Void,
+        JValue::from(true),
+        ]).unwrap();
 }
 
 

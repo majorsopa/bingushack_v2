@@ -23,7 +23,7 @@ macro_rules! call_method_or_get_field {
 
     // for methods
     ($env:expr, $cm:expr, $method_name:literal, $is_static:literal, $method_args:expr) => {{
-        let method = $cm.get_field($method_name, $is_static).unwrap();
+        let method = $cm.get_method($method_name, $is_static).unwrap();
 
         if $is_static {
             $env.call_static_method(
