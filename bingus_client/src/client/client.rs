@@ -1,15 +1,24 @@
-use bingus_module::prelude::{BingusModule, populate_modules};
+use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
 use bingus_ui::module_widget;
+use jni::{JNIEnv, JavaVM};
+use jni_mappings::get_javavm;
 
 pub struct BingusClient {
     modules: Vec<BingusModule>,
+    jvm: JavaVM,  // idk if this is needed
+    env: JNIEnv<'static>,
 }
 
 impl BingusClient {
     pub fn new() -> Self {
+        let jvm = unsafe { get_javavm() };
+        let env = jvm.attach_current_thread_as_daemon().unwrap();
+        let env: JNIEnv<'static> = unsafe { std::mem::transmute(env) };
         let new_self = Self {
             modules: populate_modules(),
+            jvm,
+            env,
         };
 
         new_self
@@ -25,6 +34,10 @@ impl eframe::App for BingusClient {
                 ui.add(module_widget(module));
             }
         });
+
+        for module in &mut self.modules {
+            module.tick(self.env, todo!());
+        }
     }
 }
 

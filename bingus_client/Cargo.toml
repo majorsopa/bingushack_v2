@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-#enum_dispatch = "0.3.8"
-event_feed = "0.1.0"
 bingus_module = { path = "../bingus_module" }
 eframe = { path = "../lib/egui/eframe" }
 bingus_ui = { path = "../bingus_ui" }
+jni_mappings = { path = "../jni_mappings" }
+jni = { version = "0.20.0", features = ["invocation"] }
