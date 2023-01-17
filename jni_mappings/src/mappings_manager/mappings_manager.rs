@@ -58,15 +58,11 @@ impl MappingsManager<'_> {
 
         let mut new_self = MappingsManager::default();
 
-
-
-        let mut mappings_manager = MappingsManager::default();
-
         add_mapping!(new_self, "MinecraftClient", "ejf", {
             add_field!("player", "t", "Lfcz;", false);
         });
 
-        mappings_manager
+        new_self
     }
 
     pub fn get_class(&self, name: &str) -> Option<&ClassMapping> {
