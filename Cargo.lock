@@ -1401,6 +1401,7 @@ name = "jni_mappings"
 version = "0.1.0"
 dependencies = [
  "jni 0.20.0",
+ "mappings_macro",
 ]
 
 [[package]]

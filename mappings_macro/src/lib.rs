@@ -42,7 +42,7 @@ macro_rules! mappings_block {
 
         $mappings_to_add;
 
-        __internal_mappings_manager;
+        __internal_mappings_manager
     }};
 }
 

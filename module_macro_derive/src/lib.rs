@@ -37,8 +37,10 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         }
     };
 
+    let defaults_args = quote! {&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>};
+
     let toggle_method= quote! {
-        fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>) {
+        fn toggle(#defaults_args) {
             let new_val = !<SettingsType as Into<bool>>::into(self.__enabled_bool_setting.0.get_value().into());
             *self.__enabled_bool_setting.0.get_value_mut() = new_val.into();
         }
@@ -46,8 +48,6 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
 
     let defaults = {
-        let defaults_args = quote! {&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>};
-
         let tick_method = {
             let matched = opts.tick_method.inner;
             quote! {
