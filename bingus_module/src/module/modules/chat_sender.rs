@@ -1,14 +1,14 @@
 use crate::{crate_prelude::*, module::bingus_module_trait::MakeNewBingusModule};
 
 
-fn tick() {
+fn tick(env: JNIEnv, mappings_manager: Rc<MappingsManager>) {
     println!("tick called");
 }
 
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "ChatSender", tick_method = "tick()", settings_list_field_names = "[bool_setting]")]
+#[bingus_module(name = "ChatSender", tick_method = "tick(_env, _mappings_manager)", settings_list_field_names = "[bool_setting]")]
 pub struct ChatSender {
     bool_setting: (BingusSetting, &'static str),
 }
