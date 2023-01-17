@@ -5,13 +5,13 @@ use crate::crate_prelude::*;
 pub trait BingusModuleTrait {
     fn get_name(&self) -> &'static str;
 
-    fn tick(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
-    fn on_enable(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
-    fn on_disable(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
-    fn on_load(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
-    fn on_unload(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
+    fn tick(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_enable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_disable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_load(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_unload(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
 
-    fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>);
+    fn toggle(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
 
     fn get_enabled(&self) -> (BingusSetting, &'static str);
     fn get_enabled_mut(&mut self) -> &mut (BingusSetting, &'static str);

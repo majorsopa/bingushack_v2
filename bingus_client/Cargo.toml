@@ -9,3 +9,5 @@ eframe = { path = "../lib/egui/eframe" }
 bingus_ui = { path = "../bingus_ui" }
 jni_mappings = { path = "../jni_mappings" }
 jni = { version = "0.20.0", features = ["invocation"] }
+
+winapi = { version = "0.3.9", features = ["processthreadsapi", "libloaderapi", "winuser", "handleapi"] }

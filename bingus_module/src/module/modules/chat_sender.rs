@@ -4,7 +4,7 @@ use mappings_macro::{apply_object, call_method_or_get_field};
 use crate::{crate_prelude::*, module::bingus_module_trait::MakeNewBingusModule};
 
 
-fn tick(env: JNIEnv, mappings_manager: Rc<MappingsManager>) {
+fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
     let minecraft_client = mappings_manager.get("MinecraftClient").unwrap();
     apply_object!(
         minecraft_client,
@@ -34,7 +34,7 @@ fn tick(env: JNIEnv, mappings_manager: Rc<MappingsManager>) {
         JValue::Void,
         JValue::from(200),
         JValue::Void,
-        JValue::from(true),
+        JValue::from(false),
         ]).unwrap();
 }
 

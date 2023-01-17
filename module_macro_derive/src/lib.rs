@@ -37,7 +37,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         }
     };
 
-    let defaults_args = quote! {&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>};
+    let defaults_args = quote! {&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager};
 
     let toggle_method= quote! {
         fn toggle(#defaults_args) {

@@ -216,6 +216,7 @@ dependencies = [
  "eframe",
  "jni 0.20.0",
  "jni_mappings",
+ "winapi",
 ]
 
 [[package]]

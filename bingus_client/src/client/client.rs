@@ -1,31 +1,22 @@
-use std::rc::Rc;
+use std::{rc::Rc, sync::{Mutex, Arc}, cell::RefCell};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
 use bingus_ui::module_widget;
-use jni::{JNIEnv, JavaVM};
+use jni::JNIEnv;
 use jni_mappings::{get_javavm, MappingsManager};
 
+use crate::message_box;
+
 pub struct BingusClient {
-    modules: Vec<BingusModule>,
-    jvm: JavaVM,  // idk if this is needed
-    env: JNIEnv<'static>,
-    mappings_manager: Rc<MappingsManager<'static>>,
+    modules: Arc<Mutex<RefCell<Vec<BingusModule>>>>,
 }
 
 impl BingusClient {
-    pub fn new() -> Self {
-        let jvm = unsafe { get_javavm() };
-        let env = jvm.attach_current_thread_as_daemon().unwrap();
-        let env: JNIEnv<'static> = unsafe { std::mem::transmute(env) };
-        let new_self = Self {
-            modules: populate_modules(),
-            jvm,
-            env,
-            mappings_manager: Rc::new(MappingsManager::new(env)),
-        };
-
-        new_self
+    pub fn new(modules: Arc<Mutex<RefCell<Vec<BingusModule>>>>) -> Self {
+        Self {
+            modules,
+        }
     }
 }
 
@@ -34,19 +25,42 @@ impl eframe::App for BingusClient {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("bingushack");
             ui.separator();
-            for module in &mut self.modules {
+            for module in &mut *(*self.modules.lock().unwrap()).borrow_mut() {
                 ui.add(module_widget(module));
             }
         });
-
-        for module in &mut self.modules {
-            module.tick(self.env, Rc::clone(&self.mappings_manager));
-        }
     }
 }
 
 pub fn run_client() {
-    let app = BingusClient::new();
+    let modules = Arc::new(Mutex::new(RefCell::new(populate_modules())));
+    let app = BingusClient::new(Arc::clone(&modules));
+
     let options = eframe::NativeOptions::default();
+
+
+    let (tx, rx) = std::sync::mpsc::channel::<()>();
+    let running_modules = std::thread::spawn(move || {
+        let jvm = unsafe { get_javavm() };
+        let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
+        let mappings_manager = MappingsManager::new(jni_env);
+        loop {
+            for module in &mut *(*modules.lock().unwrap()).borrow_mut() {
+                if module.get_enabled().0.get_value().into() {
+                    module.tick(jni_env, &mappings_manager);
+                    message_box("brah2");
+                }
+            }
+
+            std::thread::sleep(std::time::Duration::from_millis(5));
+            if rx.try_recv().is_ok() {
+                break;
+            }
+        }
+    });
+
+
     eframe::run_native("bingushack", options, Box::new(|_cc| Box::new(app)));
+    tx.send(()).unwrap();
+    running_modules.join().unwrap();
 }
