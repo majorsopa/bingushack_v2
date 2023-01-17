@@ -39,8 +39,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
     let toggle_method= quote! {
         fn toggle(&mut self, _env: JNIEnv, _mappings_manager: Rc<MappingsManager>) {
-            let new_val = !<SettingsType as Into<bool>>::into(self.__enabled_bool_setting.get_value().into());
-            *self.__enabled_bool_setting.get_value_mut() = new_val.into();
+            let new_val = !<SettingsType as Into<bool>>::into(self.__enabled_bool_setting.0.get_value().into());
+            *self.__enabled_bool_setting.0.get_value_mut() = new_val.into();
         }
     };
 
@@ -117,19 +117,19 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
         {
             quote!{
-                fn get_enabled(&self) -> BingusSetting {
+                fn get_enabled(&self) -> (BingusSetting, &'static str) {
                     self.__enabled_bool_setting
                 }
 
-                fn get_enabled_mut(&mut self) -> &mut BingusSetting {
+                fn get_enabled_mut(&mut self) -> &mut (BingusSetting, &'static str) {
                     &mut self.__enabled_bool_setting
                 }
 
-                fn get_settings(#get) -> Vec<BingusSetting> {
+                fn get_settings(#get) -> Vec<(BingusSetting, &'static str)> {
                     vec![#settings_list]
                 }
 
-                fn get_settings_mut(&mut self) -> Vec<&mut BingusSetting> {
+                fn get_settings_mut(&mut self) -> Vec<&mut (BingusSetting, &'static str)> {
                     vec![#mut_settings_list]
                 }
             }
@@ -159,7 +159,7 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         .named
                         .push(syn::Field::parse_named.parse2(
                             quote! {
-                                __enabled_bool_setting: BingusSetting
+                                __enabled_bool_setting: (BingusSetting, &'static str)
                             }
                         ).unwrap());
                 }   

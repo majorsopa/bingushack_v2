@@ -10,14 +10,14 @@ fn tick() {
 #[add_bingus_fields]
 #[bingus_module(name = "ChatSender", tick_method = "tick()", settings_list_field_names = "[bool_setting]")]
 pub struct ChatSender {
-    bool_setting: BingusSetting,
+    bool_setting: (BingusSetting, &'static str),
 }
 
 impl MakeNewBingusModule for ChatSender {
     fn new() -> Self {
         let new_self = Self {
-            bool_setting: BingusSetting::BoolSetting(false.into()),
-            __enabled_bool_setting: BingusSetting::BoolSetting(false.into()),
+            bool_setting: (BingusSetting::BoolSetting(false.into()), "testing name"),
+            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled"),
         };
 
         new_self

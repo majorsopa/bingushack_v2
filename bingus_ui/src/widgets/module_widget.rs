@@ -10,7 +10,13 @@ fn module_ui(ui: &mut egui::Ui, module: &mut BingusModule) -> egui::Response {
     if ui.is_rect_visible(rect) {
         ui.horizontal(|ui| {
             ui.label(module.get_name());
+
             ui.add(setting_widget(module.get_enabled_mut()));
+        });
+        ui.collapsing("settings", |ui| {
+            for setting in module.get_settings_mut() {
+                ui.add(setting_widget(setting));
+            }
         });
     }
 

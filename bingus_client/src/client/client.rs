@@ -21,8 +21,6 @@ impl eframe::App for BingusClient {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("bingushack");
             ui.separator();
-            ui.label("Modules:");
-            ui.separator();
             for module in &mut self.modules {
                 ui.add(module_widget(module));
             }

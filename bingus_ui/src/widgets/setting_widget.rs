@@ -1,19 +1,20 @@
-use bingus_setting::prelude::{BingusSetting, BingusSettingTrait};
+use bingus_setting::prelude::BingusSetting;
 use eframe::egui;
 
 use crate::toggle;
 
-fn setting_ui(ui: &mut egui::Ui, setting: &mut BingusSetting) -> egui::Response {
-    match setting {
-        BingusSetting::BoolSetting(value) => {
-            ui.add(toggle(value.get_value_mut().into()))
+fn setting_ui(ui: &mut egui::Ui, setting: &mut (BingusSetting, &'static str)) -> egui::Response {
+    match setting.0 {
+        BingusSetting::BoolSetting(_) => {
+            ui.label(setting.1);
+            ui.add(toggle(setting.0.get_value_mut().into()))
         }
-        BingusSetting::IntSetting(value) => {
-            ui.add(egui::Slider::new(value.get_value_mut(), 0..=24))
+        BingusSetting::IntSetting(_) => {
+            ui.add(egui::Slider::new(setting.0.get_value_mut().into(), 0..=24))
         }
     }
 }
 
-pub fn setting_widget(setting: &mut BingusSetting) -> impl eframe::egui::Widget + '_ {
+pub fn setting_widget<'a>(setting: &'a mut (BingusSetting, &'static str)) -> impl eframe::egui::Widget + 'a {
     move |ui: &mut egui::Ui| setting_ui(ui, setting)
 }

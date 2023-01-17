@@ -9,7 +9,7 @@ use syn::{DeriveInput, parse_macro_input};
 #[derive(FromDeriveInput)]
 #[darling(attributes(bingus_setting))]
 struct Opts {
-    setting_type: TypeHelper
+    setting_type: TypeHelper,
 }
 
 #[proc_macro_derive(BingusSettingTrait, attributes(bingus_setting))]
