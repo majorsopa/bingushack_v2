@@ -23,7 +23,7 @@ macro_rules! call_method_or_get_field {
 
     // for methods
     ($env:expr, $cm:expr, $method_name:literal, $is_static:literal, $method_args:expr) => {{
-        let method = $cm.get_field($field_name, $is_static).unwrap();
+        let method = $cm.get_field($method_name, $is_static).unwrap();
 
         if $is_static {
             $env.call_static_method(
@@ -31,23 +31,23 @@ macro_rules! call_method_or_get_field {
                 method.get_name(),
                 method.get_sig(),
                 $method_args,
-            );
+            )
         } else {
             $env.call_method(
                 $cm.get_object().unwrap(),
                 method.get_name(),
                 method.get_sig(),
                 $method_args,
-            );
+            )
         }
     }};
 }
 
-// put all uses of the above macro in here so the variables work
+// puts a jni JObject into a ClassMapping
+// `apply_object!(ClassMapping, JObject);`
 #[macro_export]
-macro_rules! use_jni_env_block {
-    ($jni_env:ident, $block:block) => {{
-        let __internal_jni_env = $jni_env;
-        $block;
-    }};
+macro_rules! apply_object {
+    ($to_apply_cm:ident, $object_to_apply:expr) => {
+        $to_apply_cm.apply_object($object_to_apply)
+    };
 }

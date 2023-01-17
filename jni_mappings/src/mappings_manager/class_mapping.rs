@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, cell::RefCell};
 
 use jni::objects::{JClass, JObject};
 
@@ -6,8 +6,8 @@ use super::sig_holder::SigHolder;
 
 #[derive(Debug)]
 pub struct ClassMapping<'a> {
-    class: JClass<'a>,
-    object: Option<JObject<'a>>,
+    class: RefCell<JClass<'a>>,
+    object: RefCell<Option<JObject<'a>>>,
 
     fields: HashMap<&'static str, SigHolder>,
     static_fields: HashMap<&'static str, SigHolder>,
@@ -19,8 +19,8 @@ pub struct ClassMapping<'a> {
 impl<'a> ClassMapping<'a> {
     pub fn new_from_class(class: JClass<'a>) -> Self {
         Self {
-            class,
-            object: None,
+            class: RefCell::new(class),
+            object: RefCell::new(None),
 
             fields: HashMap::new(),
             static_fields: HashMap::new(),
@@ -28,6 +28,10 @@ impl<'a> ClassMapping<'a> {
             methods: HashMap::new(),
             static_methods: HashMap::new(),
         }
+    }
+
+    pub fn apply_object(&self, object: JObject<'a>) {
+        *self.object.borrow_mut() = Some(object);
     }
 
     pub fn get_field(&self, name: &str, is_static: bool) -> Option<&SigHolder> {
@@ -63,10 +67,10 @@ impl<'a> ClassMapping<'a> {
     }
 
     pub fn get_class(&self) -> JClass<'a> {
-        self.class
+        *self.class.borrow()
     }
 
     pub fn get_object(&self) -> Option<JObject<'a>> {
-        self.object
+        *self.object.borrow()
     }
 }

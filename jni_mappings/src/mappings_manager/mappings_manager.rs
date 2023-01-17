@@ -61,11 +61,16 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "MinecraftClient", "ejf", {
             add_field!("player", "t", "Lfcz;", false);
         });
+        add_mapping!(new_self, "PlayerEntity", "bwp", {
+            add_method!("sendChatMessage", "b", "(Ljava/lang/String;)V", false);
+        });
 
         new_self
     }
 
-    pub fn get_class(&self, name: &str) -> Option<&ClassMapping> {
-        self.mappings.get(name)
+    pub fn get(&self, name: &str) -> Option<&ClassMapping> {
+        unsafe {
+            self.mappings.get(name).map(|r| std::mem::transmute::<&ClassMapping, &ClassMapping>(r))  // i don't know why this transmute is legal but it is so cope
+        }
     }
 }
