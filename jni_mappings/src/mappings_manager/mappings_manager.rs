@@ -11,7 +11,7 @@ pub struct MappingsManager<'a> {
 }
 
 impl MappingsManager<'_> {
-    pub fn new(env: JNIEnv) -> Self {
+    pub fn new(env: JNIEnv<'static>) -> Self {
         macro_rules! adds {
             ($cm:ident) => {
                 #[allow(unused_macros)]
