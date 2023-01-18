@@ -7,13 +7,12 @@ use quote::{
 
 #[derive(Default)]
 pub struct StringHelper {
-    pub inner: &'static str,
+    pub inner: String,
 }
 
 impl FromMeta for StringHelper {
     fn from_string(value: &str) -> Result<Self, darling::Error> {
-        let value = unsafe { std::mem::transmute::<&str, &'static str>(value) };
-        Ok(StringHelper { inner: value })
+        Ok(StringHelper { inner: value.to_string() })
     }
 }
 
