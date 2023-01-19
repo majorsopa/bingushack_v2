@@ -226,10 +226,12 @@ version = "0.1.0"
 dependencies = [
  "bingus_setting",
  "enum_dispatch",
+ "gl",
  "jni 0.20.0",
  "jni_mappings",
  "mappings_macro",
  "module_macro_derive",
+ "once_cell",
 ]
 
 [[package]]
