@@ -41,8 +41,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
     let toggle_method= quote! {
         fn toggle(#defaults_args) {
-            let new_val = !<SettingsType as Into<bool>>::into(self.__enabled_bool_setting.0.get_value().into());
-            *self.__enabled_bool_setting.0.get_value_mut() = new_val.into();
+            let new_val = !self.__enabled_bool_setting.0.get_bool();
+            *self.__enabled_bool_setting.0.get_bool_mut() = new_val;
         }
     };
 

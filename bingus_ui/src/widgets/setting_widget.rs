@@ -3,18 +3,19 @@ use eframe::egui;
 
 use crate::toggle;
 
-fn setting_ui(ui: &mut egui::Ui, setting: &mut (BingusSetting, &'static str)) -> egui::Response {
+fn setting_ui(ui: &mut egui::Ui, setting: (&mut BingusSetting, &'static str)) -> egui::Response {
     ui.label(setting.1);
     match setting.0 {
         BingusSetting::BoolSetting(_) => {
-            ui.add(toggle(setting.0.get_value_mut().into()))
+            ui.add(toggle(setting.0.get_bool_mut()))
         }
         BingusSetting::IntSetting(_) => {
-            ui.add(egui::Slider::new(setting.0.get_value_mut().into(), 0..=24))
+            //ui.add(egui::Slider::new(setting.0.get_value_mut().into(), 0..=24))
+            todo!()
         }
     }
 }
 
-pub fn setting_widget<'a>(setting: &'a mut (BingusSetting, &'static str)) -> impl eframe::egui::Widget + 'a {
+pub fn setting_widget<'a>(setting: (&'a mut BingusSetting, &'static str)) -> impl eframe::egui::Widget + 'a {
     move |ui: &mut egui::Ui| setting_ui(ui, setting)
 }

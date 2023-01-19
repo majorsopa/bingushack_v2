@@ -33,8 +33,7 @@ impl eframe::App for BingusClient {
 }
 
 pub fn run_client() {
-    let modules = populate_modules();
-    let modules = Arc::new(Mutex::new(modules));
+    let modules = Arc::new(Mutex::new(populate_modules()));
     let app = BingusClient::new(Arc::clone(&modules));
 
     let options = eframe::NativeOptions::default();
@@ -47,7 +46,7 @@ pub fn run_client() {
         let mappings_manager = MappingsManager::new(jni_env);
         loop {
             for module in modules.lock().unwrap().iter_mut() {
-                if module.get_enabled().0.get_value().into() {
+                if module.get_enabled().0.get_bool() {
                     module.tick(jni_env, &mappings_manager);
                 }
             }
