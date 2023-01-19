@@ -150,7 +150,9 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
             wglMakeCurrent(hdc, *local_new_context.get_mut());
 
             for module in modules.lock().unwrap().iter_mut() {
-                module.render();
+                if module.get_enabled().0.get_bool() {
+                    module.render();
+                }
             }
 
             let local_old_context = OLD_CONTEXT.get_mut().unwrap();
