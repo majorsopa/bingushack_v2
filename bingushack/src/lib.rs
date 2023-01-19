@@ -1,6 +1,6 @@
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
-use bingus_module::prelude::BingusModuleTrait;
+use bingus_module::prelude::{BingusModuleTrait, ESP_SHADER, triangle::compile_triangle};
 use widestring::WideCString;
 use winapi::{
     shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
@@ -139,6 +139,8 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
                 check
             }
         } as *const _);
+
+        let _ = ESP_SHADER.get_or_init(|| compile_triangle());
     });
 
     if let Some(modules) = MODULES.get() {

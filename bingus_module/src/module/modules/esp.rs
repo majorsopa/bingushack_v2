@@ -3,14 +3,14 @@ use std::{mem, ptr, ffi::CString};
 use gl::types::{GLuint, GLsizeiptr, GLfloat, GLboolean};
 use once_cell::sync::OnceCell;
 
-use crate::crate_prelude::{*, triangle::compile_triangle};
+use crate::crate_prelude::*;
 
-static ESP_SHADER: OnceCell<GLuint> = OnceCell::new();
+pub static ESP_SHADER: OnceCell<GLuint> = OnceCell::new();
 static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
 
 fn render(_esp: &mut Esp) {
-    let shader: GLuint  = *ESP_SHADER.get_or_init(|| compile_triangle());
+    let shader: GLuint  = *ESP_SHADER.get().unwrap();
 
 
     let mut vao = 0;
