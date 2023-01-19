@@ -254,6 +254,7 @@ name = "bingushack"
 version = "0.1.0"
 dependencies = [
  "bingus_client",
+ "bingus_module",
  "crochet",
  "gl",
  "once_cell",

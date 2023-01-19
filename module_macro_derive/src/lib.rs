@@ -14,6 +14,7 @@ use macro_common::*;
 struct Opts {
     name: StringHelper,
     tick_method: FnHelper,
+    render_method: FnHelper,
     on_enable_method: FnHelper,
     on_disable_method: FnHelper,
     on_load_method: FnHelper,
@@ -56,6 +57,14 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
                 }
             }
         };
+        let render_method = {
+            let matched = opts.render_method.inner;
+            quote! {
+                fn render(&mut self) {
+                    #matched;
+                }
+            }
+        };
         let on_enable_method = {
             let matched = opts.on_enable_method.inner;
             quote! {
@@ -91,6 +100,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
         let defaults = quote! {
             #tick_method
+            #render_method
             #on_enable_method
             #on_disable_method
             #on_load_method

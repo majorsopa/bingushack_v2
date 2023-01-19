@@ -6,6 +6,8 @@ pub trait BingusModuleTrait {
     fn get_name(&self) -> &'static str;
 
     fn tick(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn render(&mut self);
+
     fn on_enable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
     fn on_disable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
     fn on_load(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);

@@ -1,7 +1,7 @@
 use jni::objects::JValue;
 use mappings_macro::{apply_object, call_method_or_get_field};
 
-use crate::{crate_prelude::*, module::bingus_module_trait::MakeNewBingusModule};
+use crate::crate_prelude::*;
 
 
 fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {

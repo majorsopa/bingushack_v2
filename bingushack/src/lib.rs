@@ -1,5 +1,6 @@
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
+use bingus_module::prelude::BingusModuleTrait;
 use widestring::WideCString;
 use winapi::{
     shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
@@ -149,7 +150,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
             wglMakeCurrent(hdc, *local_new_context.get_mut());
 
             for module in modules.lock().unwrap().iter_mut() {
-                
+                module.render();
             }
 
             let local_old_context = OLD_CONTEXT.get_mut().unwrap();
