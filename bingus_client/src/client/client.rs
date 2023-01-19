@@ -6,7 +6,7 @@ use bingus_ui::module_widget;
 use jni::JNIEnv;
 use jni_mappings::{get_javavm, MappingsManager};
 
-use crate::message_box;
+use crate::{message_box, MODULES};
 
 pub struct BingusClient {
     modules: Arc<Mutex<Vec<BingusModule>>>,
@@ -33,7 +33,7 @@ impl eframe::App for BingusClient {
 }
 
 pub fn run_client() {
-    let modules = Arc::new(Mutex::new(populate_modules()));
+    let modules = MODULES.get_or_init(|| Arc::new(Mutex::new(populate_modules())));
     let app = BingusClient::new(Arc::clone(&modules));
 
     let options = eframe::NativeOptions::default();
