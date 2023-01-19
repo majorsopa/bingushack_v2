@@ -10,9 +10,7 @@ static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
 
 fn render(_esp: &mut Esp) {
-    let shader = *ESP_SHADER.get_or_init(|| compile_triangle());
-
-
+    let shader: GLuint  = *ESP_SHADER.get_or_init(|| compile_triangle());
 
 
     let mut vao = 0;

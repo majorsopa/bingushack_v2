@@ -115,7 +115,6 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
             let _ = OLD_CONTEXT.get_or_init(|| AtomicPtr::new(wglGetCurrentContext()));
             let _ = NEW_CONTEXT.get_or_init(|| AtomicPtr::new(wglCreateContext(hdc)));
 
-            // idk if this is needed, will test later
             let local_new_context = NEW_CONTEXT.get_mut().unwrap();
             wglMakeCurrent(hdc, *local_new_context.get_mut());
         }
@@ -146,11 +145,10 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
         unsafe {
             let local_new_context = NEW_CONTEXT.get_mut().unwrap();
             wglMakeCurrent(hdc, *local_new_context.get_mut());
-
-            for module in modules.lock().unwrap().iter_mut() {
-                if module.get_enabled().0.get_bool() {
-                    module.render();
-                }
+        }
+        for module in modules.lock().unwrap().iter_mut() {
+            if module.get_enabled().0.get_bool() {
+                module.render();
             }
         }
     }

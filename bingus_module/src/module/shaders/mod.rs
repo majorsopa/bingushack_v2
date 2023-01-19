@@ -23,7 +23,7 @@ pub fn compile_shader(src: &str, ty: GLenum) -> GLuint {
             let mut len = 0;
             gl::GetShaderiv(shader, gl::INFO_LOG_LENGTH, &mut len);
             let mut buf = Vec::with_capacity(len as usize);
-            buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
+            //buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
             gl::GetShaderInfoLog(
                 shader,
                 len,
@@ -31,7 +31,7 @@ pub fn compile_shader(src: &str, ty: GLenum) -> GLuint {
                 buf.as_mut_ptr() as *mut GLchar,
             );
             panic!(
-                "{}",
+                "compile_shader error:{}",
                 str::from_utf8(&buf)
                     .ok()
                     .expect("ShaderInfoLog not valid utf8")
@@ -56,7 +56,7 @@ pub fn link_program(vs: GLuint, fs: GLuint) -> GLuint {
             let mut len: GLint = 0;
             gl::GetProgramiv(program, gl::INFO_LOG_LENGTH, &mut len);
             let mut buf = Vec::with_capacity(len as usize);
-            buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
+            //buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
             gl::GetProgramInfoLog(
                 program,
                 len,
@@ -64,7 +64,7 @@ pub fn link_program(vs: GLuint, fs: GLuint) -> GLuint {
                 buf.as_mut_ptr() as *mut GLchar,
             );
             panic!(
-                "{}",
+                "link_program error:{}",
                 str::from_utf8(&buf)
                     .ok()
                     .expect("ProgramInfoLog not valid utf8")
