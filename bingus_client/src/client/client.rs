@@ -39,7 +39,7 @@ pub fn run_client() {
     let options = eframe::NativeOptions::default();
 
 
-    let (tx, rx) = std::sync::mpsc::channel::<()>();
+    let (modules_tx, modules_rx) = std::sync::mpsc::channel::<()>();
     let running_modules = std::thread::spawn(move || {
         let jvm = unsafe { get_javavm() };
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
@@ -52,7 +52,7 @@ pub fn run_client() {
             }
 
             std::thread::sleep(std::time::Duration::from_millis(5));
-            if rx.try_recv().is_ok() {
+            if modules_rx.try_recv().is_ok() {
                 break;
             }
         }
@@ -60,6 +60,6 @@ pub fn run_client() {
 
 
     eframe::run_native("bingushack", options, Box::new(|_cc| Box::new(app)));
-    tx.send(()).unwrap();
+    modules_tx.send(()).unwrap();
     running_modules.join().unwrap();
 }
