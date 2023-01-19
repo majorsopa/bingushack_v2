@@ -2,13 +2,13 @@ use gl::types::GLuint;
 
 use super::{compile_shader, link_program};
 
-static VS_SRC: &str = "
+static VS_SRC: &'static str = "
 #version 150
 in vec2 position;
 void main() {
     gl_Position = vec4(position, 0.0, 1.0);
 }";
-static FS_SRC: &str = "
+static FS_SRC: &'static str = "
 #version 150
 out vec4 out_color;
 void main() {

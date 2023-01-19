@@ -5,8 +5,14 @@ use eframe::egui;
 use bingus_ui::module_widget;
 use jni::JNIEnv;
 use jni_mappings::{get_javavm, MappingsManager};
+use once_cell::sync::OnceCell;
+use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}};
 
 use crate::{message_box, MODULES};
+
+
+static mut CLICKGUI_CONTEXT: OnceCell<HGLRC> = OnceCell::new();
+static mut CLICKGUI_HDC: OnceCell<HDC> = OnceCell::new();
 
 pub struct BingusClient {
     modules: Arc<Mutex<Vec<BingusModule>>>,
@@ -22,13 +28,33 @@ impl BingusClient {
 
 impl eframe::App for BingusClient {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        let _ = unsafe {
+            CLICKGUI_HDC.get_or_init(|| wglGetCurrentDC())
+        };
+        let _ = unsafe {
+            CLICKGUI_CONTEXT.get_or_init(|| wglGetCurrentContext())
+        };
+
+
+
+
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("bingushack");
             ui.separator();
-            for module in self.modules.lock().unwrap().iter_mut() {
-                ui.add(module_widget(module));
+            for (i, module) in self.modules.lock().unwrap().iter_mut().enumerate() {
+                ui.push_id(i, |ui| {
+                    ui.add(module_widget(module));
+                });
             }
         });
+
+
+
+        unsafe {
+            let hdc = *CLICKGUI_HDC.get().unwrap();
+            let context = CLICKGUI_CONTEXT.get_mut().unwrap();
+            wglMakeCurrent(hdc, *context);
+        }
     }
 }
 

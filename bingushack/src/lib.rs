@@ -140,8 +140,6 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
                 check
             }
         } as *const _);
-
-        // compile the shaders
     });
 
     if let Some(modules) = MODULES.get() {
@@ -154,10 +152,12 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
                     module.render();
                 }
             }
-
-            let local_old_context = OLD_CONTEXT.get_mut().unwrap();
-            wglMakeCurrent(hdc, *local_old_context.get_mut());
         }
+    }
+
+    unsafe {
+        let local_old_context = OLD_CONTEXT.get_mut().unwrap();
+        wglMakeCurrent(hdc, *local_old_context.get_mut());
     }
 
     call_original!(hdc)
