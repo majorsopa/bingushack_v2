@@ -25,10 +25,32 @@ impl BingusSetting {
     }
 }
 
+impl From<SettingsType> for BingusSetting {
+    fn from(setting: SettingsType) -> Self {
+        match setting {
+            SettingsType::Bool(value) => BingusSetting::BoolSetting(value.into()),
+            SettingsType::Int(value) => BingusSetting::IntSetting(value.into()),
+            _ => panic!("tried to convert non bool or int setting to bingus setting"),
+        }
+    }
+}
+
+impl From<&mut SettingsType> for &mut BingusSetting {
+    fn from(setting: &mut SettingsType) -> Self {
+        match setting {
+            SettingsType::Bool(value) => unsafe { std::mem::transmute(value) },
+            SettingsType::Int(value) => unsafe { std::mem::transmute(value) },
+            _ => panic!("tried to convert non bool or int setting to bingus setting"),
+        }
+    }
+}
+
 
 
 // todo make all a macro
 mod settings_types {
+    use super::BingusSetting;
+
     pub enum SettingsType {
         Bool(bool),
         Int(u32),
@@ -57,10 +79,11 @@ mod settings_types {
         }
     }
 
-    impl<'a> Into<&'a mut bool> for &mut SettingsType {
+    // lifetime change
+    impl<'a> Into<&'a mut bool> for &'a mut SettingsType {
         fn into(self) -> &'a mut bool {
             match self {
-                SettingsType::Bool(value) => unsafe { std::mem::transmute(value) },
+                SettingsType::Bool(value) => value,
                 _ => panic!("tried to convert non bool setting to bool"),
             }
         }

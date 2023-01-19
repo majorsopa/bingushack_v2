@@ -4,9 +4,9 @@ use eframe::egui;
 use crate::toggle;
 
 fn setting_ui(ui: &mut egui::Ui, setting: &mut (BingusSetting, &'static str)) -> egui::Response {
+    ui.label(setting.1);
     match setting.0 {
         BingusSetting::BoolSetting(_) => {
-            ui.label(setting.1);
             ui.add(toggle(setting.0.get_value_mut().into()))
         }
         BingusSetting::IntSetting(_) => {

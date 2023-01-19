@@ -1,4 +1,4 @@
-use std::{rc::Rc, sync::{Mutex, Arc}, cell::RefCell};
+use std::{rc::Rc, sync::{Mutex, Arc}};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
@@ -9,11 +9,11 @@ use jni_mappings::{get_javavm, MappingsManager};
 use crate::message_box;
 
 pub struct BingusClient {
-    modules: Arc<Mutex<RefCell<Vec<BingusModule>>>>,
+    modules: Arc<Mutex<Vec<BingusModule>>>,
 }
 
 impl BingusClient {
-    pub fn new(modules: Arc<Mutex<RefCell<Vec<BingusModule>>>>) -> Self {
+    pub fn new(modules: Arc<Mutex<Vec<BingusModule>>>) -> Self {
         Self {
             modules,
         }
@@ -25,7 +25,7 @@ impl eframe::App for BingusClient {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("bingushack");
             ui.separator();
-            for module in &mut *(*self.modules.lock().unwrap()).borrow_mut() {
+            for module in self.modules.lock().unwrap().iter_mut() {
                 ui.add(module_widget(module));
             }
         });
@@ -33,7 +33,8 @@ impl eframe::App for BingusClient {
 }
 
 pub fn run_client() {
-    let modules = Arc::new(Mutex::new(RefCell::new(populate_modules())));
+    let modules = populate_modules();
+    let modules = Arc::new(Mutex::new(modules));
     let app = BingusClient::new(Arc::clone(&modules));
 
     let options = eframe::NativeOptions::default();
@@ -45,10 +46,9 @@ pub fn run_client() {
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
         let mappings_manager = MappingsManager::new(jni_env);
         loop {
-            for module in &mut *(*modules.lock().unwrap()).borrow_mut() {
+            for module in modules.lock().unwrap().iter_mut() {
                 if module.get_enabled().0.get_value().into() {
                     module.tick(jni_env, &mappings_manager);
-                    message_box("brah2");
                 }
             }
 

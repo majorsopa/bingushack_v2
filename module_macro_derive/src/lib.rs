@@ -18,7 +18,7 @@ struct Opts {
     on_disable_method: FnHelper,
     on_load_method: FnHelper,
     on_unload_method: FnHelper,
-    settings_list_field_names: SettingsListHelper,
+    settings_list_fields: SettingsListHelper,
 }
 
 #[proc_macro_derive(BingusModuleTrait, attributes(bingus_module))]
@@ -104,13 +104,16 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         let get = quote! {&self};
 
         let mut settings_list = quote! {};
-        let mut mut_settings_list = quote! {};
+        let mut mut_settings_list_with_names = quote! {};
 
-        let settings_list_field_names = opts.settings_list_field_names.inner.into_iter().map(|x| x.inner).collect::<Vec<_>>();
+        let settings_list_fields = opts.settings_list_fields.inner.into_iter().map(|x| x.inner).collect::<Vec<_>>();
 
-        for setting in settings_list_field_names {
+        for setting in settings_list_fields {
             settings_list.extend(quote! {self.#setting,});
-            mut_settings_list.extend(quote! {&mut self.#setting,});
+            mut_settings_list_with_names.extend(quote! {{
+                let name = self.#setting.1;
+                (&mut self.#setting.0, name)
+            },});
         }
 
         
@@ -121,16 +124,18 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
                     self.__enabled_bool_setting
                 }
 
-                fn get_enabled_mut(&mut self) -> &mut (BingusSetting, &'static str) {
-                    &mut self.__enabled_bool_setting
+                fn get_enabled_mut(&mut self) -> (&mut BingusSetting, &'static str) {
+                    let name = self.__enabled_bool_setting.1;
+
+                    (&mut self.__enabled_bool_setting.0, name)
                 }
 
                 fn get_settings(#get) -> Vec<(BingusSetting, &'static str)> {
                     vec![#settings_list]
                 }
 
-                fn get_settings_mut(&mut self) -> Vec<&mut (BingusSetting, &'static str)> {
-                    vec![#mut_settings_list]
+                fn get_settings_mut(&mut self) -> Vec<(&mut BingusSetting, &'static str)> {
+                    vec![#mut_settings_list_with_names]
                 }
             }
         }
