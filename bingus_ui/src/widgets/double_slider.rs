@@ -585,7 +585,7 @@ fn logaritmic_zero_cutoff(min: f64, max: f64) -> f64 {
     };
 
     let cutoff = min_magnitude / (min_magnitude + max_magnitude);
-    assert!(0.0 <= cutoff && cutoff <= 1.0);
+    assert!((0.0..=1.0).contains(&cutoff));
     cutoff
 }
 

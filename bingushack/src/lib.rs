@@ -140,7 +140,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
             }
         } as *const _);
 
-        let _ = ESP_SHADER.get_or_init(|| compile_triangle());
+        let _ = ESP_SHADER.get_or_init(compile_triangle);
     });
 
     if let Some(modules) = MODULES.get() {

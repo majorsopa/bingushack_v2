@@ -1,14 +1,14 @@
-use std::{rc::Rc, sync::{Mutex, Arc}};
+use std::sync::{Mutex, Arc};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
 use bingus_ui::module_widget;
-use jni::JNIEnv;
+
 use jni_mappings::{get_javavm, MappingsManager};
 use once_cell::sync::OnceCell;
 use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}};
 
-use crate::{message_box, MODULES};
+use crate::MODULES;
 
 
 static mut CLICKGUI_CONTEXT: OnceCell<HGLRC> = OnceCell::new();
@@ -60,7 +60,7 @@ impl eframe::App for BingusClient {
 
 pub fn run_client() {
     let modules = MODULES.get_or_init(|| Arc::new(Mutex::new(populate_modules())));
-    let app = BingusClient::new(Arc::clone(&modules));
+    let app = BingusClient::new(Arc::clone(modules));
 
     let options = eframe::NativeOptions::default();
 
