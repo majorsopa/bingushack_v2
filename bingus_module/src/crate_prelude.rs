@@ -8,3 +8,4 @@ pub use module_macro_derive::*;
 pub use bingus_setting::prelude::*;
 pub use crate::module::shaders::*;
 pub use crate::module::bingus_module_trait::MakeNewBingusModule;
+pub use jni::objects::{JValue, JObject};

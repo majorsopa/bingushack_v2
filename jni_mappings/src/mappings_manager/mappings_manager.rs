@@ -71,6 +71,7 @@ impl MappingsManager<'_> {
 
             add_method!("getInventory", "fE", "()Lbwo;", false);
             add_method!("getOffHandStack", "eG", "()Lcdt;", false);
+            add_method!("displayClientMessage", "a", "(Lss;Z)V", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);

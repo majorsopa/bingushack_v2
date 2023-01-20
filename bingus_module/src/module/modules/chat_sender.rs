@@ -11,16 +11,17 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
         call_method_or_get_field!(env, minecraft_client, "getInstance", true, &[]).unwrap().l().unwrap()
     );
 
-    let in_game_hud = mappings_manager.get("InGameHud").unwrap();
+    let player = mappings_manager.get("PlayerEntity").unwrap();
     apply_object!(
-        in_game_hud,
-        call_method_or_get_field!(env, minecraft_client, "inGameHud", false).unwrap().l().unwrap()
-    );
-
-    let chat_hud = mappings_manager.get("ChatHud").unwrap();
-    apply_object!(
-        chat_hud,
-        call_method_or_get_field!(env, in_game_hud, "chatHud", false, &[]).unwrap().l().unwrap()
+        player,
+        {
+            let check_if_null = call_method_or_get_field!(env, minecraft_client, "player", false).unwrap().l().unwrap();
+            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
+                return;
+            } else {
+                check_if_null
+            }
+        }
     );
 
     let bingus_text = mappings_manager.get("Text").unwrap();
@@ -29,13 +30,10 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
         call_method_or_get_field!(env, bingus_text, "of", true, &[JValue::from(env.new_string("bingus").unwrap())]).unwrap().l().unwrap()
     );
 
-    call_method_or_get_field!(env, chat_hud, "addMessage", false, &[
+    call_method_or_get_field!(env, player, "displayClientMessage", false, &[
         JValue::from(bingus_text.get_object().unwrap()),
-        JValue::Void,
-        JValue::from(200),
-        JValue::Void,
-        JValue::from(false),
-        ]).unwrap();
+        JValue::from(false)
+    ]).unwrap();
 }
 
 
