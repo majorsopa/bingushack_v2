@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use jni::objects::JValue;
+use jni::objects::{JValue, JObject};
 use rand::Rng;
 use crate::crate_prelude::*;
 use mappings_macro::{apply_object, call_method_or_get_field};
@@ -45,7 +45,14 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
     let player = mappings_manager.get("PlayerEntity").unwrap();
     apply_object!(
         player,
-        call_method_or_get_field!(env, minecraft_client, "player", false).unwrap().l().unwrap()
+        {
+            let check_if_null = call_method_or_get_field!(env, minecraft_client, "player", false).unwrap().l().unwrap();
+            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
+                return;
+            } else {
+                check_if_null
+            }
+        }
     );
 
     let inventory = mappings_manager.get("Inventory").unwrap();
