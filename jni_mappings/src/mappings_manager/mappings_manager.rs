@@ -62,11 +62,27 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "MinecraftClient", "ejf", {
             add_field!("player", "t", "Lfcz;", false);
             add_field!("inGameHud", "l", "Lekn;", false);
+            add_field!("interactionManager", "r", "Lezd;", false);
 
             add_method!("getInstance", "N", "()Lejf;", true);
         });
         add_mapping!(new_self, "PlayerEntity", "bwp", {
-            
+            add_field!("currentScreenHandler", "bU", "Lbzg;", false);
+
+            add_method!("getInventory", "fE", "()Lbwo;", false);
+            add_method!("getOffHandStack", "eG", "()Lcdt;", false);
+        });
+        add_mapping!(new_self, "ItemStack", "cdt", {
+            add_method!("getItem", "c", "()Lcdp;", false);
+        });
+        add_mapping!(new_self, "Item", "cdp", {
+            add_method!("getRawId", "a", "(Lcdp;)I", true);
+        });
+        add_mapping!(new_self, "Items", "cdw", {
+            add_field!("TOTEM_OF_UNDYING", "tV", "Lcdp;", true);
+        });
+        add_mapping!(new_self, "Inventory", "bwo", {
+            add_method!("getStack", "a", "(I)Lcdt;", false);
         });
         add_mapping!(new_self, "InGameHud", "ekn", {
             add_method!("chatHud", "d", "()Lela;", false);
@@ -76,6 +92,15 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "Text", "ss", {
             add_method!("of", "a", "(Ljava/lang/String;)Lss;", true);
+        });
+        add_mapping!(new_self, "InteractionManager", "ezd", {
+            add_method!("clickSlot", "a", "(IIILbzp;Lbwp;)V", false);
+        });
+        add_mapping!(new_self, "ScreenHandler", "bzg", {
+            add_field!("syncId", "j", "I", false);
+        });
+        add_mapping!(new_self, "SlotActionType", "bzp", {
+            add_field!("PICKUP", "a", "Lbzp;", true);
         });
 
         new_self

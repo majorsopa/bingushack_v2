@@ -77,7 +77,7 @@ pub fn run_client() {
                 }
             }
 
-            std::thread::sleep(std::time::Duration::from_millis(5));
+            std::thread::sleep(std::time::Duration::from_millis(1));
             if modules_rx.try_recv().is_ok() {
                 break;
             }

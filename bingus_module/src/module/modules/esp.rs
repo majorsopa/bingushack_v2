@@ -20,10 +20,10 @@ fn render(_esp: &mut Esp) {
     unsafe {
         // Create Vertex Array Object
         gl::GenVertexArrays(1, &mut vao);
-        gl::BindVertexArray(vao);  // crash
+        gl::BindVertexArray(vao);
 
 
-        
+
         // Create a Vertex Buffer Object and copy the vertex data to it
         gl::GenBuffers(1, &mut vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, vbo);

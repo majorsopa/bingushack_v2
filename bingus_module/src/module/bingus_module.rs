@@ -6,6 +6,7 @@ use super::bingus_module_trait::MakeNewBingusModule;
 pub enum BingusModule {
     ChatSender,
     Esp,
+    Autototem,
 }
 
 pub fn populate_modules() -> Vec<BingusModule> {
@@ -13,6 +14,7 @@ pub fn populate_modules() -> Vec<BingusModule> {
 
     modules.push(ChatSender::new().into());
     modules.push(Esp::new().into());
+    modules.push(Autototem::new().into());
 
     modules
 }
