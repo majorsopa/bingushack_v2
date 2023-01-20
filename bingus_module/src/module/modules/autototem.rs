@@ -21,8 +21,12 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
         None => {
             let new_random_delay: u128 = {
                 let bounds = autototem.delay_setting.0.get_range();
-                let mut rng = rand::thread_rng();
-                rng.gen_range((bounds[0] as u128)..(bounds[1] as u128))
+                if bounds[0] == bounds[1] {
+                    bounds[0] as u128
+                } else {
+                    let mut rng = rand::thread_rng();
+                    rng.gen_range((bounds[0] as u128)..(bounds[1] as u128))
+                }
             };
             autototem.randomly_chosen_time = Some(new_random_delay);
             return;
@@ -104,7 +108,7 @@ pub struct Autototem {
 impl MakeNewBingusModule for Autototem {
     fn new() -> Self {
         Self {
-            delay_setting: (BingusSetting::RangeSetting([500.0, 1000.0].into()), "delay (ms)", Some([0.0, 5000.0])),
+            delay_setting: (BingusSetting::RangeSetting([500.0, 1000.0].into()), "delay (ms)", Some([1.0, 5000.0])),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
