@@ -64,6 +64,7 @@ impl MappingsManager<'_> {
             add_field!("inGameHud", "l", "Lekn;", false);
             add_field!("interactionManager", "r", "Lezd;", false);
 
+            add_method!("getTickDelta", "av", "()F", false);
             add_method!("getInstance", "N", "()Lejf;", true);
         });
         add_mapping!(new_self, "PlayerEntity", "bwp", {
@@ -72,6 +73,8 @@ impl MappingsManager<'_> {
             add_method!("getInventory", "fE", "()Lbwo;", false);
             add_method!("getOffHandStack", "eG", "()Lcdt;", false);
             add_method!("displayClientMessage", "a", "(Lss;Z)V", false);
+            add_method!("isUsingItem", "eZ", "()Z", false);
+            add_method!("getAttackCooldownProgress", "w", "(F)F", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);
@@ -96,12 +99,23 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "InteractionManager", "ezd", {
             add_method!("clickSlot", "a", "(IIILbzp;Lbwp;)V", false);
+            add_method!("attackEntity", "a", "(Lbwp;Lbdr;)V", false);
         });
         add_mapping!(new_self, "ScreenHandler", "bzg", {
             add_field!("syncId", "j", "I", false);
         });
         add_mapping!(new_self, "SlotActionType", "bzp", {
             add_field!("PICKUP", "a", "Lbzp;", true);
+        });
+        add_mapping!(new_self, "Optional", "java/util/Optional", {
+            add_method!("isPresent", "isPresent", "()Z", false);
+            add_method!("get", "get", "()Ljava/lang/Object;", false);
+        });
+        add_mapping!(new_self, "DebugRenderer", "fgz", {
+            add_method!("getTargetedEntity", "a", "(Lbdr;I)Ljava/util/Optional;", true);
+        });
+        add_mapping!(new_self, "Entity", "bdr", {
+            add_method!("isAlive", "br", "()Z", false);
         });
 
         new_self
