@@ -5,14 +5,13 @@ use eframe::egui;
 use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
-use once_cell::sync::OnceCell;
 use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}};
 
 use crate::MODULES;
 
 
-static mut CLICKGUI_CONTEXT: OnceCell<HGLRC> = OnceCell::new();
-static mut CLICKGUI_HDC: OnceCell<HDC> = OnceCell::new();
+static mut CLICKGUI_CONTEXT: Option<HGLRC> = None;
+static mut CLICKGUI_HDC: Option<HDC> = None;
 
 pub struct BingusClient {
     modules: Arc<Mutex<Vec<BingusModule>>>,
@@ -28,13 +27,16 @@ impl BingusClient {
 
 impl eframe::App for BingusClient {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        let _ = unsafe {
-            CLICKGUI_HDC.get_or_init(|| wglGetCurrentDC())
-        };
-        let _ = unsafe {
-            CLICKGUI_CONTEXT.get_or_init(|| wglGetCurrentContext())
-        };
-
+        if unsafe { CLICKGUI_HDC.is_none() } {
+            unsafe {
+                CLICKGUI_HDC = Some(wglGetCurrentDC());
+            }
+        }
+        if unsafe { CLICKGUI_CONTEXT.is_none() } {
+            unsafe {
+                CLICKGUI_CONTEXT = Some(wglGetCurrentContext());
+            }
+        }
 
 
 
@@ -51,8 +53,8 @@ impl eframe::App for BingusClient {
 
 
         unsafe {
-            let hdc = *CLICKGUI_HDC.get().unwrap();
-            let context = CLICKGUI_CONTEXT.get_mut().unwrap();
+            let hdc = *CLICKGUI_HDC.as_ref().unwrap();
+            let context = CLICKGUI_CONTEXT.as_mut().unwrap();
             wglMakeCurrent(hdc, *context);
         }
     }
@@ -88,4 +90,8 @@ pub fn run_client() {
     eframe::run_native("bingushack", options, Box::new(|_cc| Box::new(app)));
     modules_tx.send(()).unwrap();
     running_modules.join().unwrap();
+    unsafe {
+        CLICKGUI_CONTEXT = None;
+        CLICKGUI_HDC = None;
+    }
 }
