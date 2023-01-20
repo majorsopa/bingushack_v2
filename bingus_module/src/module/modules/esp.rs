@@ -68,7 +68,7 @@ fn render(_esp: &mut Esp) {
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "ESP", render_method = "render(self)")]
+#[bingus_module(name = "ESP (doesn't work)", render_method = "render(self)")]
 pub struct Esp {
 
 }

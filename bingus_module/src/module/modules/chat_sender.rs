@@ -41,7 +41,7 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "ChatSender", tick_method = "tick(_env, _mappings_manager)", settings_list_fields = "[bool_setting]")]
+#[bingus_module(name = "ChatSender (useless testing module)", tick_method = "tick(_env, _mappings_manager)", settings_list_fields = "[bool_setting]")]
 pub struct ChatSender {
     bool_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
 }

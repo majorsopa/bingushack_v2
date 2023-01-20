@@ -12,9 +12,9 @@ pub enum BingusModule {
 pub fn populate_modules() -> Vec<BingusModule> {
     let mut modules = Vec::new();
 
+    modules.push(Autototem::new().into());
     modules.push(ChatSender::new().into());
     modules.push(Esp::new().into());
-    modules.push(Autototem::new().into());
 
     modules
 }
