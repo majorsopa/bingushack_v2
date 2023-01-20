@@ -8,3 +8,17 @@ pub fn get_minecraft_client<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsM
     );
     minecraft_client
 }
+
+pub fn get_interaction_manager<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> &'a ClassMapping<'a> {
+    let interaction_manager = mappings_manager.get("InteractionManager").unwrap();
+    apply_object!(
+        interaction_manager,
+        call_method_or_get_field!(
+            env,
+            minecraft_client,
+            "interactionManager",
+            false
+        ).unwrap().l().unwrap()
+    );
+    interaction_manager
+}
