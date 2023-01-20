@@ -1,5 +1,5 @@
 pub use crate::prelude::*;
-
+pub use crate::utilities::*;
 pub use jni::JNIEnv;
 pub use jni_mappings::MappingsManager;
 pub use std::rc::Rc;
@@ -9,3 +9,5 @@ pub use bingus_setting::prelude::*;
 pub use crate::module::shaders::*;
 pub use crate::module::bingus_module_trait::MakeNewBingusModule;
 pub use jni::objects::{JValue, JObject};
+pub use mappings_macro::{apply_object, call_method_or_get_field};
+pub use jni_mappings::ClassMapping;

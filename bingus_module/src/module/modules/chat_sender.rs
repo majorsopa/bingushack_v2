@@ -1,34 +1,17 @@
 use jni::objects::JValue;
-use mappings_macro::{apply_object, call_method_or_get_field};
 
 use crate::crate_prelude::*;
 
 
 fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
-    let minecraft_client = mappings_manager.get("MinecraftClient").unwrap();
-    apply_object!(
-        minecraft_client,
-        call_method_or_get_field!(env, minecraft_client, "getInstance", true, &[]).unwrap().l().unwrap()
-    );
+    let minecraft_client = get_minecraft_client(env, mappings_manager);
 
-    let player = mappings_manager.get("PlayerEntity").unwrap();
-    apply_object!(
-        player,
-        {
-            let check_if_null = call_method_or_get_field!(env, minecraft_client, "player", false).unwrap().l().unwrap();
-            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
-                return;
-            } else {
-                check_if_null
-            }
-        }
-    );
+    let player = match get_player_checked(env, mappings_manager, minecraft_client) {
+        Some(player) => player,
+        None => return,
+    };
 
-    let bingus_text = mappings_manager.get("Text").unwrap();
-    apply_object!(
-        bingus_text,
-        call_method_or_get_field!(env, bingus_text, "of", true, &[JValue::from(env.new_string("bingus").unwrap())]).unwrap().l().unwrap()
-    );
+    let bingus_text = make_minecraft_text_object(env, mappings_manager, "bingus");
 
     call_method_or_get_field!(env, player, "displayClientMessage", false, &[
         JValue::from(bingus_text.get_object().unwrap()),

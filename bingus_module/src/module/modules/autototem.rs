@@ -2,7 +2,6 @@ use std::time::SystemTime;
 
 use rand::Rng;
 use crate::crate_prelude::*;
-use mappings_macro::{apply_object, call_method_or_get_field};
 
 fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManager) {
     if autototem.time_since_lost_totem.is_none() {
@@ -35,24 +34,12 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
 
 
-    let minecraft_client = mappings_manager.get("MinecraftClient").unwrap();
-    apply_object!(
-        minecraft_client,
-        call_method_or_get_field!(env, minecraft_client, "getInstance", true, &[]).unwrap().l().unwrap()
-    );
+    let minecraft_client = get_minecraft_client(env, mappings_manager);
 
-    let player = mappings_manager.get("PlayerEntity").unwrap();
-    apply_object!(
-        player,
-        {
-            let check_if_null = call_method_or_get_field!(env, minecraft_client, "player", false).unwrap().l().unwrap();
-            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
-                return;
-            } else {
-                check_if_null
-            }
-        }
-    );
+    let player = match get_player_checked(env, mappings_manager, minecraft_client) {
+        Some(player) => player,
+        None => return,
+    };
 
     let inventory = mappings_manager.get("Inventory").unwrap();
     apply_object!(
