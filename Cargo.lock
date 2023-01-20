@@ -232,6 +232,7 @@ dependencies = [
  "mappings_macro",
  "module_macro_derive",
  "once_cell",
+ "rand",
 ]
 
 [[package]]

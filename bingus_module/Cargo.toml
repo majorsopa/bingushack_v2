@@ -12,3 +12,4 @@ bingus_setting = { path = "../bingus_setting" }
 mappings_macro = { path = "../mappings_macro" }
 gl = "0.14.0"
 once_cell = "1.17.0"
+rand = "0.8.5"

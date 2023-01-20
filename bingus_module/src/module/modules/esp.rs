@@ -76,7 +76,7 @@ pub struct Esp {
 impl MakeNewBingusModule for Esp {
     fn new() -> Self {
         Self {
-            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled"),
+            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
         }
     }
 }

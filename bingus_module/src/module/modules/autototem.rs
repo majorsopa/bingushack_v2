@@ -1,8 +1,41 @@
+use std::time::SystemTime;
+
 use jni::objects::JValue;
+use rand::Rng;
 use crate::crate_prelude::*;
 use mappings_macro::{apply_object, call_method_or_get_field};
 
-fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
+fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManager) {
+    if autototem.time_since_lost_totem.is_none() {
+        autototem.time_since_lost_totem = Some(SystemTime::now());
+    }
+    match autototem.randomly_chosen_time {
+        Some(time) => {
+            let time_since_lost_totem = autototem.time_since_lost_totem.unwrap();
+            let time_since_lost_totem = time_since_lost_totem.elapsed().unwrap().as_millis();
+            if time_since_lost_totem >= time {
+                autototem.time_since_lost_totem = None;
+                autototem.randomly_chosen_time = None;
+            } else {
+                return;
+            }
+        }
+        None => {
+            let new_random_delay: u128 = {
+                let bounds = autototem.delay_setting.0.get_range();
+                let mut rng = rand::thread_rng();
+                rng.gen_range((bounds[0] as u128)..(bounds[1] as u128))
+            };
+            autototem.randomly_chosen_time = Some(new_random_delay);
+            return;
+        }
+    }
+
+
+
+
+
+
     let minecraft_client = mappings_manager.get("MinecraftClient").unwrap();
     apply_object!(
         minecraft_client,
@@ -176,15 +209,20 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Autototem", tick_method = "tick(_env, _mappings_manager)")]
+#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting]")]
 pub struct Autototem {
-    
+    delay_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
+    randomly_chosen_time: Option<u128>,
+    time_since_lost_totem: Option<SystemTime>,
 }
 
 impl MakeNewBingusModule for Autototem {
     fn new() -> Self {
         Self {
-            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled"),
+            delay_setting: (BingusSetting::RangeSetting([500.0, 1000.0].into()), "delay (ms)", Some([0.0, 5000.0])),
+            randomly_chosen_time: None,
+            time_since_lost_totem: None,
+            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
         }
     }
 }

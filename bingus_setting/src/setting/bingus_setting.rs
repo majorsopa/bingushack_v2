@@ -6,6 +6,8 @@ pub use settings::*;
 pub enum BingusSetting {
     BoolSetting,
     IntSetting,
+    FloatSetting,
+    RangeSetting,
 }
 
 impl BingusSetting {
@@ -20,6 +22,48 @@ impl BingusSetting {
         match self {
             BingusSetting::BoolSetting(setting) => setting.get_value_mut(),
             _ => panic!("Not a bool setting"),
+        }
+    }
+
+    pub fn get_int(&self) -> u32 {
+        match self {
+            BingusSetting::IntSetting(setting) => setting.get_value(),
+            _ => panic!("Not a int setting"),
+        }
+    }
+
+    pub fn get_int_mut(&mut self) -> &mut u32 {
+        match self {
+            BingusSetting::IntSetting(setting) => setting.get_value_mut(),
+            _ => panic!("Not a int setting"),
+        }
+    }
+
+    pub fn get_float(&self) -> f32 {
+        match self {
+            BingusSetting::FloatSetting(setting) => setting.get_value(),
+            _ => panic!("Not a float setting"),
+        }
+    }
+
+    pub fn get_float_mut(&mut self) -> &mut f32 {
+        match self {
+            BingusSetting::FloatSetting(setting) => setting.get_value_mut(),
+            _ => panic!("Not a float setting"),
+        }
+    }
+
+    pub fn get_range(&self) -> [f32; 2] {
+        match self {
+            BingusSetting::RangeSetting(setting) => setting.get_value(),
+            _ => panic!("Not a range setting"),
+        }
+    }
+
+    pub fn get_range_mut(&mut self) -> &mut [f32; 2] {
+        match self {
+            BingusSetting::RangeSetting(setting) => setting.get_value_mut(),
+            _ => panic!("Not a range setting"),
         }
     }
 }

@@ -43,14 +43,14 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
 #[add_bingus_fields]
 #[bingus_module(name = "ChatSender", tick_method = "tick(_env, _mappings_manager)", settings_list_fields = "[bool_setting]")]
 pub struct ChatSender {
-    bool_setting: (BingusSetting, &'static str),
+    bool_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
 }
 
 impl MakeNewBingusModule for ChatSender {
     fn new() -> Self {
         Self {
-            bool_setting: (BingusSetting::BoolSetting(false.into()), "testing name"),
-            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled"),
+            bool_setting: (BingusSetting::BoolSetting(false.into()), "testing name", None),
+            __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
         }
     }
 }

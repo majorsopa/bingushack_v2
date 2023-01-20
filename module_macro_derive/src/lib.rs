@@ -122,7 +122,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             settings_list.extend(quote! {self.#setting,});
             mut_settings_list_with_names.extend(quote! {{
                 let name = self.#setting.1;
-                (&mut self.#setting.0, name)
+                let range = self.#setting.2;
+                (&mut self.#setting.0, name, range)
             },});
         }
 
@@ -130,21 +131,21 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
         {
             quote!{
-                fn get_enabled(&self) -> (BingusSetting, &'static str) {
+                fn get_enabled(&self) -> (BingusSetting, &'static str, Option<[f32; 2]>) {
                     self.__enabled_bool_setting
                 }
 
-                fn get_enabled_mut(&mut self) -> (&mut BingusSetting, &'static str) {
+                fn get_enabled_mut(&mut self) -> (&mut BingusSetting, &'static str, Option<[f32; 2]>) {
                     let name = self.__enabled_bool_setting.1;
-
-                    (&mut self.__enabled_bool_setting.0, name)
+                    let range = self.__enabled_bool_setting.2;
+                    (&mut self.__enabled_bool_setting.0, name, range)
                 }
 
-                fn get_settings(#get) -> Vec<(BingusSetting, &'static str)> {
+                fn get_settings(#get) -> Vec<(BingusSetting, &'static str, Option<[f32; 2]>)> {
                     vec![#settings_list]
                 }
 
-                fn get_settings_mut(&mut self) -> Vec<(&mut BingusSetting, &'static str)> {
+                fn get_settings_mut(&mut self) -> Vec<(&mut BingusSetting, &'static str, Option<[f32; 2]>)> {
                     vec![#mut_settings_list_with_names]
                 }
             }
@@ -174,7 +175,7 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         .named
                         .push(syn::Field::parse_named.parse2(
                             quote! {
-                                __enabled_bool_setting: (BingusSetting, &'static str)
+                                __enabled_bool_setting: (BingusSetting, &'static str, Option<[f32; 2]>)
                             }
                         ).unwrap());
                 }   
