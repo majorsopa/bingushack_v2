@@ -83,7 +83,6 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
                         return;
                     } else {
                         let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
-                        send_chat_message(env, mappings_manager, player, &*format!("swapped: {}", swapped));
                         if !swapped {
                             swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
                             autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
