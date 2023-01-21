@@ -11,10 +11,7 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
 
     let bingus_text = make_minecraft_text_object(env, mappings_manager, "bingus");
 
-    call_method_or_get_field!(env, player, "displayClientMessage", false, &[
-        JValue::from(bingus_text.get_object().unwrap()),
-        JValue::from(false)
-    ]).unwrap();
+    send_chat_message(env, mappings_manager, player, bingus_text);
 }
 
 
