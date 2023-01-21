@@ -83,14 +83,11 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
                         return;
                     } else {
                         let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
+                        send_chat_message(env, mappings_manager, player, &*format!("swapped: {}", swapped));
                         if !swapped {
                             swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
                             autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
                             return;
-                        } else {
-                            send_chat_message(env, mappings_manager, player, "resetting slot");
-                            set_selected_slot(env, inventory, prev_slot);
-                            // no return here is important
                         }
                     }
                 }
@@ -99,7 +96,13 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
             }
         }
     }
-    autototem.hotbar_swap_prev_slot = None;
+    if autototem.hotbar_swap_prev_slot.is_some() {
+        let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
+        if swapped {
+            set_selected_slot(env, inventory, prev_slot);
+        }
+        autototem.hotbar_swap_prev_slot = None;
+    }
 }
 
 #[derive(BingusModuleTrait)]
