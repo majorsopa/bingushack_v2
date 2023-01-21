@@ -18,7 +18,7 @@ pub fn click_slot<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, interaction_man
         &[
             JValue::from(sync_id),
             JValue::from(slot),
-            JValue::from(0),
+            JValue::from(button),
             slot_action_type,
             JValue::from(player.get_object().unwrap())
         ]
@@ -54,10 +54,14 @@ pub fn swap_offhand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, 
         true
     ).unwrap();
 
-    let slot = slot + if slot < 9 { 36 } else { 0 };
-    // pick up
-    click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
 
-    // put down
-    click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
+    if slot < 9 {
+        click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
+    } else {
+        // pick up
+        click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
+
+        // put down
+        click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
+    }
 }

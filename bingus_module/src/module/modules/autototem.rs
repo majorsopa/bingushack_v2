@@ -74,22 +74,24 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
         if found_totem_slots.len() > 0 {
             if autototem.hotbar_only.0.get_bool() {
                 let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
-                let hotbar_totem = if let Some(hotbar_totem) = hotbar_totem {
-                    *hotbar_totem
-                } else {
-                    return;
-                };
-                if autototem.hotbar_swap_prev_slot.is_none() {
-                    autototem.hotbar_swap_prev_slot = Some((get_selected_slot(env, inventory), false));
-                    set_selected_slot(env, inventory, hotbar_totem);
-                } else {
-                    let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
-                    if !swapped {
-                        swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
-                        autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
+                if let Some(hotbar_totem) = hotbar_totem {
+                    let hotbar_totem = *hotbar_totem;
+
+                    if autototem.hotbar_swap_prev_slot.is_none() {
+                        autototem.hotbar_swap_prev_slot = Some((get_selected_slot(env, inventory), false));
+                        set_selected_slot(env, inventory, hotbar_totem);
+                        return;
                     } else {
-                        set_selected_slot(env, inventory, prev_slot);
-                        autototem.hotbar_swap_prev_slot = None;
+                        let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
+                        if !swapped {
+                            swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
+                            autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
+                            return;
+                        } else {
+                            send_chat_message(env, mappings_manager, player, "resetting slot");
+                            set_selected_slot(env, inventory, prev_slot);
+                            // no return here is important
+                        }
                     }
                 }
             } else {
@@ -97,6 +99,7 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
             }
         }
     }
+    autototem.hotbar_swap_prev_slot = None;
 }
 
 #[derive(BingusModuleTrait)]
