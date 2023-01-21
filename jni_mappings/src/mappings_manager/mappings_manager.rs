@@ -81,7 +81,6 @@ impl MappingsManager<'_> {
             add_method!("isUsingItem", "eZ", "()Z", false);
             add_method!("getAttackCooldownProgress", "w", "(F)F", false);
             add_method!("swingHand", "a", "(Lbcl;Z)V", false);
-            add_method!("swapHandStacks", "x", "()V", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);

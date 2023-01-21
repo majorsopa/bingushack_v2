@@ -54,9 +54,9 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
 
     if get_raw_id_of_item_object(env, mappings_manager, offhand_item) != totem_of_undying_id {
-        let mut found_totem_slot: Option<i32> = None;
+        let mut found_totem_slots: Vec<i32> = vec![];
 
-        for i in 9..45 {
+        for i in 0..45 {
             let res = {
                 let i_item_stack = get_inventory_slot_item_stack(env, mappings_manager, inventory, i);
 
@@ -66,51 +66,58 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
             };
             
             if res {
-                found_totem_slot = Some(i);
-                break;
+                found_totem_slots.push(i);
             }
         }
 
         // swap totem to offhand
-        if let Some(found_totem_slot) = found_totem_slot {
-            let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
-
-            let current_screen_handler = get_screen_handler(env, mappings_manager, player);
-
-            let sync_id = get_sync_id(env, current_screen_handler);
-
-            let pickup_slot_action = call_method_or_get_field!(
-                env,
-                mappings_manager.get("SlotActionType").unwrap(),
-                "PICKUP",
-                true
-            ).unwrap();
-
-            // call clickSlot
-            // pick up
-            click_slot(env, player, interaction_manager, sync_id, found_totem_slot, pickup_slot_action);
-
-            // put down
-            click_slot(env, player, interaction_manager, sync_id, 45, pickup_slot_action);
+        if found_totem_slots.len() > 0 {
+            if autototem.hotbar_only.0.get_bool() {
+                let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
+                let hotbar_totem = if let Some(hotbar_totem) = hotbar_totem {
+                    *hotbar_totem
+                } else {
+                    return;
+                };
+                if autototem.hotbar_swap_prev_slot.is_none() {
+                    autototem.hotbar_swap_prev_slot = Some((get_selected_slot(env, inventory), false));
+                    set_selected_slot(env, inventory, hotbar_totem);
+                } else {
+                    let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
+                    if !swapped {
+                        swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
+                        autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
+                    } else {
+                        set_selected_slot(env, inventory, prev_slot);
+                        autototem.hotbar_swap_prev_slot = None;
+                    }
+                }
+            } else {
+                swap_offhand(env, mappings_manager, minecraft_client, player, found_totem_slots[0]);
+            }
         }
     }
 }
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting]")]
+#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting, hotbar_only]")]
 pub struct Autototem {
     delay_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
+    hotbar_only: (BingusSetting, &'static str, Option<[f32; 2]>),
     randomly_chosen_time: Option<u128>,
     time_since_lost_totem: Option<SystemTime>,
+    hotbar_swap_prev_slot: Option<(i32, bool)>,
 }
 
 impl MakeNewBingusModule for Autototem {
     fn new() -> Self {
         Self {
             delay_setting: (BingusSetting::RangeSetting([500.0, 1000.0].into()), "delay (ms)", Some([1.0, 5000.0])),
+            hotbar_only: (BingusSetting::BoolSetting(false.into()), "hotbar only", None),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
+            hotbar_swap_prev_slot: None,
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
         }
     }
