@@ -9,7 +9,7 @@ pub fn make_minecraft_text_object<'a>(env: JNIEnv<'a>, mappings_manager: &'a Map
     minecraft_text
 }
 
-pub fn send_chat_message<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, player: &'a ClassMapping, message: &'a ClassMapping) {
+pub fn send_chat_message<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, message: &'a ClassMapping) {
     call_method_or_get_field!(env, player, "displayClientMessage", false, &[
         JValue::from(message.get_object().unwrap()),
         JValue::from(false)
