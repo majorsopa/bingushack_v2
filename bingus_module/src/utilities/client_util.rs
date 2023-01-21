@@ -61,6 +61,24 @@ pub fn facing_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager,
     env.is_same_object(hit_result_type.get_object().unwrap(), entity_hit_result_field_object).unwrap()
 }
 
+pub fn get_targeted_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> Option<&'a ClassMapping<'a>> {
+    let targeted_entity = mappings_manager.get("Entity").unwrap();
+    apply_object!(
+        targeted_entity,
+        call_method_or_get_field!(
+            env,
+            minecraft_client,
+            "targetedEntity",
+            false
+        ).unwrap().l().unwrap()
+    );
+    if env.is_same_object(targeted_entity.get_object().unwrap(), JObject::null()).unwrap() {
+        return None;
+    } else {
+        return Some(targeted_entity);
+    }
+}
+
 pub fn get_tick_delta<'a>(env: JNIEnv<'a>, minecraft_client: &'a ClassMapping) -> f32 {
     call_method_or_get_field!(
         env,

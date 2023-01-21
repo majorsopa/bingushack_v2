@@ -8,11 +8,25 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         None => return,
     };
 
+    let world = mappings_manager.get("ClientWorld").unwrap();
+    apply_object!(
+        world,
+        {
+            let check_if_null = call_method_or_get_field!(env, minecraft_client, "world", false).unwrap().l().unwrap();
+            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
+                return;
+            } else {
+                check_if_null
+            }
+        }
+    );
 
 
-    if !facing_entity(env, mappings_manager, minecraft_client) {
-        return;
-    }
+
+    let targeted_entity = match get_targeted_entity(env, mappings_manager, minecraft_client) {
+        Some(targeted_entity) => targeted_entity,
+        None => return,
+    };
 
     if triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
         return;
@@ -22,6 +36,28 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
+
+
+
+    let attack_packet = mappings_manager.get("PlayerInteractEntityC2SPacket").unwrap();
+    apply_object!(
+        attack_packet,
+        call_method_or_get_field!(
+            env,
+            attack_packet,
+            "attack",
+            true,
+            &[JValue::from(targeted_entity.get_object().unwrap()), JValue::from(false)]
+        ).unwrap().l().unwrap()
+    );
+
+    call_method_or_get_field!(
+        env,
+        world,
+        "sendPacketToServer",
+        false,
+        &[JValue::from(attack_packet.get_object().unwrap())]
+    ).unwrap();
 
 
     call_method_or_get_field!(

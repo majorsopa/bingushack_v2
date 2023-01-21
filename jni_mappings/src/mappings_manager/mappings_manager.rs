@@ -65,6 +65,7 @@ impl MappingsManager<'_> {
             add_field!("interactionManager", "r", "Lezd;", false);
             add_field!("crosshairTarget", "w", "Leac;", false);
             add_field!("world", "s", "Leyz;", false);
+            add_field!("targetedEntity", "v", "Lbdr;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
