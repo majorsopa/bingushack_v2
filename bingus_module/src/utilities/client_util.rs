@@ -60,3 +60,13 @@ pub fn facing_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager,
 
     env.is_same_object(hit_result_type.get_object().unwrap(), entity_hit_result_field_object).unwrap()
 }
+
+pub fn get_tick_delta<'a>(env: JNIEnv<'a>, minecraft_client: &'a ClassMapping) -> f32 {
+    call_method_or_get_field!(
+        env,
+        minecraft_client,
+        "getTickDelta",
+        false,
+        &[]
+    ).unwrap().f().unwrap()
+}

@@ -70,3 +70,41 @@ pub fn get_sync_id<'a>(env: JNIEnv<'a>, screen_handler: &'a ClassMapping) -> i32
         false
     ).unwrap().i().unwrap()
 }
+
+pub fn get_attack_cooldown_progress<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, tick_delta: f32) -> f32 {
+    call_method_or_get_field!(
+        env,
+        player,
+        "getAttackCooldownProgress",
+        false,
+        &[JValue::from(tick_delta)]
+    ).unwrap().f().unwrap()
+}
+
+pub fn is_using_item<'a>(env: JNIEnv<'a>, player: &'a ClassMapping) -> bool {
+    call_method_or_get_field!(
+        env,
+        player,
+        "isUsingItem",
+        false,
+        &[]
+    ).unwrap().z().unwrap()
+}
+
+pub fn swing_hand<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, mappings_manager: &'a MappingsManager, main_hand: bool) {
+    call_method_or_get_field!(
+        env,
+        player,
+        "swingHand",
+        false,
+        &[
+            call_method_or_get_field!(
+                env,
+                mappings_manager.get("Hand").unwrap(),
+                if main_hand { "MAIN_HAND" } else { "OFF_HAND" },
+                true
+            ).unwrap(),
+            JValue::from(false),
+        ]
+    ).unwrap();
+}

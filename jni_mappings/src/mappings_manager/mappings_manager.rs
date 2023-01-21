@@ -64,6 +64,7 @@ impl MappingsManager<'_> {
             add_field!("inGameHud", "l", "Lekn;", false);
             add_field!("interactionManager", "r", "Lezd;", false);
             add_field!("crosshairTarget", "w", "Leac;", false);
+            add_field!("world", "s", "Leyz;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
@@ -78,6 +79,7 @@ impl MappingsManager<'_> {
             add_method!("displayClientMessage", "a", "(Lss;Z)V", false);
             add_method!("isUsingItem", "eZ", "()Z", false);
             add_method!("getAttackCooldownProgress", "w", "(F)F", false);
+            add_method!("swingHand", "a", "(Lbcl;Z)V", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);
@@ -125,6 +127,16 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "HitResultType", "eac$a", {
             add_field!("ENTITY", "c", "Leac$a;", true);
+        });
+        add_mapping!(new_self, "Hand", "bcl", {
+            add_field!("MAIN_HAND", "a", "Lbcl;", true);
+            add_field!("OFF_HAND", "b", "Lbcl;", true);
+        });
+        add_mapping!(new_self, "ClientWorld", "eyz", {
+            add_method!("sendPacketToServer", "a", "(Luh;)V", false);
+        });
+        add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
+            add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
         });
 
         new_self
