@@ -4,7 +4,6 @@ use super::bingus_module_trait::MakeNewBingusModule;
 
 #[enum_dispatch(BingusModuleTrait)]
 pub enum BingusModule {
-    Esp,
     Autototem,
     Triggerbot,
 }
