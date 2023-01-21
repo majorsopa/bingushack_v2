@@ -63,8 +63,11 @@ impl MappingsManager<'_> {
             add_field!("player", "t", "Lfcz;", false);
             add_field!("inGameHud", "l", "Lekn;", false);
             add_field!("interactionManager", "r", "Lezd;", false);
+            add_field!("crosshairTarget", "w", "Leac;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
+            add_method!("doAttack", "bg", "()Z", false);
+            
             add_method!("getInstance", "N", "()Lejf;", true);
         });
         add_mapping!(new_self, "PlayerEntity", "bwp", {
@@ -116,6 +119,12 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "Entity", "bdr", {
             add_method!("isAlive", "br", "()Z", false);
+        });
+        add_mapping!(new_self, "HitResult", "eac", {
+            add_method!("getType", "c", "Leac$a;", false);
+        });
+        add_mapping!(new_self, "HitResultType", "eac$a", {
+            add_field!("ENTITY", "c", "Leac$a;", true);
         });
 
         new_self
