@@ -62,6 +62,6 @@ pub fn swap_offhand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, 
         click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
 
         // put down
-        click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
+        click_slot(env, player, interaction_manager, sync_id, 45, 0, pickup_slot_action);
     }
 }

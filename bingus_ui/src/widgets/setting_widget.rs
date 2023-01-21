@@ -16,11 +16,11 @@ fn setting_ui(ui: &mut egui::Ui, setting: (&mut BingusSetting, &'static str, Opt
         }
         BingusSetting::FloatSetting(_) => {
             let range = setting.2.unwrap();
-            ui.add(egui::Slider::new(setting.0.get_float_mut(), range[0]..=range[1]))
+            ui.add(egui::Slider::new(setting.0.get_float_mut(), range[0]..=range[1]).step_by(1.0))
         }
         BingusSetting::RangeSetting(_) => {
             let range = setting.2.unwrap();
-            ui.add(DoubleSlider::new(setting.0.get_range_mut(), range[0]..=range[1]))
+            ui.add(DoubleSlider::new(setting.0.get_range_mut(), range[0]..=range[1]).step_by(1.0))
         }
     }
 }
