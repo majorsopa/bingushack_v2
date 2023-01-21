@@ -9,7 +9,7 @@ pub fn get_inventory<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager,
     inventory
 }
 
-pub fn click_slot<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, interaction_manager: &'a ClassMapping, sync_id: i32, slot: i32, slot_action_type: JValue) {
+pub fn click_slot<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, interaction_manager: &'a ClassMapping, sync_id: i32, slot: i32, button: i32, slot_action_type: JValue) {
     call_method_or_get_field!(
         env,
         interaction_manager,
@@ -54,9 +54,10 @@ pub fn swap_offhand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, 
         true
     ).unwrap();
 
+    let slot = slot + if slot < 9 { 36 } else { 0 };
     // pick up
-    click_slot(env, player, interaction_manager, sync_id, slot + if slot < 9 { 36 } else { 0 }, pickup_slot_action);
+    click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
 
     // put down
-    click_slot(env, player, interaction_manager, sync_id, 45, pickup_slot_action);
+    click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
 }
