@@ -24,3 +24,28 @@ pub fn click_slot<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, interaction_man
         ]
     ).unwrap();
 }
+
+pub fn get_selected_slot<'a>(env: JNIEnv<'a>, inventory: &'a ClassMapping) -> i32 {
+    call_method_or_get_field!(
+        env,
+        inventory,
+        "selectedSlot",
+        false
+    ).unwrap().i().unwrap()
+}
+
+pub fn set_selected_slot<'a>(env: JNIEnv<'a>, inventory: &'a ClassMapping, slot: i32) {
+    let field_name = "selectedSlot";
+    let slot_type = inventory.get_field(field_name, false).unwrap().get_sig();
+    env.set_field(inventory.get_object().unwrap(), field_name, slot_type, JValue::from(slot)).unwrap();
+}
+
+pub fn swap_offhand<'a>(env: JNIEnv<'a>, player: &'a ClassMapping) {
+    call_method_or_get_field!(
+        env,
+        player,
+        "swapHandStacks",
+        false,
+        &[]
+    ).unwrap();
+}

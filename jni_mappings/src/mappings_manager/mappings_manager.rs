@@ -81,6 +81,7 @@ impl MappingsManager<'_> {
             add_method!("isUsingItem", "eZ", "()Z", false);
             add_method!("getAttackCooldownProgress", "w", "(F)F", false);
             add_method!("swingHand", "a", "(Lbcl;Z)V", false);
+            add_method!("swapHandStacks", "x", "()V", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);
@@ -92,6 +93,8 @@ impl MappingsManager<'_> {
             add_field!("TOTEM_OF_UNDYING", "tV", "Lcdp;", true);
         });
         add_mapping!(new_self, "Inventory", "bwo", {
+            add_field!("selectedSlot", "k", "I", false);
+
             add_method!("getStack", "a", "(I)Lcdt;", false);
         });
         add_mapping!(new_self, "InGameHud", "ekn", {
