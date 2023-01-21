@@ -118,8 +118,8 @@ pub struct Autototem {
 impl MakeNewBingusModule for Autototem {
     fn new() -> Self {
         Self {
-            delay_setting: (BingusSetting::RangeSetting([500.0, 1000.0].into()), "delay (ms)", Some([1.0, 5000.0])),
-            hotbar_only: (BingusSetting::BoolSetting(false.into()), "hotbar only", None),
+            delay_setting: (BingusSetting::RangeSetting([100.0, 250.0].into()), "delay (ms)", Some([1.0, 5000.0])),
+            hotbar_only: (BingusSetting::BoolSetting(true.into()), "hotbar only", None),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
             hotbar_swap_prev_slot: None,
