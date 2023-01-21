@@ -42,6 +42,10 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
+    if triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, player) != 0 {
+        return;
+    }
+
 
 
     if triggerbot.last_attack.is_none() {
@@ -67,7 +71,8 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 #[add_bingus_fields]
 #[bingus_module(name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, stop_while_using_item]")]
 pub struct Triggerbot {
-    wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),  // need to add a small cooldown or else it crashes when you look at an entity for too long lol
+    wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
+    wait_for_damage_tick: (BingusSetting, &'static str, Option<[f32; 2]>),
     stop_while_using_item: (BingusSetting, &'static str, Option<[f32; 2]>),
     last_attack: Option<SystemTime>,
 }
@@ -76,6 +81,7 @@ impl MakeNewBingusModule for Triggerbot {
     fn new() -> Self {
         Self {
             wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for cooldown", None),
+            wait_for_damage_tick: (BingusSetting::BoolSetting(false.into()), "wait for damage tick", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             last_attack: None,

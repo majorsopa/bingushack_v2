@@ -124,6 +124,8 @@ impl MappingsManager<'_> {
             add_method!("getTargetedEntity", "a", "(Lbdr;I)Ljava/util/Optional;", true);
         });
         add_mapping!(new_self, "Entity", "bdr", {
+            add_field!("hurtTime", "aK", "I", false);
+
             add_method!("isAlive", "br", "()Z", false);
         });
         add_mapping!(new_self, "HitResult", "eac", {
