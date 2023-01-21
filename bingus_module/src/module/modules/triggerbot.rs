@@ -10,19 +10,6 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         None => return,
     };
 
-    let world = mappings_manager.get("ClientWorld").unwrap();
-    apply_object!(
-        world,
-        {
-            let check_if_null = call_method_or_get_field!(env, minecraft_client, "world", false).unwrap().l().unwrap();
-            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
-                return;
-            } else {
-                check_if_null
-            }
-        }
-    );
-
 
 
     let targeted_entity = match get_targeted_entity(env, mappings_manager, minecraft_client) {
