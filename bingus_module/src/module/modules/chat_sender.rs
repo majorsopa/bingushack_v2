@@ -11,7 +11,7 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
 
     let bingus_text = make_minecraft_text_object(env, mappings_manager, "bingus");
 
-    send_chat_message(env, mappings_manager, player, bingus_text);
+    send_chat_message(env, player, bingus_text);
 }
 
 
