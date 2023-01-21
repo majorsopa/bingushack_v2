@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use crate::crate_prelude::*;
 
 fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsManager) {
@@ -8,9 +10,27 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         None => return,
     };
 
+    let world = mappings_manager.get("ClientWorld").unwrap();
+    apply_object!(
+        world,
+        {
+            let check_if_null = call_method_or_get_field!(env, minecraft_client, "world", false).unwrap().l().unwrap();
+            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
+                return;
+            } else {
+                check_if_null
+            }
+        }
+    );
 
 
-    if !facing_entity(env, mappings_manager, minecraft_client) {
+
+    let targeted_entity = match get_targeted_entity(env, mappings_manager, minecraft_client) {
+        Some(targeted_entity) => targeted_entity,
+        None => return,
+    };
+
+    if !is_alive(env, targeted_entity) {
         return;
     }
 
@@ -24,6 +44,16 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 
 
 
+    if triggerbot.last_attack.is_none() {
+        triggerbot.last_attack = Some(SystemTime::now());
+    } else {
+        let last_attack = triggerbot.last_attack.unwrap();
+        if last_attack.elapsed().unwrap().as_millis() < 50 {
+            return;
+        }
+    }
+
+
     call_method_or_get_field!(
         env,
         minecraft_client,
@@ -31,27 +61,15 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         false,
         &[]
     ).unwrap();
-
-    let world = mappings_manager.get("ClientWorld").unwrap();
-    apply_object!(
-        world,
-        call_method_or_get_field!(
-            env,
-            minecraft_client,
-            "world",
-            false
-        ).unwrap().l().unwrap()
-    );
-
-    
 }
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Triggerbot", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, stop_while_using_item]")]
+#[bingus_module(name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, stop_while_using_item]")]
 pub struct Triggerbot {
     wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),  // need to add a small cooldown or else it crashes when you look at an entity for too long lol
     stop_while_using_item: (BingusSetting, &'static str, Option<[f32; 2]>),
+    last_attack: Option<SystemTime>,
 }
 
 impl MakeNewBingusModule for Triggerbot {
@@ -60,6 +78,7 @@ impl MakeNewBingusModule for Triggerbot {
             wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for cooldown", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
+            last_attack: None,
         }
     }
 }
