@@ -2,63 +2,54 @@ use crate::crate_prelude::*;
 
 fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
     let minecraft_client = get_minecraft_client(env, mappings_manager);
+
+    // debug
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
         Some(player) => player,
         None => return,
     };
 
-    let target = mappings_manager.get("Optional").unwrap();
+    let hit_result = mappings_manager.get("HitResult").unwrap();
     apply_object!(
-        target,
+        hit_result,
         call_method_or_get_field!(
             env,
-            mappings_manager.get("DebugRenderer").unwrap(),
-            "getTargetedEntity",
-            true,
-            &[
-                JValue::from(player.get_object().unwrap()),
-                JValue::from(3),
-            ]
+            minecraft_client,
+            "crosshairTarget",
+            false
         ).unwrap().l().unwrap()
     );
-    if !call_method_or_get_field!(env, target, "isPresent", false, &[]).unwrap().z().unwrap() {
+
+    // check if the hit result is null (important)
+    if env.is_same_object(hit_result.get_object().unwrap(), JObject::null()).unwrap() {
         return;
     }
-    let target = {
-        let entity = mappings_manager.get("Entity").unwrap();
-        apply_object!(
-            entity,
-            call_method_or_get_field!(
-                env,
-                target,
-                "get",
-                false,
-                &[]
-            ).unwrap().l().unwrap()
-        );
-        entity
-    };
-    if {
-        !call_method_or_get_field!(env, target, "isAlive", false, &[]).unwrap().z().unwrap()
-        || call_method_or_get_field!(env, player, "isUsingItem", false, &[]).unwrap().z().unwrap()
-        || (call_method_or_get_field!(env, player, "getAttackCooldownProgress", false, &[
-            call_method_or_get_field!(env, minecraft_client, "getTickDelta", false, &[]).unwrap(),
-        ]).unwrap().f().unwrap() != 1.0 )
-    } {
-        return;
+    let hit_result_type = mappings_manager.get("HitResultType").unwrap();
+    apply_object!(
+        hit_result_type,
+        call_method_or_get_field!(
+            env,
+            hit_result,
+            "getType",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+
+    let entity_hit_result_field_object = call_method_or_get_field!(
+        env,
+        hit_result_type,
+        "ENTITY",
+        true
+    ).unwrap().l().unwrap();
+
+    if !env.is_same_object(hit_result_type.get_object().unwrap(), entity_hit_result_field_object).unwrap() {
+        send_chat_message(env, player, make_minecraft_text_object(env, mappings_manager, "not entity"));
+    } else {
+        send_chat_message(env, player, make_minecraft_text_object(env, mappings_manager, "yes entity"));
     }
 
-    let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
-    call_method_or_get_field!(
-        env,
-        interaction_manager,
-        "attackEntity",
-        false,
-        &[
-            JValue::from(player.get_object().unwrap()),
-            JValue::from(target.get_object().unwrap()),
-        ]
-    ).unwrap();
+    
 }
 
 #[derive(BingusModuleTrait)]
