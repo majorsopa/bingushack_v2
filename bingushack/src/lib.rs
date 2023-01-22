@@ -43,6 +43,25 @@ macro_rules! exit_thread {
 }
 
 unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
+    // check hwid, only on release
+    #[cfg(not(build = "debug"))]
+    if obfstr::obfstr!(env!("HWID")) != {
+        use uniqueid::{IdentifierBuilder, IdentifierType};
+
+        let mut builder = IdentifierBuilder::default();
+
+        builder.name("Cocaine3");
+        builder.add(IdentifierType::CPU);
+        builder.add(IdentifierType::RAM);
+        builder.add(IdentifierType::DISK);
+
+        builder.build().to_string(true)
+    } {
+        message_box("consider buying the client at http://bingushack.cc");
+        panic!();
+    }
+
+
     message_box("injected");
 
 
