@@ -12,3 +12,8 @@ members = [
     "setting_macro_derive",
     "macro_common",
 ]
+
+[profile.release]
+debug = false
+strip = true
+panic = "abort"
