@@ -1,6 +1,5 @@
 use std::time::SystemTime;
 
-use copystr::s3;
 use rand::Rng;
 use crate::crate_prelude::*;
 

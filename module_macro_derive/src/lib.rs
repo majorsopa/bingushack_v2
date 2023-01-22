@@ -111,8 +111,6 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     };
 
     let settings = {
-        let get = quote! {&self};
-
         let mut settings_list = quote! {};
         let mut mut_settings_list_with_names = quote! {};
 
