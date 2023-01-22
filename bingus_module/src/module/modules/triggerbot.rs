@@ -68,7 +68,7 @@ impl MakeNewBingusModule for Triggerbot {
     fn new() -> Self {
         Self {
             wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for cooldown", None),
-            wait_for_damage_tick: (BingusSetting::BoolSetting(false.into()), "wait for damage tick", None),
+            wait_for_damage_tick: (BingusSetting::BoolSetting(true.into()), "wait for damage tick", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             last_attack: None,
