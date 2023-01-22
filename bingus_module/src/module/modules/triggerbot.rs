@@ -56,7 +56,7 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, stop_while_using_item]")]
+#[bingus_module(name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item]")]
 pub struct Triggerbot {
     wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
     wait_for_damage_tick: (BingusSetting, &'static str, Option<[f32; 2]>),
