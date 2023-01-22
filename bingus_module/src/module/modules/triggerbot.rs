@@ -29,7 +29,7 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
-    if triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, player) != 0 {
+    if triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, targeted_entity) != 0 {
         return;
     }
 
