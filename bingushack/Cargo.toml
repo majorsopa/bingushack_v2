@@ -11,6 +11,8 @@ crochet = "0.1.1"
 once_cell = "1.17.0"
 gl = "0.14.0"
 widestring = "1.0.2"
+obfstr = "0.4.1"
+uniqueid = "0.2.6"
 
 [lib]
 crate-type = ["dylib"]
