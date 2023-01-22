@@ -73,6 +73,7 @@ impl MakeNewBingusModule for Triggerbot {
             wait_for_damage_tick: (BingusSetting::BoolSetting(true.into()), "wait for damage tick", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
+            __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             last_attack: None,
         }
     }

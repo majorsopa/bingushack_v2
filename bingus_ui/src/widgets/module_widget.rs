@@ -12,6 +12,7 @@ fn module_ui(ui: &mut egui::Ui, module: &mut BingusModule) -> egui::Response {
             ui.label(module.get_name());
 
             ui.add(setting_widget(module.get_enabled()));
+            ui.add(setting_widget(module.get_keybind()));
         });
         if !module.get_settings().is_empty() {
             ui.collapsing("settings", |ui| {

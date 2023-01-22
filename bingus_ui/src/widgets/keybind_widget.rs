@@ -1,7 +1,10 @@
 use eframe::{egui::{self, TextEdit, TextStyle}, epaint::Color32};
 
 fn keybind_ui(ui: &mut egui::Ui, key: &mut String) -> egui::Response {
-    let castable = key.parse::<u32>().is_ok();
+    let castable = {
+        let prefix_removed = key.trim_start_matches("0x");
+        u32::from_str_radix(prefix_removed, 16).is_ok()
+    };
     let text_widget = TextEdit::singleline(key).font(TextStyle::Monospace);
     // if castable to u32
     let text_widget = if !castable {

@@ -1,11 +1,11 @@
-use std::sync::{Mutex, Arc};
+use std::{sync::{Mutex, Arc}, collections::HashMap};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
 use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
-use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}};
+use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
 
 use crate::MODULES;
 
@@ -42,6 +42,8 @@ impl eframe::App for BingusClient {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("bingushack");
+            ui.label("for keybinds,");
+            ui.hyperlink("https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
             ui.separator();
             for (i, module) in self.modules.lock().unwrap().iter_mut().enumerate() {
                 ui.push_id(i, |ui| {
@@ -73,14 +75,28 @@ pub fn run_client() {
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
         let mappings_manager = MappingsManager::new(jni_env);
         loop {
-            for module in modules.lock().unwrap().iter_mut() {
-                // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-                
+            let mut keys_multimap: HashMap<i32, Vec<usize>> = HashMap::new();
+            for (i, module) in modules.lock().unwrap().iter_mut().enumerate() {
+                if let Ok(key) = {
+                    let key = module.get_keybind().0.get_key();
+                    let prefix_removed = key.trim_start_matches("0x");
+                    u32::from_str_radix(prefix_removed, 16)
+                } {
+                    keys_multimap.entry(key as i32).or_insert_with(Vec::new).push(i);
+                }
 
                 if *module.get_enabled().0.get_bool() {
                     module.tick(jni_env, &mappings_manager);
                 }
             }
+            for (key, modules_vec) in keys_multimap {
+                if unsafe { GetAsyncKeyState(key) } & 0x01 == 1 {
+                    for i in modules_vec {
+                        modules.lock().unwrap()[i].toggle(jni_env, &mappings_manager);
+                    }
+                }
+            }
+
 
             std::thread::sleep(std::time::Duration::from_millis(1));
             if modules_rx.try_recv().is_ok() {

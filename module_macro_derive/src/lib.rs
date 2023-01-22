@@ -135,6 +135,12 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
                     (&mut self.__enabled_bool_setting.0, name, range)
                 }
 
+                fn get_keybind(&mut self) -> (&mut BingusSetting, &'static str, Option<[f32; 2]>) {
+                    let name = self.__keybind_setting.1;
+                    let range = self.__keybind_setting.2;
+                    (&mut self.__keybind_setting.0, name, range)
+                }
+
                 fn get_settings(&mut self) -> Vec<(&mut BingusSetting, &'static str, Option<[f32; 2]>)> {
                     vec![#mut_settings_list_with_names]
                 }
@@ -166,6 +172,13 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         .push(syn::Field::parse_named.parse2(
                             quote! {
                                 __enabled_bool_setting: (BingusSetting, &'static str, Option<[f32; 2]>)
+                            }
+                        ).unwrap());
+                    fields
+                        .named
+                        .push(syn::Field::parse_named.parse2(
+                            quote! {
+                                __keybind_setting: (BingusSetting, &'static str, Option<[f32; 2]>)
                             }
                         ).unwrap());
                 }   

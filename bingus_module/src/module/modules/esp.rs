@@ -77,6 +77,7 @@ impl MakeNewBingusModule for Esp {
     fn new() -> Self {
         Self {
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
+            __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
         }
     }
 }
