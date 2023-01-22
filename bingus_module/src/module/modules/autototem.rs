@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+use copystr::s3;
 use rand::Rng;
 use crate::crate_prelude::*;
 
@@ -72,7 +73,7 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
         // swap totem to offhand
         if found_totem_slots.len() > 0 {
-            if autototem.hotbar_only.0.get_bool() {
+            if *autototem.hotbar_only.0.get_bool() {
                 let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
                 if let Some(hotbar_totem) = hotbar_totem {
                     let hotbar_totem = *hotbar_totem;
@@ -106,10 +107,11 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting, hotbar_only]")]
+#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting, hotbar_only, tester_test]")]
 pub struct Autototem {
     delay_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
     hotbar_only: (BingusSetting, &'static str, Option<[f32; 2]>),
+    tester_test: (BingusSetting, &'static str, Option<[f32; 2]>),
     randomly_chosen_time: Option<u128>,
     time_since_lost_totem: Option<SystemTime>,
     hotbar_swap_prev_slot: Option<(i32, bool)>,
@@ -120,6 +122,7 @@ impl MakeNewBingusModule for Autototem {
         Self {
             delay_setting: (BingusSetting::RangeSetting([100.0, 250.0].into()), "delay (ms)", Some([1.0, 1500.0])),
             hotbar_only: (BingusSetting::BoolSetting(true.into()), "hotbar only", None),
+            tester_test: (BingusSetting::KeySetting(String::from("10").into()), "tester test", None),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
             hotbar_swap_prev_slot: None,

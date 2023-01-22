@@ -74,7 +74,10 @@ pub fn run_client() {
         let mappings_manager = MappingsManager::new(jni_env);
         loop {
             for module in modules.lock().unwrap().iter_mut() {
-                if module.get_enabled().0.get_bool() {
+                // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+                
+
+                if *module.get_enabled().0.get_bool() {
                     module.tick(jni_env, &mappings_manager);
                 }
             }

@@ -22,21 +22,14 @@ pub fn derive_bingus_setting(input: TokenStream) -> TokenStream {
     let setting_type = opts.setting_type.inner;
 
     let get_value = quote! {
-        fn get_value(&self) -> #setting_type {
-            self.0
-        }
-    };
-
-    let get_value_mut = quote! {
-        fn get_value_mut(&mut self) -> &mut #setting_type {
-            &mut self.0
+        fn get_value(&mut self) -> &mut #setting_type {
+            Arc::get_mut(&mut self.0).unwrap()
         }
     };
 
     let output = quote! {
         impl BingusSettingTrait<#setting_type> for #ident {
             #get_value
-            #get_value_mut
         }
     };
 

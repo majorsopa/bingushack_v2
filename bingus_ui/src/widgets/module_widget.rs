@@ -11,11 +11,11 @@ fn module_ui(ui: &mut egui::Ui, module: &mut BingusModule) -> egui::Response {
         ui.horizontal(|ui| {
             ui.label(module.get_name());
 
-            ui.add(setting_widget(module.get_enabled_mut()));
+            ui.add(setting_widget(module.get_enabled()));
         });
         if !module.get_settings().is_empty() {
             ui.collapsing("settings", |ui| {
-                for setting in module.get_settings_mut() {
+                for setting in module.get_settings() {
                     ui.add(setting_widget(setting));
                 }
             });

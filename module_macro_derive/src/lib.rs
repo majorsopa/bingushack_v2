@@ -42,8 +42,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
     let toggle_method= quote! {
         fn toggle(#defaults_args) {
-            let new_val = !self.__enabled_bool_setting.0.get_bool();
-            *self.__enabled_bool_setting.0.get_bool_mut() = new_val;
+            let new_val = !*self.__enabled_bool_setting.0.get_bool();
+            *self.__enabled_bool_setting.0.get_bool() = new_val;
         }
     };
 
@@ -131,21 +131,13 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
         {
             quote!{
-                fn get_enabled(&self) -> (BingusSetting, &'static str, Option<[f32; 2]>) {
-                    self.__enabled_bool_setting
-                }
-
-                fn get_enabled_mut(&mut self) -> (&mut BingusSetting, &'static str, Option<[f32; 2]>) {
+                fn get_enabled(&mut self) -> (&mut BingusSetting, &'static str, Option<[f32; 2]>) {
                     let name = self.__enabled_bool_setting.1;
                     let range = self.__enabled_bool_setting.2;
                     (&mut self.__enabled_bool_setting.0, name, range)
                 }
 
-                fn get_settings(#get) -> Vec<(BingusSetting, &'static str, Option<[f32; 2]>)> {
-                    vec![#settings_list]
-                }
-
-                fn get_settings_mut(&mut self) -> Vec<(&mut BingusSetting, &'static str, Option<[f32; 2]>)> {
+                fn get_settings(&mut self) -> Vec<(&mut BingusSetting, &'static str, Option<[f32; 2]>)> {
                     vec![#mut_settings_list_with_names]
                 }
             }

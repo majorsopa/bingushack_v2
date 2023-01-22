@@ -21,15 +21,15 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
-    if triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
+    if *triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
         return;
     }
 
-    if triggerbot.stop_while_using_item.0.get_bool() && is_using_item(env, player) {
+    if *triggerbot.stop_while_using_item.0.get_bool() && is_using_item(env, player) {
         return;
     }
 
-    if triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, targeted_entity) != 0 {
+    if *triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, targeted_entity) != 0 {
         return;
     }
 
