@@ -39,7 +39,9 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         triggerbot.last_attack = Some(SystemTime::now());
     } else {
         let last_attack = triggerbot.last_attack.unwrap();
-        if last_attack.elapsed().unwrap().as_millis() < 50 {
+        if last_attack.elapsed().unwrap().as_millis() > 50 {
+            triggerbot.last_attack = None;
+        } else {
             return;
         }
     }
