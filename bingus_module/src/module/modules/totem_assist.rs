@@ -47,14 +47,20 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
         return;
     }
 
-    let focused_slot_index = get_slot_index(env, focused_slot);
+    // first hotbar slot is 36-45 but for this to work it needs to be 0-9
+    let focused_slot_index = {
+        let actual_index = get_slot_index(env, focused_slot);
+        if actual_index > 35 {
+            actual_index - 36
+        } else {
+            actual_index
+        }
+    };
 
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
         Some(player) => player,
         None => return,
     };
-
-    send_chat_message(env, mappings_manager, player, &*format!("focused slot index: {}", focused_slot_index));
 
     swap_slots(env, mappings_manager, minecraft_client, player, 45, focused_slot_index);
 }
