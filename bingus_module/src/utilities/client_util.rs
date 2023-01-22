@@ -88,3 +88,19 @@ pub fn get_tick_delta<'a>(env: JNIEnv<'a>, minecraft_client: &'a ClassMapping) -
         &[]
     ).unwrap().f().unwrap()
 }
+
+pub fn get_current_screen_checked<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> Option<&'a ClassMapping<'a>> {
+    let screen = mappings_manager.get("Screen").unwrap();
+    apply_object!(
+        screen,
+        {
+            let check_if_null = call_method_or_get_field!(env, minecraft_client, "currentScreen", false).unwrap().l().unwrap();
+            if env.is_same_object(check_if_null, JObject::null()).unwrap() {
+                return None;
+            } else {
+                check_if_null
+            }
+        }
+    );
+    Some(screen)
+}

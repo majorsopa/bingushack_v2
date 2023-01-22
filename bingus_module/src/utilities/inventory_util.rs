@@ -39,8 +39,27 @@ pub fn set_selected_slot<'a>(env: JNIEnv<'a>, inventory: &'a ClassMapping, slot:
     env.set_field(inventory.get_object().unwrap(), field_mapping.get_name(), field_mapping.get_sig(), JValue::from(slot)).unwrap();
 }
 
-pub fn swap_offhand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, slot: i32) {
-    
+pub fn swap_slots<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, to_index: i32, from_index: i32) {
+    let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
+
+    let current_screen_handler = get_screen_handler(env, mappings_manager, player);
+
+    let sync_id = get_sync_id(env, current_screen_handler);
+
+    let pickup_slot_action = JValue::from(
+        call_method_or_get_field!(
+            env,
+            mappings_manager.get("SlotActionType").unwrap(),
+            "SWAP",
+            true
+        ).unwrap()
+    );
+
+
+    click_slot(env, player, interaction_manager, sync_id, to_index, from_index, pickup_slot_action);
+}
+
+pub fn swap_offhand_handled<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, slot: i32) {
     let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
 
     let current_screen_handler = get_screen_handler(env, mappings_manager, player);
@@ -64,4 +83,19 @@ pub fn swap_offhand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, 
         // put down
         click_slot(env, player, interaction_manager, sync_id, 45, 0, pickup_slot_action);
     }
+}
+
+pub fn get_focused_slot_checked<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, handled_screen: &'a ClassMapping) -> Option<&'a ClassMapping<'a>> {
+    let slot = mappings_manager.get("Slot").unwrap();
+    let focused_slot = call_method_or_get_field!(env, handled_screen, "focusedSlot", false).unwrap().l().unwrap();
+    if env.is_same_object(focused_slot, JObject::null()).unwrap() {
+        return None;
+    } else {
+        apply_object!(slot, focused_slot);
+        return Some(slot);
+    }
+}
+
+pub fn get_slot_index<'a>(env: JNIEnv<'a>, slot: &'a ClassMapping) -> i32 {
+    call_method_or_get_field!(env, slot, "index", false).unwrap().i().unwrap()
 }

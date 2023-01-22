@@ -84,14 +84,14 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
                     } else {
                         let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
                         if !swapped {
-                            swap_offhand(env, mappings_manager, minecraft_client, player, hotbar_totem);
+                            swap_offhand_handled(env, mappings_manager, minecraft_client, player, hotbar_totem);
                             autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
                             return;
                         }
                     }
                 }
             } else {
-                swap_offhand(env, mappings_manager, minecraft_client, player, found_totem_slots[0]);
+                swap_offhand_handled(env, mappings_manager, minecraft_client, player, found_totem_slots[0]);
             }
         }
     }

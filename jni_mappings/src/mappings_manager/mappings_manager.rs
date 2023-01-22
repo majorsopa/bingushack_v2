@@ -66,6 +66,7 @@ impl MappingsManager<'_> {
             add_field!("crosshairTarget", "w", "Leac;", false);
             add_field!("world", "s", "Leyz;", false);
             add_field!("targetedEntity", "v", "Lbdr;", false);
+            add_field!("currentScreen", "z", "Lepb;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
@@ -143,6 +144,17 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
             add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
+        });
+        add_mapping!(new_self, "Slot", "cax", {
+            add_field!("index", "e", "I", false);
+
+            add_method!("getStack", "e", "()Lcdt;", false);
+        });
+        add_mapping!(new_self, "HandledScreen", "epz", {
+            add_field!("focusedSlot", "u", "Lcax;", false);
+        });
+        add_mapping!(new_self, "Screen", "epb", {
+
         });
 
         new_self
