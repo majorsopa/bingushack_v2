@@ -8,10 +8,10 @@ pub trait BingusModuleTrait {
     fn tick(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
     fn render(&mut self);
 
-    fn on_enable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);      // do nothing atm
-    fn on_disable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);     // do nothing atm
-    fn on_load(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);        // do nothing atm
-    fn on_unload(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);      // do nothing atm
+    fn on_enable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_disable(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
+    fn on_load(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);        // does nothing atm
+    fn on_unload(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);      // does nothing atm
 
     fn toggle(&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager);
 

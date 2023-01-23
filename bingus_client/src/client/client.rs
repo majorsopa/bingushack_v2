@@ -76,7 +76,9 @@ pub fn run_client() {
         let mappings_manager = MappingsManager::new(jni_env);
         loop {
             let mut keys_multimap: HashMap<i32, Vec<usize>> = HashMap::new();
+            let mut enabled_modules_map: HashMap<usize, bool> = HashMap::new();
             for (i, module) in modules.lock().unwrap().iter_mut().enumerate() {
+                enabled_modules_map.insert(i, *module.get_enabled().0.get_bool());
                 if let Ok(key) = {
                     let key = module.get_keybind().0.get_key();
                     let prefix_removed = key.trim_start_matches("0x");
@@ -93,6 +95,17 @@ pub fn run_client() {
                 if unsafe { GetAsyncKeyState(key) } & 0x01 == 1 {
                     for i in modules_vec {
                         modules.lock().unwrap()[i].toggle(jni_env, &mappings_manager);
+                    }
+                }
+            }
+            for (i, enabled) in enabled_modules_map {
+                let mut locked_inner_modules = modules.lock().unwrap();
+                let inner_module = locked_inner_modules.get_mut(i).unwrap();
+                if enabled != *inner_module.get_enabled().0.get_bool() {
+                    if enabled {
+                        inner_module.on_enable(jni_env, &mappings_manager);
+                    } else {
+                        inner_module.on_disable(jni_env, &mappings_manager);
                     }
                 }
             }

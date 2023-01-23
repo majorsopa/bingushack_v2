@@ -67,6 +67,8 @@ impl MappingsManager<'_> {
             add_field!("world", "s", "Leyz;", false);
             add_field!("targetedEntity", "v", "Lbdr;", false);
             add_field!("currentScreen", "z", "Lepb;", false);
+            add_field!("gameRenderer", "j", "Lfdo;", false);
+            add_field!("options", "m", "Lejj;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
@@ -155,6 +157,23 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "Screen", "epb", {
 
+        });
+        add_mapping!(new_self, "GameRenderer", "fdo", {
+            add_field!("fovMultiplier", "p", "F", false);
+        });
+        add_mapping!(new_self, "SimpleOption", "eji", {
+            add_field!("value", "k", "Ljava/lang/Object;", false);
+        });
+        add_mapping!(new_self, "GameOptions", "ejj", {
+            add_field!("fov", "bH", "Leji;", false);
+        });
+        add_mapping!(new_self, "Integer", "java/lang/Integer", {
+            add_method!("intValue", "intValue", "()I", false);
+
+            add_method!("valueOf", "valueOf", "(I)Ljava/lang/Integer;", true);
+        });
+        add_mapping!(new_self, "Object", "java/lang/Object", {
+            
         });
 
         new_self
