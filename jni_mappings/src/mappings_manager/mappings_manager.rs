@@ -175,6 +175,38 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "Object", "java/lang/Object", {
             
         });
+        add_mapping!(new_self, "Viewport", "com/mojang/blaze3d/platform/GlStateManager$m", {  // static enum
+            add_field!("x", "b", "I", true);
+            add_field!("y", "c", "I", true);
+            add_field!("width", "d", "I", true);
+            add_field!("height", "e", "I", true);
+        });
+        add_mapping!(new_self, "RenderSystem", "com/mojang/blaze3d/systems/RenderSystem", {
+            add_method!("getModelViewMatrix", "getModelViewMatrix", "()Lorg/joml/Matrix4f;", true);
+            add_method!("getProjectionMatrix", "getProjectionMatrix", "()Lorg/joml/Matrix4f;", true);
+        });
+        add_mapping!(new_self, "Matrix4f", "org/joml/Matrix4f", {
+            // bruh
+            add_field!("m00", "m00", "F", false);
+            add_field!("m01", "m01", "F", false);
+            add_field!("m02", "m02", "F", false);
+            add_field!("m03", "m03", "F", false);
+
+            add_field!("m10", "m10", "F", false);
+            add_field!("m11", "m11", "F", false);
+            add_field!("m12", "m12", "F", false);
+            add_field!("m13", "m13", "F", false);
+
+            add_field!("m20", "m20", "F", false);
+            add_field!("m21", "m21", "F", false);
+            add_field!("m22", "m22", "F", false);
+            add_field!("m23", "m23", "F", false);
+
+            add_field!("m30", "m30", "F", false);
+            add_field!("m31", "m31", "F", false);
+            add_field!("m32", "m32", "F", false);
+            add_field!("m33", "m33", "F", false);
+        });
 
         new_self
     }
