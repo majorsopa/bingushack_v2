@@ -16,6 +16,14 @@ impl RenderInfo {
             bounding_box
         }
     }
+
+    pub fn get_entity_pos(&self) -> [f64; 3] {
+        self.entity_pos
+    }
+
+    pub fn get_bounding_box(&self) -> [f64; 6] {
+        self.bounding_box
+    }
 }
 
 pub fn setup_ortho(projection_matrix: *const GLfloat, modelview_matrix: *const GLfloat) {
@@ -34,31 +42,33 @@ pub fn restore_gl() {
     }
 }
 
-pub fn get_viewport<'a>(env: JNIEnv<'a>, viewport_class_mapping: &'a ClassMapping<'a>) -> [i32; 4] {
+// the casting might be a bruh moment
+pub fn get_viewport<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> [f32; 4] {
+    let viewport_class_mapping = mappings_manager.get("Viewport").unwrap();
     let x = call_method_or_get_field!(
         env,
         viewport_class_mapping,
         "x",
         true
-    ).unwrap().i().unwrap();
+    ).unwrap().i().unwrap() as f32;
     let y = call_method_or_get_field!(
         env,
         viewport_class_mapping,
         "y",
         true
-    ).unwrap().i().unwrap();
+    ).unwrap().i().unwrap() as f32;
     let width = call_method_or_get_field!(
         env,
         viewport_class_mapping,
         "width",
         true
-    ).unwrap().i().unwrap();
+    ).unwrap().i().unwrap() as f32;
     let height = call_method_or_get_field!(
         env,
         viewport_class_mapping,
         "height",
         true
-    ).unwrap().i().unwrap();
+    ).unwrap().i().unwrap() as f32;
 
     [x, y, width, height]
 }

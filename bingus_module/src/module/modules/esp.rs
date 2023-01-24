@@ -1,3 +1,6 @@
+use glam::{Vec4, Vec2, Vec3};
+use glu_sys::{glRectf, glClearColor, glClear};
+
 use crate::crate_prelude::*;
 
 
@@ -80,7 +83,7 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         ).unwrap().l().unwrap()
     );
 
-    let viewport = get_viewport(env, minecraft_client);
+    let viewport = get_viewport(env, mappings_manager);
     let modelview_matrix = get_matrix_16(env, get_modelview_class_mapping(env, mappings_manager));
     let projection_matrix = get_matrix_16(env, get_projection_class_mapping(env, mappings_manager));
 
@@ -104,8 +107,59 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         ).unwrap().f().unwrap()
     };
 
-    for entity in esp.entity_list {
-        
+    for entity in &esp.entity_list {
+        let bounding_box = entity.get_bounding_box();  // minx miny minz maxx maxy maxz
+        let box_vertices: [[f64; 3]; 8] = [
+            [bounding_box[0] - 0.1, bounding_box[1] - 0.1, bounding_box[2] - 0.1],
+            [bounding_box[0] - 0.1, bounding_box[4] + 0.1, bounding_box[2] - 0.1],
+            [bounding_box[3] + 0.1, bounding_box[4] + 0.1, bounding_box[2] - 0.1],
+            [bounding_box[3] + 0.1, bounding_box[1] - 0.1, bounding_box[2] - 0.1],
+            [bounding_box[3] + 0.1, bounding_box[4] + 0.1, bounding_box[5] + 0.1],
+            [bounding_box[0] - 0.1, bounding_box[4] + 0.1, bounding_box[5] + 0.1],
+            [bounding_box[0] - 0.1, bounding_box[1] - 0.1, bounding_box[5] + 0.1],
+            [bounding_box[3] + 0.1, bounding_box[1] - 0.1, bounding_box[5] + 0.1]
+        ];
+
+        let mut w2sbb = Vec4::new(f32::MAX, f32::MAX, -1.0, -1.0);
+
+        for i in 0..8 {
+            if let Some(screen_pos) = world_to_screen(
+                Vec3::new(box_vertices[i][0] as f32, box_vertices[i][1] as f32, box_vertices[i][2] as f32),
+                modelview_matrix,
+                projection_matrix,
+                viewport
+            ) {
+                w2sbb.x = if w2sbb.x < screen_pos.x {
+                    w2sbb.x
+                } else {
+                    screen_pos.x
+                };
+                w2sbb.y = if w2sbb.x < screen_pos.y {
+                    w2sbb.x
+                } else {
+                    screen_pos.y
+                };
+                w2sbb.z = if w2sbb.z > screen_pos.x {
+                    w2sbb.z
+                } else {
+                    screen_pos.x
+                };
+                w2sbb.w = if w2sbb.w > screen_pos.y {
+                    w2sbb.w
+                } else {
+                    screen_pos.y
+                };
+            }
+        }
+
+
+        if w2sbb.x >= 0.0 || w2sbb.y >= 0.0 || w2sbb.z <= viewport[2] || w2sbb.w <= viewport[3] {
+            unsafe {
+                glClearColor(0.1, 0.8, 0.1, 1.0);
+                glClear();
+                glRectf(w2sbb.x, w2sbb.y, w2sbb.z, w2sbb.w)
+            }
+        }
     }
 }
 
