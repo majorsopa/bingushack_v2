@@ -207,6 +207,14 @@ impl MappingsManager<'_> {
             add_field!("m32", "m32", "F", false);
             add_field!("m33", "m33", "F", false);
         });
+        add_mapping!(new_self, "EntityRenderer", "fip", {
+            add_method!("getRenderOffset", "a", "(Lbdr;F)Leae;", false);  // Vec3d getPositionOffset(T entity, float tickDelta)
+        });
+        add_mapping!(new_self, "Vec3d", "eae", {
+            add_field!("x", "c", "D", false);
+            add_field!("y", "d", "D", false);
+            add_field!("z", "e", "D", false);
+        });
 
         new_self
     }

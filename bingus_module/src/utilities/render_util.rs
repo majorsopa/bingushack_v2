@@ -110,3 +110,8 @@ pub fn get_projection_class_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a M
 
     matrix
 }
+
+pub fn get_render_pos_vec<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> [f32; 3] {
+    let vec3d = mappings_manager.get("Vec3d").unwrap();
+    let entity_renderer = mappings_manager.get("EntityRenderer").unwrap();
+}
