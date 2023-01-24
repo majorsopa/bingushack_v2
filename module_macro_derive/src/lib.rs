@@ -29,7 +29,15 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     let DeriveInput { ident, .. } = input;
 
 
-    // todo: settings
+    let init = quote! {
+        fn init(&mut self, jni_env: JNIEnv<'static>, mappings_manager: &mut Arc<MappingsManager<'static>>) {
+            let jni_env: *mut JNIEnv<'static> = Box::into_raw(Box::new(jni_env));
+            self.__env = Some(AtomicPtr::new(jni_env));
+            let mappings_manager: *mut MappingsManager<'static> = unsafe { Arc::get_mut_unchecked(mappings_manager) };  // bruh
+            self.__mappings_manager = Some(Arc::new(AtomicPtr::new(mappings_manager)));
+        }
+    };
+
     let name = opts.name.inner;
 
     let get_name = quote! {
@@ -122,6 +130,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         };
 
         let defaults = quote! {
+            #init
             #tick_method
             #render_method
             #on_enable_method
@@ -215,7 +224,7 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         .named
                         .push(syn::Field::parse_named.parse2(
                             quote! {
-                                __mappings_manager: Option<AtomicPtr<MappingsManager<'static>>>
+                                __mappings_manager: Option<Arc<AtomicPtr<MappingsManager<'static>>>>
                             }
                         ).unwrap());
                 }   

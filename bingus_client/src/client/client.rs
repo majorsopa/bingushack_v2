@@ -66,23 +66,18 @@ pub fn run_client() {
 
     let options = eframe::NativeOptions::default();
 
-    // proc macro for this when
-    let unatomicify_module = |module: &mut AtomicPtr<BingusModule>| {
-        let module = unsafe { &mut **module.get_mut() };
-        module
-    };
-
-    /*
     let (modules_tx, modules_rx) = std::sync::mpsc::channel::<()>();
     let running_modules = std::thread::spawn(move || {
         let jvm = unsafe { get_javavm() };
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
-        let mappings_manager = MappingsManager::new(jni_env);
+        let mappings_manager = Arc::new(MappingsManager::new(jni_env));
+        for module in modules.lock().unwrap().iter_mut() {
+            module.init(jni_env, &mut Arc::clone(&mappings_manager));
+        }
         loop {
             let mut keys_multimap: HashMap<i32, Vec<usize>> = HashMap::new();
             let mut enabled_modules_map: HashMap<usize, bool> = HashMap::new();
             for (i, module) in modules.lock().unwrap().iter_mut().enumerate() {
-                let module = unatomicify_module(module);
                 enabled_modules_map.insert(i, *module.get_enabled().0.get_bool());
                 if let Ok(key) = {
                     let key = module.get_keybind().0.get_key();
@@ -99,14 +94,13 @@ pub fn run_client() {
             for (key, modules_vec) in keys_multimap {
                 if unsafe { GetAsyncKeyState(key) } & 0x01 == 1 {
                     for i in modules_vec {
-                        unatomicify_module(&mut modules.lock().unwrap()[i]).toggle();
+                        modules.lock().unwrap()[i].toggle();
                     }
                 }
             }
             for (i, enabled) in enabled_modules_map {
                 let mut locked_inner_modules = modules.lock().unwrap();
                 let inner_module = locked_inner_modules.get_mut(i).unwrap();
-                let inner_module = unatomicify_module(inner_module);
                 if enabled != *inner_module.get_enabled().0.get_bool() {
                     if enabled {
                         inner_module.on_enable();
@@ -123,12 +117,11 @@ pub fn run_client() {
             }
         }
     });
-    */
 
 
     eframe::run_native("bingushack", options, Box::new(|_cc| Box::new(app)));
-    //modules_tx.send(()).unwrap();
-    //running_modules.join().unwrap();
+    modules_tx.send(()).unwrap();
+    running_modules.join().unwrap();
     unsafe {
         CLICKGUI_CONTEXT = None;
         CLICKGUI_HDC = None;
