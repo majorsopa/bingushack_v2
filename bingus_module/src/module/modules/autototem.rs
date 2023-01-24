@@ -125,6 +125,8 @@ impl MakeNewBingusModule for Autototem {
             hotbar_swap_prev_slot: None,
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
+            __env: None,
+            __mappings_manager: None,
         }
     }
 }

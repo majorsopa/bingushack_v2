@@ -38,7 +38,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         }
     };
 
-    let defaults_args = quote! {&mut self, _env: JNIEnv, _mappings_manager: &MappingsManager};
+    let defaults_args = quote! {&mut self};
 
     let toggle_method= quote! {
         fn toggle(#defaults_args) {
@@ -47,12 +47,30 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
         }
     };
 
+    let unwrapped = quote! {
+        let _env = unsafe {
+            let matched = match self.__env {
+                Some(ref env) => env,
+                None => return,
+            };
+            *matched.load(std::sync::atomic::Ordering::Relaxed)
+        };
+        let _mappings_manager = unsafe {
+            let matched = match self.__mappings_manager {
+                Some(ref mappings_manager) => mappings_manager,
+                None => return,
+            };
+            let loaded = matched.load(std::sync::atomic::Ordering::Relaxed);
+            loaded.as_ref().unwrap()
+        };
+    };
 
     let defaults = {
         let tick_method = {
             let matched = opts.tick_method.inner;
             quote! {
                 fn tick(#defaults_args) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -61,6 +79,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.render_method.inner;
             quote! {
                 fn render(&mut self) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -69,6 +88,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.on_enable_method.inner;
             quote! {
                 fn on_enable(#defaults_args) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -77,6 +97,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.on_disable_method.inner;
             quote! {
                 fn on_disable(#defaults_args) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -85,6 +106,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.on_load_method.inner;
             quote! {
                 fn on_load(#defaults_args) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -93,6 +115,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.on_unload_method.inner;
             quote! {
                 fn on_unload(#defaults_args) {
+                    #unwrapped;
                     #matched;
                 }
             }
@@ -181,11 +204,25 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                                 __keybind_setting: (BingusSetting, &'static str, Option<[f32; 2]>)
                             }
                         ).unwrap());
+                    fields
+                        .named
+                        .push(syn::Field::parse_named.parse2(
+                            quote! {
+                                __env: Option<AtomicPtr<JNIEnv<'static>>>
+                            }
+                        ).unwrap());
+                    fields
+                        .named
+                        .push(syn::Field::parse_named.parse2(
+                            quote! {
+                                __mappings_manager: Option<AtomicPtr<MappingsManager<'static>>>
+                            }
+                        ).unwrap());
                 }   
                 _ => {
                     
                 }
-            }              
+            }
             
             quote! {
                 #ast

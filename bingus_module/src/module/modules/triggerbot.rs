@@ -75,6 +75,8 @@ impl MakeNewBingusModule for Triggerbot {
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             last_attack: None,
+            __env: None,
+            __mappings_manager: None,
         }
     }
 }

@@ -1,6 +1,6 @@
 mod client;
 
-use std::{ptr::null_mut, ffi::CString, sync::{Arc, Mutex}};
+use std::{ptr::null_mut, ffi::CString, sync::{Arc, Mutex, atomic::AtomicPtr}};
 
 use bingus_module::prelude::BingusModule;
 pub use client::*;

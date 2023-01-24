@@ -1,6 +1,6 @@
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
-use bingus_module::prelude::{BingusModuleTrait, ESP_SHADER, triangle::compile_triangle};
+use bingus_module::prelude::{BingusModuleTrait, BingusModule};
 use widestring::WideCString;
 use winapi::{
     shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
@@ -158,14 +158,12 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
                 check
             }
         } as *const _);
-
-        let _ = ESP_SHADER.get_or_init(compile_triangle);
     });
 
     if let Some(modules) = MODULES.get() {
         unsafe {
             let local_new_context = NEW_CONTEXT.get_mut().unwrap();
-            wglMakeCurrent(hdc, *local_new_context.get_mut());
+            wglMakeCurrent(hdc, *local_new_context.get_mut());  // might be bad?
         }
         for module in modules.lock().unwrap().iter_mut() {
             if *module.get_enabled().0.get_bool() {
@@ -176,7 +174,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
 
     unsafe {
         let local_old_context = OLD_CONTEXT.get_mut().unwrap();
-        wglMakeCurrent(hdc, *local_old_context.get_mut());
+        wglMakeCurrent(hdc, *local_old_context.get_mut());  // might be bad?
     }
 
     call_original!(hdc)
