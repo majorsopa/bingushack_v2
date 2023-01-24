@@ -1,3 +1,4 @@
+use glam::{Vec4, Vec3, Vec2};
 use glu_sys::{glMatrixMode, GL_PROJECTION, GL_MODELVIEW, glPushMatrix, glLoadMatrixf, GLfloat, glPopMatrix};
 
 use crate::crate_prelude::*;
@@ -111,7 +112,39 @@ pub fn get_projection_class_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a M
     matrix
 }
 
-pub fn get_render_pos_vec<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> [f32; 3] {
-    let vec3d = mappings_manager.get("Vec3d").unwrap();
-    let entity_renderer = mappings_manager.get("EntityRenderer").unwrap();
+pub fn world_to_screen_multiply(in_vec: Vec4, mat: [GLfloat; 16]) -> Vec4 {
+    let [x, y, z, w] = in_vec.to_array();
+    Vec4::new(
+        x * mat[0] + y * mat[4] + z * mat[8] + w * mat[12],
+        x * mat[1] + y * mat[5] + z * mat[9] + w * mat[13],
+        x * mat[2] + y * mat[6] + z * mat[10] + w * mat[14],
+        x * mat[3] + y * mat[7] + z * mat[11] + w * mat[15],
+    )
+}
+
+pub fn world_to_screen(point_in_world: Vec3, model_view: [GLfloat; 16], projection: [GLfloat; 16], viewport: [GLfloat; 4]) -> Option<Vec2> {
+    let clip_space_pos = world_to_screen_multiply(
+        world_to_screen_multiply(
+            Vec4::new(point_in_world.x, point_in_world.y, point_in_world.z, 1.0),
+            model_view
+        ),
+        projection
+    );
+    // ncd = normalized device coordinates
+    let ncd_space_pos = Vec3::new(
+        clip_space_pos.x / clip_space_pos.w,
+        clip_space_pos.y / clip_space_pos.w,
+        clip_space_pos.z / clip_space_pos.w
+    );
+
+    if ncd_space_pos.z > 1.0 || ncd_space_pos.z < -1.0 {
+        return None;
+    } else {
+        let screen_space_pos = Vec2::new(
+            ((ncd_space_pos.x + 1.0) / 2.0) * viewport[2],
+            ((1.0 - ncd_space_pos.y) / 2.0) * viewport[3]
+        );
+
+        Some(screen_space_pos)
+    }
 }
