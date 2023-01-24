@@ -91,7 +91,7 @@ pub fn is_using_item<'a>(env: JNIEnv<'a>, player: &'a ClassMapping) -> bool {
     ).unwrap().z().unwrap()
 }
 
-pub fn swing_hand<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, mappings_manager: &'a MappingsManager, main_hand: bool) {
+pub fn swing_hand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, player: &'a ClassMapping, main_hand: bool) {
     call_method_or_get_field!(
         env,
         player,
@@ -107,4 +107,14 @@ pub fn swing_hand<'a>(env: JNIEnv<'a>, player: &'a ClassMapping, mappings_manage
             JValue::from(false),
         ]
     ).unwrap();
+}
+
+pub fn get_player_pos<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, player: &'a ClassMapping) -> [f64; 3] {
+    let player_entity = mappings_manager.get("Entity").unwrap();
+    apply_object!(
+        player_entity,
+        player.get_object().unwrap()
+    );
+
+    get_entity_pos_array(env, mappings_manager, player_entity)
 }

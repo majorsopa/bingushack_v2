@@ -1,5 +1,5 @@
 use glam::{Vec4, Vec2, Vec3};
-use glu_sys::{glRectf, glClearColor, glClear};
+use glu_sys::{glRectf, glClearColor, glClear, GL_COLOR_BUFFER_BIT};
 
 use crate::crate_prelude::*;
 
@@ -58,7 +58,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
 
             esp.entity_list.push(RenderInfo::new(
                 get_entity_pos_array(env, mappings_manager, entity),
-                get_entity_bounding_box_minmax_array(env, mappings_manager, entity),
+                get_entity_bounding_box_minmax_array(env, mappings_manager, minecraft_client, player, entity),
             ));
         } else {
             break;
@@ -87,25 +87,6 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     let modelview_matrix = get_matrix_16(env, get_modelview_class_mapping(env, mappings_manager));
     let projection_matrix = get_matrix_16(env, get_projection_class_mapping(env, mappings_manager));
 
-    let [render_x, render_y, render_z] = get_entity_pos_array(env, mappings_manager, player);
-    let partial_tick = {
-        let render_tick_counter = mappings_manager.get("RenderTickCounter").unwrap();
-        apply_object!(
-            render_tick_counter,
-            call_method_or_get_field!(
-                env,
-                minecraft_client,
-                "renderTickCounter",
-                false
-            ).unwrap().l().unwrap()
-        );
-        call_method_or_get_field!(
-            env,
-            render_tick_counter,
-            "partialTick",
-            false
-        ).unwrap().f().unwrap()
-    };
 
     for entity in &esp.entity_list {
         let bounding_box = entity.get_bounding_box();  // minx miny minz maxx maxy maxz
@@ -156,7 +137,7 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         if w2sbb.x >= 0.0 || w2sbb.y >= 0.0 || w2sbb.z <= viewport[2] || w2sbb.w <= viewport[3] {
             unsafe {
                 glClearColor(0.1, 0.8, 0.1, 1.0);
-                glClear();
+                glClear(GL_COLOR_BUFFER_BIT);
                 glRectf(w2sbb.x, w2sbb.y, w2sbb.z, w2sbb.w)
             }
         }

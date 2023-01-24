@@ -1,7 +1,14 @@
+use std::sync::Mutex;
+
 use glam::{Vec4, Vec3, Vec2};
 use glu_sys::{glMatrixMode, GL_PROJECTION, GL_MODELVIEW, glPushMatrix, glLoadMatrixf, GLfloat, glPopMatrix};
 
 use crate::crate_prelude::*;
+
+
+
+pub static PROJECTION_MATRIX: Mutex<Option<[f32; 16]>> = Mutex::new(None);
+pub static MODELVIEW_MATRIX: Mutex<Option<[f32; 16]>> = Mutex::new(None);
 
 
 pub struct RenderInfo {
@@ -26,8 +33,16 @@ impl RenderInfo {
     }
 }
 
-pub fn setup_ortho(projection_matrix: *const GLfloat, modelview_matrix: *const GLfloat) {
+pub fn setup_ortho() {
     unsafe {
+        let projection_matrix = match (*PROJECTION_MATRIX.lock().unwrap()).as_ref() {
+            Some(matrix) => matrix,
+            None => return,
+        } as *const f32;
+        let modelview_matrix = match (*MODELVIEW_MATRIX.lock().unwrap()).as_ref() {
+            Some(matrix) => matrix,
+            None => return,
+        } as *const f32;
         glPushMatrix();
         glMatrixMode(GL_PROJECTION);
         glLoadMatrixf(projection_matrix);

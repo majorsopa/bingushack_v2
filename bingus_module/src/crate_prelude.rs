@@ -1,5 +1,4 @@
 pub use crate::prelude::*;
-pub use crate::utilities::*;
 pub use jni::JNIEnv;
 pub use jni::objects::JClass;
 pub use jni_mappings::MappingsManager;

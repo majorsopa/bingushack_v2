@@ -46,9 +46,9 @@ pub fn get_bounding_box<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManag
     bounding_box
 }
 
-pub fn get_entity_bounding_box_minmax_array<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, entity: &'a ClassMapping<'a>) -> [f64; 6] {
-    let entity = get_bounding_box(env, mappings_manager, entity);
-    bounding_box_minmax_array(env, entity)
+pub fn get_entity_bounding_box_minmax_array<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping<'a>, player: &'a ClassMapping<'a>, entity: &'a ClassMapping<'a>) -> [f64; 6] {
+    let entity_box = get_bounding_box(env, mappings_manager, entity);
+    bounding_box_minmax_array(env, mappings_manager, minecraft_client, player, entity, entity_box)
 }
 
 pub fn get_entity_id<'a>(env: JNIEnv<'a>, entity: &'a ClassMapping<'a>) -> i32 {

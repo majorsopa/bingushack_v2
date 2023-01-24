@@ -88,6 +88,8 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             quote! {
                 fn render(&mut self) {
                     #unwrapped;
+                    *PROJECTION_MATRIX.lock().unwrap() = Some(get_matrix_16(_env, get_projection_class_mapping(_env, _mappings_manager)));
+                    *MODELVIEW_MATRIX.lock().unwrap() = Some(get_matrix_16(_env, get_modelview_class_mapping(_env, _mappings_manager)));
                     #matched;
                 }
             }

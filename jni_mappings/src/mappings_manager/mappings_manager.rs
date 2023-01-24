@@ -130,6 +130,9 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "Entity", "bdr", {
             add_field!("hurtTime", "aK", "I", false);
+            add_field!("lastRenderX", "M", "D", false);
+            add_field!("lastRenderY", "N", "D", false);
+            add_field!("lastRenderZ", "O", "D", false);
 
             add_method!("isAlive", "br", "()Z", false);
             add_method!("getPos", "dd", "()Leae;", false);

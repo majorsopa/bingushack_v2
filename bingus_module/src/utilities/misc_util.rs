@@ -78,43 +78,99 @@ pub fn java_iterable_to_iterator<'a>(env: JNIEnv<'a>, mappings_manager: &'a Mapp
     iterator
 }
 
-pub fn bounding_box_minmax_array<'a>(env: JNIEnv<'a>, bounding_box: &'a ClassMapping<'a>) -> [f64; 6] {
-    let min_x = call_method_or_get_field!(
+pub fn bounding_box_minmax_array<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    minecraft_client: &'a ClassMapping<'a>,
+    player: &'a ClassMapping<'a>,
+    entity: &'a ClassMapping<'a>,
+    bounding_box: &'a ClassMapping<'a>
+) -> [f64; 6] {
+    let last_render_pos_x = call_method_or_get_field!(
+        env,
+        entity,
+        "lastRenderX",
+        false
+    ).unwrap().d().unwrap();
+    let last_render_pos_y = call_method_or_get_field!(
+        env,
+        entity,
+        "lastRenderY",
+        false
+    ).unwrap().d().unwrap();
+    let last_render_pos_z = call_method_or_get_field!(
+        env,
+        entity,
+        "lastRenderZ",
+        false
+    ).unwrap().d().unwrap();
+    let [pos_x, pos_y, pos_z] = get_entity_pos_array(env, mappings_manager, entity);
+
+
+    let mut min_x = call_method_or_get_field!(
         env,
         bounding_box,
         "minX",
         false
     ).unwrap().d().unwrap();
-    let min_y = call_method_or_get_field!(
+    let mut min_y = call_method_or_get_field!(
         env,
         bounding_box,
         "minY",
         false
     ).unwrap().d().unwrap();
-    let min_z = call_method_or_get_field!(
+    let mut min_z = call_method_or_get_field!(
         env,
         bounding_box,
         "minZ",
         false
     ).unwrap().d().unwrap();
-    let max_x = call_method_or_get_field!(
+    let mut max_x = call_method_or_get_field!(
         env,
         bounding_box,
         "maxX",
         false
     ).unwrap().d().unwrap();
-    let max_y = call_method_or_get_field!(
+    let mut max_y = call_method_or_get_field!(
         env,
         bounding_box,
         "maxY",
         false
     ).unwrap().d().unwrap();
-    let max_z = call_method_or_get_field!(
+    let mut max_z = call_method_or_get_field!(
         env,
         bounding_box,
         "maxZ",
         false
     ).unwrap().d().unwrap();
+
+    let partial_tick = {
+        let render_tick_counter = mappings_manager.get("RenderTickCounter").unwrap();
+        apply_object!(
+            render_tick_counter,
+            call_method_or_get_field!(
+                env,
+                minecraft_client,
+                "renderTickCounter",
+                false
+            ).unwrap().l().unwrap()
+        );
+        call_method_or_get_field!(
+            env,
+            render_tick_counter,
+            "partialTick",
+            false
+        ).unwrap().f().unwrap()
+    } as f64;
+
+    let [player_x, player_y, player_z] = get_player_pos(env, mappings_manager, player);
+
+    min_x = min_x - pos_x + (last_render_pos_x + (pos_x - last_render_pos_x) * partial_tick) - player_x;
+    min_y = min_y - pos_y + (last_render_pos_y + (pos_y - last_render_pos_y) * partial_tick) - player_y;
+    min_z = min_z - pos_z + (last_render_pos_z + (pos_z - last_render_pos_z) * partial_tick) - player_z;
+    max_x = max_x - pos_x + (last_render_pos_x + (pos_x - last_render_pos_x) * partial_tick) - player_x;
+    max_y = max_y - pos_y + (last_render_pos_y + (pos_y - last_render_pos_y) * partial_tick) - player_y;
+    max_z = max_z - pos_z + (last_render_pos_z + (pos_z - last_render_pos_z) * partial_tick) - player_z;
 
     [min_x, min_y, min_z, max_x, max_y, max_z]
 }
