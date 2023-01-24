@@ -1,17 +1,13 @@
 use crate::crate_prelude::*;
 
 
-fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
-
-}
-
-fn render(_esp: &mut Esp) {
+fn render(_esp: &mut Esp, _env: JNIEnv, _mappings_manager: &MappingsManager) {
 
 }
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "ESP (doesn't work)", tick_method = "tick(self, _env, _mappings_manager)", render_method = "render(self)")]
+#[bingus_module(name = "ESP (doesn't work)", render_method = "render(self, _env, _mappings_manager)")]
 pub struct Esp {
     
 }
