@@ -3,6 +3,21 @@ use glu_sys::{glMatrixMode, GL_PROJECTION, GL_MODELVIEW, glPushMatrix, glLoadMat
 
 use crate::crate_prelude::*;
 
+
+pub struct RenderInfo {
+    entity_pos: [f64; 3],
+    bounding_box: [f64; 6],
+}
+
+impl RenderInfo {
+    pub fn new(entity_pos: [f64; 3], bounding_box: [f64; 6]) -> Self {
+        Self {
+            entity_pos,
+            bounding_box
+        }
+    }
+}
+
 pub fn setup_ortho(projection_matrix: *const GLfloat, modelview_matrix: *const GLfloat) {
     unsafe {
         glPushMatrix();
@@ -49,7 +64,7 @@ pub fn get_viewport<'a>(env: JNIEnv<'a>, viewport_class_mapping: &'a ClassMappin
 }
 
 pub fn get_matrix_16<'a>(env: JNIEnv<'a>, matrix_class_mapping: &'a ClassMapping<'a>) -> [f32; 16] {
-    let mut modelview = [0.0; 16];
+    let mut matrix = [0.0; 16];
 
     for i in 0..4 {
         for j in 0..4 {
@@ -61,11 +76,11 @@ pub fn get_matrix_16<'a>(env: JNIEnv<'a>, matrix_class_mapping: &'a ClassMapping
                 true
             ).unwrap().f().unwrap();
 
-            modelview[i * 4 + j] = field;
+            matrix[i * 4 + j] = field;
         }
     }
 
-    modelview
+    matrix
 }
 
 pub fn get_render_system<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> &'a ClassMapping<'a> {

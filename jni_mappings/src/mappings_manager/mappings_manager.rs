@@ -69,9 +69,11 @@ impl MappingsManager<'_> {
             add_field!("currentScreen", "z", "Lepb;", false);
             add_field!("gameRenderer", "j", "Lfdo;", false);
             add_field!("options", "m", "Lejj;", false);
+            add_field!("renderTickCounter", "R", "Lejt;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
+            add_method!("calculateBoundingBox", "ao", "()Ldzz;", false);
 
             add_method!("getInstance", "N", "()Lejf;", true);
         });
@@ -131,6 +133,7 @@ impl MappingsManager<'_> {
 
             add_method!("isAlive", "br", "()Z", false);
             add_method!("getPos", "dd", "()Leae;", false);
+            add_method!("getId", "ah", "()I", false);
         });
         add_mapping!(new_self, "HitResult", "eac", {
             add_method!("getType", "c", "()Leac$a;", false);
@@ -144,6 +147,7 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "ClientWorld", "eyz", {
             add_method!("sendPacketToServer", "a", "(Luh;)V", false);
+            add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);
         });
         add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
             add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
@@ -215,6 +219,27 @@ impl MappingsManager<'_> {
             add_field!("x", "c", "D", false);
             add_field!("y", "d", "D", false);
             add_field!("z", "e", "D", false);
+        });
+        add_mapping!(new_self, "RenderTickCounter", "ejt", {
+            add_field!("partialTick", "a", "F", false);
+        });
+        add_mapping!(new_self, "Iterable", "java/lang/Iterable", {
+            add_method!("iterator", "iterator", "()Ljava/util/Iterator;", false);
+        });
+        add_mapping!(new_self, "Iterator", "java/util/Iterator", {
+            add_method!("hasNext", "hasNext", "()Z", false);
+            add_method!("next", "next", "()Ljava/lang/Object;", false);
+        });
+        add_mapping!(new_self, "Box", "dzz", {
+            add_field!("minX", "a", "D", false);
+            add_field!("minY", "b", "D", false);
+            add_field!("minZ", "c", "D", false);
+            add_field!("maxX", "d", "D", false);
+            add_field!("maxY", "e", "D", false);
+            add_field!("maxZ", "f", "D", false);
+        });
+        add_mapping!(new_self, "LivingEntity", "beg", {
+
         });
 
         new_self

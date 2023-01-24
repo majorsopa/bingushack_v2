@@ -30,3 +30,33 @@ pub fn get_entity_pos_array<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsM
     let z = call_method_or_get_field!(env, vec3d, "z", false).unwrap().d().unwrap();
     [x, y, z]
 }
+
+pub fn get_bounding_box<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, entity: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    let bounding_box = mappings_manager.get("Box").unwrap();
+    apply_object!(
+        bounding_box,
+        call_method_or_get_field!(
+            env,
+            entity,
+            "calculateBoundingBox",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+    bounding_box
+}
+
+pub fn get_entity_bounding_box_minmax_array<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, entity: &'a ClassMapping<'a>) -> [f64; 6] {
+    let entity = get_bounding_box(env, mappings_manager, entity);
+    bounding_box_minmax_array(env, entity)
+}
+
+pub fn get_entity_id<'a>(env: JNIEnv<'a>, entity: &'a ClassMapping<'a>) -> i32 {
+    call_method_or_get_field!(
+        env,
+        entity,
+        "getId",
+        false,
+        &[]
+    ).unwrap().i().unwrap()
+}
