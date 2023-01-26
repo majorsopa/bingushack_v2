@@ -64,7 +64,10 @@ pub fn run_client() {
     let modules = MODULES.get_or_init(|| Arc::new(Mutex::new(populate_modules())));
     let app = BingusClient::new(Arc::clone(modules));
 
-    let options = eframe::NativeOptions::default();
+    let mut options = eframe::NativeOptions::default();
+
+    options.resizable = false;
+    options.drag_and_drop_support = false;
 
     let (modules_tx, modules_rx) = std::sync::mpsc::channel::<()>();
     let running_modules = std::thread::spawn(move || {
