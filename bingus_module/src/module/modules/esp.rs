@@ -51,7 +51,11 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
             if {
                 env.is_same_object(entity.get_object().unwrap(), JObject::null()).unwrap() ||
                 !is_instance_of(env, entity, mappings_manager.get("LivingEntity").unwrap()) ||
-                get_entity_id(env, entity) == get_entity_id(env, player)
+                get_entity_id(env, entity) == get_entity_id(env, {
+                    let entity = mappings_manager.get("Entity").unwrap();
+                    apply_object!(entity, player.get_object().unwrap());
+                    entity
+                })
             } {
                 continue;
             }
