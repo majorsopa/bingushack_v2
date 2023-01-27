@@ -93,6 +93,10 @@ impl Clone for EspWindow {
 
 impl eframe::App for EspWindow {
     fn update(&mut self, ctx: &eframe::egui::Context, frame: &mut eframe::Frame) {
+        if self.receiver.is_some() {
+            frame.close();
+            return;
+        }
         if unsafe { ESP_HDC.is_none() } {
             unsafe {
                 ESP_HDC = Some(wglGetCurrentDC());
@@ -147,6 +151,9 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
 
 fn on_disable(esp: &mut Esp) {
     esp.sender.send(()).unwrap();
+    unsafe {
+        ESP_JOINHANDLE.take().unwrap().join().unwrap();
+    }
 }
 
 fn on_enable() {
@@ -188,7 +195,7 @@ impl MakeNewBingusModule for Esp {
         unsafe { ESP_WINDOW.get_or_init(|| {
             EspWindow {
                 rects: Arc::new(Mutex::new(vec![])),
-                receiver: Arc::new(None)
+                receiver: Arc::new(Some(receiver))
             }
         })};
         Self {
@@ -198,6 +205,7 @@ impl MakeNewBingusModule for Esp {
             sender,
             __env: None,
             __mappings_manager: None,
+            __prev_enabled: false,
         }
     }
 }

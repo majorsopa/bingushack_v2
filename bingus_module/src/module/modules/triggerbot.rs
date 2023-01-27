@@ -77,6 +77,7 @@ impl MakeNewBingusModule for Triggerbot {
             last_attack: None,
             __env: None,
             __mappings_manager: None,
+            __prev_enabled: false,
         }
     }
 }

@@ -106,17 +106,6 @@ pub fn run_client() {
                     }
                 }
             }
-            for (i, enabled) in enabled_modules_map {
-                let mut locked_inner_modules = modules.lock().unwrap();
-                let inner_module = locked_inner_modules.get_mut(i).unwrap();
-                if enabled != *inner_module.get_enabled().0.get_bool() {
-                    if !enabled {
-                        inner_module.on_enable();
-                    } else {
-                        inner_module.on_disable();
-                    }
-                }
-            }
 
 
             std::thread::sleep(std::time::Duration::from_millis(1));

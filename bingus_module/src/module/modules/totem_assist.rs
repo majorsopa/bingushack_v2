@@ -80,6 +80,7 @@ impl MakeNewBingusModule for TotemAssist {
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             __env: None,
             __mappings_manager: None,
+            __prev_enabled: false,
         }
     }
 }

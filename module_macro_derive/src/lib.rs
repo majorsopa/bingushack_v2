@@ -78,6 +78,14 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
             let matched = opts.tick_method.inner;
             quote! {
                 fn tick(#defaults_args) {
+                    if *self.__enabled_bool_setting.0.get_bool() != self.__prev_enabled {
+                        if *self.__enabled_bool_setting.0.get_bool() {
+                            self.on_enable();
+                        } else {
+                            self.on_disable();
+                        }
+                        self.__prev_enabled = *self.__enabled_bool_setting.0.get_bool();
+                    }
                     #unwrapped;
                     #matched;
                 }
@@ -225,6 +233,13 @@ pub fn add_bingus_fields(_attr: TokenStream, input: TokenStream) -> TokenStream 
                         .push(syn::Field::parse_named.parse2(
                             quote! {
                                 __mappings_manager: Option<Arc<AtomicPtr<MappingsManager<'static>>>>
+                            }
+                        ).unwrap());
+                    fields
+                        .named
+                        .push(syn::Field::parse_named.parse2(
+                            quote! {
+                                __prev_enabled: bool
                             }
                         ).unwrap());
                 }   
