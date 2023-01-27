@@ -13,6 +13,8 @@ members = [
     "macro_common",
 ]
 
+resolver = "2"
+
 [profile.release]
 debug = false
 strip = true
