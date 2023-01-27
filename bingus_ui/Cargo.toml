@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-eframe = "0.20.1"
+eframe = { path = "../lib/egui/crates/eframe" }
 bingus_module = { path = "../bingus_module" }
 bingus_setting = { path = "../bingus_setting" }
