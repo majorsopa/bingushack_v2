@@ -1,6 +1,6 @@
 use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}};
 use winit::platform::windows::EventLoopBuilderExtWindows;
-use eframe::EventLoopBuilder;
+use eframe::{EventLoopBuilder, App};
 use once_cell::sync::OnceCell;
 use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext}};
 
@@ -103,6 +103,10 @@ impl eframe::App for EspWindow {
                 ESP_CONTEXT = Some(wglGetCurrentContext());
             }
         }
+
+        eframe::egui::CentralPanel::default().show(ctx, |ui| {
+            ui.label("bruh");
+        });
     }
 }
 
