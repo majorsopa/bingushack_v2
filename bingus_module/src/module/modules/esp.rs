@@ -1,6 +1,5 @@
 use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}};
 use winit::platform::windows::EventLoopBuilderExtWindows;
-use eframe::{EventLoopBuilder, App};
 use once_cell::sync::OnceCell;
 use winapi::{shared::windef::{HDC, HGLRC}, um::wingdi::{wglGetCurrentDC, wglGetCurrentContext}};
 
