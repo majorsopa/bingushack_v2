@@ -168,6 +168,8 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "GameRenderer", "fdo", {
             add_field!("fovMultiplier", "p", "F", false);
+
+            add_method!("getCamera", "m", "()Leir;", false);
         });
         add_mapping!(new_self, "SimpleOption", "eji", {
             add_field!("value", "k", "Ljava/lang/Object;", false);
@@ -243,6 +245,10 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "LivingEntity", "beg", {
 
+        });
+        add_mapping!(new_self, "Camera", "eir", {
+            add_field!("pitch", "j", "F", false);
+            add_field!("yaw", "k", "F", false);
         });
 
         new_self

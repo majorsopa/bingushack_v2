@@ -161,17 +161,11 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
     });
 
     if let Some(modules) = MODULES.get() {
-        unsafe {
-            let local_new_context = NEW_CONTEXT.get_mut().unwrap();
-            wglMakeCurrent(hdc, *local_new_context.get_mut());  // might be bad?
-        }
-        setup_ortho();
         for module in modules.lock().unwrap().iter_mut() {
             if *module.get_enabled().0.get_bool() {
                 module.render();
             }
         }
-        restore_gl();
     }
 
     unsafe {

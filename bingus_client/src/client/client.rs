@@ -1,11 +1,12 @@
 use std::{sync::{Mutex, Arc, atomic::AtomicPtr}, collections::HashMap, borrow::BorrowMut};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
-use eframe::egui;
+use eframe::{egui, EventLoopBuilder};
 use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
 use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
+use winit::platform::windows::EventLoopBuilderExtWindows;
 
 use crate::MODULES;
 
@@ -68,6 +69,10 @@ pub fn run_client() {
 
     options.resizable = false;
     options.drag_and_drop_support = false;
+    options.run_and_return = true;
+    options.event_loop_builder = Some(Box::new(|builder|{
+        builder.with_any_thread(true);
+    }));
 
     let (modules_tx, modules_rx) = std::sync::mpsc::channel::<()>();
     let running_modules = std::thread::spawn(move || {

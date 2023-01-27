@@ -1,61 +1,19 @@
-use std::sync::Mutex;
-
-use glam::{Vec4, Vec3, Vec2};
-use glu_sys::{glMatrixMode, GL_PROJECTION, GL_MODELVIEW, glPushMatrix, glLoadMatrixf, GLfloat, glPopMatrix};
-
 use crate::crate_prelude::*;
 
 
 
-pub static PROJECTION_MATRIX: Mutex<Option<[f32; 16]>> = Mutex::new(None);
-pub static MODELVIEW_MATRIX: Mutex<Option<[f32; 16]>> = Mutex::new(None);
-
-
 pub struct RenderInfo {
-    entity_pos: [f64; 3],
-    bounding_box: [f64; 6],
+    pub entity_pos: [f64; 3]
 }
 
 impl RenderInfo {
-    pub fn new(entity_pos: [f64; 3], bounding_box: [f64; 6]) -> Self {
+    pub fn new_from_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, entity: &'a ClassMapping<'a>) -> Self {
         Self {
-            entity_pos,
-            bounding_box
+            entity_pos: get_entity_pos_array(env, mappings_manager, entity)
         }
     }
-
-    pub fn get_entity_pos(&self) -> [f64; 3] {
-        self.entity_pos
-    }
-
-    pub fn get_bounding_box(&self) -> [f64; 6] {
-        self.bounding_box
-    }
 }
 
-pub fn setup_ortho() {
-    unsafe {
-        let projection_matrix = match (*PROJECTION_MATRIX.lock().unwrap()).as_ref() {
-            Some(matrix) => matrix,
-            None => return,
-        } as *const f32;
-        let modelview_matrix = match (*MODELVIEW_MATRIX.lock().unwrap()).as_ref() {
-            Some(matrix) => matrix,
-            None => return,
-        } as *const f32;
-        glPushMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(projection_matrix);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(modelview_matrix);
-    }
-}
-
-pub fn restore_gl() {
-    unsafe {
-        glPopMatrix();
-    }
-}
 
 // the casting might be a bruh moment
 pub fn get_viewport<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> [f32; 4] {
@@ -108,83 +66,65 @@ pub fn get_matrix_16<'a>(env: JNIEnv<'a>, matrix_class_mapping: &'a ClassMapping
     matrix
 }
 
-pub fn get_render_system<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> &'a ClassMapping<'a> {
-    mappings_manager.get("RenderSystem").unwrap()
-}
-
-pub fn get_viewport_class_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> &'a ClassMapping<'a> {
-    mappings_manager.get("Viewport").unwrap()
-}
-
-pub fn get_modelview_class_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> &'a ClassMapping<'a> {
-    let matrix = mappings_manager.get("Matrix4f").unwrap();
-    let render_system = get_render_system(env, mappings_manager);
-
-    apply_object!(
-        matrix,
-        call_method_or_get_field!(
+pub fn world_to_screen<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, player: &'a ClassMapping, entity_pos: [f64; 3]) -> [f64; 2] {
+    let camera_position = get_player_pos(env, mappings_manager, player);
+    let mut camera_position = [entity_pos[0] - camera_position[0], entity_pos[1] - camera_position[1], entity_pos[2] - camera_position[2]];
+    let [pitch, yaw] = get_pitch_and_yaw(
+        env,
+        get_camera(
             env,
-            render_system,
-            "getModelViewMatrix",
-            true,
-            &[]
-        ).unwrap().l().unwrap()
-    );
+            mappings_manager,
+            get_game_renderer(
+                env,
+                mappings_manager,
+                get_minecraft_client(
+                    env,
+                    mappings_manager
+                )
+            )
+        )
+    ).map(|c| c as f64);
+    // x and z might need to be swapped
+    camera_position[2] *= yaw.cos();
+    camera_position[0] *= yaw.sin();
+    camera_position[2] *= pitch.cos();
 
-    matrix
+    camera_position[1] *= pitch.sin();
+
+    [camera_position[0], camera_position[1]]
 }
 
-pub fn get_projection_class_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) -> &'a ClassMapping<'a> {
-    let matrix = mappings_manager.get("Matrix4f").unwrap();
-    let render_system = get_render_system(env, mappings_manager);
-
+pub fn get_game_renderer<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> &'a ClassMapping<'a> {
+    let game_renderer = mappings_manager.get("GameRenderer").unwrap();
     apply_object!(
-        matrix,
-        call_method_or_get_field!(
-            env,
-            render_system,
-            "getProjectionMatrix",
-            true,
-            &[]
-        ).unwrap().l().unwrap()
+        game_renderer,
+        call_method_or_get_field!(env, minecraft_client, "gameRenderer", false).unwrap().l().unwrap()
     );
-
-    matrix
+    game_renderer
 }
 
-pub fn world_to_screen_multiply(in_vec: Vec4, mat: [GLfloat; 16]) -> Vec4 {
-    let [x, y, z, w] = in_vec.to_array();
-    Vec4::new(
-        x * mat[0] + y * mat[4] + z * mat[8] + w * mat[12],
-        x * mat[1] + y * mat[5] + z * mat[9] + w * mat[13],
-        x * mat[2] + y * mat[6] + z * mat[10] + w * mat[14],
-        x * mat[3] + y * mat[7] + z * mat[11] + w * mat[15],
-    )
+pub fn get_camera<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, game_renderer: &'a ClassMapping) -> &'a ClassMapping<'a> {
+    let camera = mappings_manager.get("Camera").unwrap();
+    apply_object!(
+        camera,
+        call_method_or_get_field!(env, game_renderer, "getCamera", false, &[]).unwrap().l().unwrap()
+    );
+    camera
 }
 
-pub fn world_to_screen(point_in_world: Vec3, model_view: [GLfloat; 16], projection: [GLfloat; 16], viewport: [GLfloat; 4]) -> Option<Vec2> {
-    let clip_space_pos = world_to_screen_multiply(
-        world_to_screen_multiply(
-            Vec4::new(point_in_world.x, point_in_world.y, point_in_world.z, 1.0),
-            model_view
-        ),
-        projection
-    );
-    // ncd = normalized device coordinates
-    let ncd_space_pos = Vec3::new(
-        clip_space_pos.x / clip_space_pos.w,
-        clip_space_pos.y / clip_space_pos.w,
-        clip_space_pos.z / clip_space_pos.w
-    );
+pub fn get_pitch_and_yaw<'a>(env: JNIEnv<'a>, camera: &'a ClassMapping) -> [f32; 2] {
+    let pitch = call_method_or_get_field!(
+        env,
+        camera,
+        "pitch",
+        true
+    ).unwrap().f().unwrap();
+    let yaw = call_method_or_get_field!(
+        env,
+        camera,
+        "yaw",
+        true
+    ).unwrap().f().unwrap();
 
-    if ncd_space_pos.z > 1.0 || ncd_space_pos.z < -1.0 {
-        return None;
-    } else {
-        let screen_space_pos = Vec2::new(
-            ((ncd_space_pos.x + 1.0) / 2.0) * viewport[2],
-            ((1.0 - ncd_space_pos.y) / 2.0) * viewport[3]
-        );
-
-        Some(screen_space_pos)
-    }
+    [pitch, yaw]
 }
