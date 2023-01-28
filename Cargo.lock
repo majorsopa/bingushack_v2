@@ -231,6 +231,7 @@ dependencies = [
  "pixels",
  "rand",
  "tao",
+ "winapi",
 ]
 
 [[package]]

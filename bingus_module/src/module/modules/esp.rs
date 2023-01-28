@@ -1,9 +1,15 @@
-use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}};
+use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}, borrow::Borrow};
 use once_cell::sync::OnceCell;
 use pixels::{SurfaceTexture, Pixels};
 use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::LogicalSize, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
+use winapi::{shared::windef::{HGLRC, HDC}, um::wingdi::{wglGetCurrentContext, wglGetCurrentDC, wglMakeCurrent}};
 
 use crate::crate_prelude::*;
+
+
+
+static mut ESP_CONTEXT: Option<HGLRC> = None;
+static mut ESP_HDC: Option<HDC> = None;
 
 
 fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
@@ -138,27 +144,34 @@ fn on_enable() {
             let mut event_loop: EventLoop<()> = EventLoop::new_any_thread();
             let window = {
                 let size = LogicalSize::new(256, 256);
-                WindowBuilder::new()
+                let window = WindowBuilder::new()
                     .with_min_inner_size(size)
                     .with_decorations(false)
                     .with_resizable(false)
                     .with_always_on_top(true)
                     .with_maximized(true)
-                    //.with_transparent(true)
+                    .with_transparent(true)
                     .with_resizable(false)
                     .build(&event_loop)
-                    .unwrap()
+                    .unwrap();
+                window.set_ignore_cursor_events(true).unwrap();
+                window
             };
 
             let mut pixels = {
                 let size = window.inner_size();
                 let surface_texture = SurfaceTexture::new(size.width, size.height, &window);
-                Pixels::new(size.width, size.height, surface_texture).unwrap()
+                let mut pixels = Pixels::new(size.width, size.height, surface_texture).unwrap();
+                pixels.set_clear_color(pixels::wgpu::Color::TRANSPARENT);
+                pixels
             };
 
             event_loop.run_return(move |event, _, control_flow| {
+                let esp_window = ESP_WINDOW.get().unwrap().clone();
+                if Arc::clone(&esp_window.receiver).as_ref().as_ref().unwrap().try_recv().is_ok() {  // magic
+                    *control_flow = ControlFlow::Exit;
+                }
                 if let Event::RedrawRequested(_) = event {
-                    let esp_window = ESP_WINDOW.get().unwrap().clone();
                     let rects = esp_window.rects.lock().unwrap();
                     let frame = pixels.get_frame_mut();
                     for rect in rects.iter() {
@@ -171,10 +184,19 @@ fn on_enable() {
                         }
                     }
 
+                    if ESP_HDC.is_none() {
+                        ESP_HDC = Some(wglGetCurrentDC());
+                    }
+                    if ESP_CONTEXT.is_none() {
+                        ESP_CONTEXT = Some(wglGetCurrentContext());
+                    }
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
                         return;
                     }
+                    let hdc = *ESP_HDC.as_ref().unwrap();
+                    let context = ESP_CONTEXT.as_mut().unwrap();
+                    wglMakeCurrent(hdc, *context);
                 }
             });
         }));
