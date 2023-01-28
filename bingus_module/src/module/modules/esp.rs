@@ -1,8 +1,8 @@
 use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}, borrow::Borrow};
 use once_cell::sync::OnceCell;
 use pixels::{SurfaceTexture, Pixels};
-use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::LogicalSize, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
-use winapi::{shared::windef::{HGLRC, HDC}, um::wingdi::{wglGetCurrentContext, wglGetCurrentDC, wglMakeCurrent}};
+use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::{LogicalSize, PhysicalSize}, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
+use winapi::{shared::windef::{HGLRC, HDC}, um::{wingdi::{wglGetCurrentContext, wglGetCurrentDC, wglMakeCurrent, GetDeviceCaps, LOGPIXELSX, LOGPIXELSY}, winuser::{GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN}}};
 
 use crate::crate_prelude::*;
 
@@ -11,8 +11,16 @@ use crate::crate_prelude::*;
 static mut ESP_CONTEXT: Option<HGLRC> = None;
 static mut ESP_HDC: Option<HDC> = None;
 
+static DIMENSIONS: OnceCell<[i32; 2]> = OnceCell::new();
+
 
 fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
+    unsafe {
+        if ESP_JOINHANDLE.is_none() {
+            return;
+        }
+    }
+
     let minecraft_client = get_minecraft_client(env, mappings_manager);
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
         Some(player) => player,
@@ -22,6 +30,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         Some(world) => world,
         None => return,
     };
+
 
     let entities_iterator = mappings_manager.get("Iterator").unwrap();
     apply_object!(
@@ -45,6 +54,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
             }
         ).get_object().unwrap()
     );
+
 
     esp.entity_list = vec![];
     loop {
@@ -73,6 +83,16 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
             break;
         }
     }
+
+    let esp_window = unsafe { ESP_WINDOW.get().unwrap().clone() };
+    let mut rects = esp_window.rects.lock().unwrap();
+    // IMPORTANT
+    if !rects.is_empty() {
+        return;
+    }
+    for entity in &esp.entity_list {
+        rects.push(world_to_screen(env, mappings_manager, player, entity.entity_pos));
+    }
 }
 
 
@@ -94,43 +114,6 @@ impl Clone for EspWindow {
     }
 }
 
-fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
-    /*
-    unsafe {
-        if ESP_JOINHANDLE.is_none() {
-            return;
-        }
-    }
-
-
-    let minecraft_client = get_minecraft_client(env, mappings_manager);
-    let player = match get_player_checked(env, mappings_manager, minecraft_client) {
-        Some(player) => player,
-        None => return,
-    };
-
-
-    let esp_window = unsafe { ESP_WINDOW.get().unwrap().clone() };
-    let mut rects = esp_window.rects.lock().unwrap();
-    rects.clear();
-    for entity in &esp.entity_list {
-        //let bounding_box = entity.get_bounding_box();  // minx miny minz maxx maxy maxz
-        /*let box_vertices: [[f64; 3]; 8] = [
-            [bounding_box[0] - 0.1, bounding_box[1] - 0.1, bounding_box[2] - 0.1],
-            [bounding_box[0] - 0.1, bounding_box[4] + 0.1, bounding_box[2] - 0.1],
-            [bounding_box[3] + 0.1, bounding_box[4] + 0.1, bounding_box[2] - 0.1],
-            [bounding_box[3] + 0.1, bounding_box[1] - 0.1, bounding_box[2] - 0.1],
-            [bounding_box[3] + 0.1, bounding_box[4] + 0.1, bounding_box[5] + 0.1],
-            [bounding_box[0] - 0.1, bounding_box[4] + 0.1, bounding_box[5] + 0.1],
-            [bounding_box[0] - 0.1, bounding_box[1] - 0.1, bounding_box[5] + 0.1],
-            [bounding_box[3] + 0.1, bounding_box[1] - 0.1, bounding_box[5] + 0.1]
-        ];*/
-
-        rects.push(world_to_screen(env, mappings_manager, player, entity.entity_pos));
-    }
-    */
-}
-
 fn on_disable(esp: &mut Esp) {
     esp.sender.send(()).unwrap();
     unsafe {
@@ -139,11 +122,17 @@ fn on_disable(esp: &mut Esp) {
 }
 
 fn on_enable() {
+    let [width, height] = DIMENSIONS.get_or_init(|| unsafe {
+        let hdc = ESP_HDC.unwrap_or_else(|| wglGetCurrentDC());
+        let width = GetDeviceCaps(hdc, LOGPIXELSX);
+        let height = GetDeviceCaps(hdc, LOGPIXELSY);
+        [width, height]
+    });
     unsafe {
-        ESP_JOINHANDLE = Some(std::thread::spawn(|| {
+        ESP_JOINHANDLE = Some(std::thread::spawn(move || {
             let mut event_loop: EventLoop<()> = EventLoop::new_any_thread();
             let window = {
-                let size = LogicalSize::new(256, 256);
+                let size: LogicalSize<i32> = LogicalSize::new(*width, *height);
                 let window = WindowBuilder::new()
                     .with_min_inner_size(size)
                     .with_decorations(false)
@@ -172,31 +161,34 @@ fn on_enable() {
                     *control_flow = ControlFlow::Exit;
                 }
                 if let Event::RedrawRequested(_) = event {
-                    let rects = esp_window.rects.lock().unwrap();
+                    let mut rects = esp_window.rects.lock().unwrap();
                     let frame = pixels.get_frame_mut();
                     for rect in rects.iter() {
                         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                            let x = i as f64 % 256.0;
-                            let y = i as f64 / 256.0;
+                            let x = i as f64 % *width as f64;
+                            let y = i as f64 / *height as f64;
                             if x >= rect[0] && x <= rect[0] + 10.0 && y >= rect[1] && y <= rect[1] + 10.0 {
                                 pixel.copy_from_slice(&[255, 0, 0, 255]);
                             }
                         }
                     }
+                    rects.clear();
 
+                    // gl stuff might not be needed
                     if ESP_HDC.is_none() {
                         ESP_HDC = Some(wglGetCurrentDC());
                     }
                     if ESP_CONTEXT.is_none() {
                         ESP_CONTEXT = Some(wglGetCurrentContext());
                     }
+                    let hdc = *ESP_HDC.as_ref().unwrap();
+                    let context = ESP_CONTEXT.as_mut().unwrap();
+                    wglMakeCurrent(hdc, *context);
+
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
                         return;
                     }
-                    let hdc = *ESP_HDC.as_ref().unwrap();
-                    let context = ESP_CONTEXT.as_mut().unwrap();
-                    wglMakeCurrent(hdc, *context);
                 }
             });
         }));
@@ -208,7 +200,6 @@ fn on_enable() {
 #[bingus_module(
     name = "ESP (doesn't work)",
     tick_method = "tick(self, _env, _mappings_manager)",
-    render_method = "render(self, _env, _mappings_manager)",
     on_disable_method = "on_disable(self)",
     on_enable_method = "on_enable()"
 )]

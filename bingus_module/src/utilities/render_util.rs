@@ -91,6 +91,9 @@ pub fn world_to_screen<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManage
 
     camera_position[1] *= pitch.sin();
 
+    camera_position[0] /= camera_position[2] * 2.0;
+    camera_position[1] /= camera_position[2] * 2.0;
+
     [camera_position[0], camera_position[1]]
 }
 
@@ -117,13 +120,13 @@ pub fn get_pitch_and_yaw<'a>(env: JNIEnv<'a>, camera: &'a ClassMapping) -> [f32;
         env,
         camera,
         "pitch",
-        true
+        false
     ).unwrap().f().unwrap();
     let yaw = call_method_or_get_field!(
         env,
         camera,
         "yaw",
-        true
+        false
     ).unwrap().f().unwrap();
 
     [pitch, yaw]
