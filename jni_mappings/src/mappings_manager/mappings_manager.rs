@@ -186,10 +186,10 @@ impl MappingsManager<'_> {
             
         });
         add_mapping!(new_self, "Viewport", "com/mojang/blaze3d/platform/GlStateManager$m", {  // static enum
-            add_field!("x", "b", "I", true);
-            add_field!("y", "c", "I", true);
-            add_field!("width", "d", "I", true);
-            add_field!("height", "e", "I", true);
+            add_method!("getX", "a", "()I", true);
+            add_method!("getY", "b", "()I", true);
+            add_method!("getWidth", "c", "()I", true);
+            add_method!("getHeight", "d", "()I", true);
         });
         add_mapping!(new_self, "RenderSystem", "com/mojang/blaze3d/systems/RenderSystem", {
             add_method!("getModelViewMatrix", "getModelViewMatrix", "()Lorg/joml/Matrix4f;", true);

@@ -56,7 +56,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     );
 
 
-    esp.entity_list = vec![];
+    let mut entity_list = vec![];
     loop {
         if let Some(entity) = get_next_java_iterator_checked(env, mappings_manager, entities_iterator) {  // entity is a generic Object ClassMapping, which is casted to an Entity ClassMapping
             let entity = {
@@ -78,7 +78,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
                 continue;
             }
 
-            esp.entity_list.push(RenderInfo::new_from_entity(env, mappings_manager, entity));
+            entity_list.push(RenderInfo::new_from_entity(env, mappings_manager, entity));
         } else {
             break;
         }
@@ -90,9 +90,10 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     if !rects.is_empty() {
         return;
     }
-    for entity in &esp.entity_list {
-        rects.push(world_to_screen(env, mappings_manager, player, entity.entity_pos));
+    for entity in entity_list {
+        rects.push(world_to_screen(env, entity.entity_pos));
     }
+    send_chat_message(env, mappings_manager, player, &*format!("{:#?}", rects));
 }
 
 
@@ -101,7 +102,7 @@ static mut ESP_JOINHANDLE: Option<JoinHandle<()>> = None;
 static mut ESP_WINDOW: OnceCell<EspWindow> = OnceCell::new();
 
 struct EspWindow {
-    rects: Arc<Mutex<Vec<[f64; 2]>>>,
+    rects: Arc<Mutex<Vec<[f32; 2]>>>,
     receiver: Arc<Option<Receiver<()>>>,
 }
 
@@ -151,7 +152,12 @@ fn on_enable() {
                 let size = window.inner_size();
                 let surface_texture = SurfaceTexture::new(size.width, size.height, &window);
                 let mut pixels = Pixels::new(size.width, size.height, surface_texture).unwrap();
-                pixels.set_clear_color(pixels::wgpu::Color::TRANSPARENT);
+                pixels.set_clear_color(pixels::wgpu::Color {
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                    a: 0.0,
+                });
                 pixels
             };
 
@@ -165,10 +171,10 @@ fn on_enable() {
                     let frame = pixels.get_frame_mut();
                     for rect in rects.iter() {
                         for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
-                            let x = i as f64 % *width as f64;
-                            let y = i as f64 / *height as f64;
-                            if x >= rect[0] && x <= rect[0] + 10.0 && y >= rect[1] && y <= rect[1] + 10.0 {
-                                pixel.copy_from_slice(&[255, 0, 0, 255]);
+                            let x = i as f32 % *width as f32;
+                            let y = i as f32 / *height as f32;
+                            if (x >= rect[0] && x <= rect[0] + 10.0) || (y >= rect[1] && y <= rect[1] + 10.0) {
+                                pixel.copy_from_slice(&[255, 255, 255, 255]);
                             }
                         }
                     }
@@ -204,7 +210,6 @@ fn on_enable() {
     on_enable_method = "on_enable()"
 )]
 pub struct Esp {
-    entity_list: Vec<RenderInfo>,
     sender: Sender<()>,
 }
 
@@ -218,7 +223,6 @@ impl MakeNewBingusModule for Esp {
             }
         })};
         Self {
-            entity_list: vec![],
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             sender,

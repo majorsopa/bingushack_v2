@@ -1,3 +1,5 @@
+use nalgebra_glm::{Vec3, Vec4, Mat4, perspective, look_at};
+
 use crate::crate_prelude::*;
 
 
@@ -21,80 +23,62 @@ pub fn get_viewport<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) 
     let x = call_method_or_get_field!(
         env,
         viewport_class_mapping,
-        "x",
-        true
+        "getX",
+        true,
+        &[]
     ).unwrap().i().unwrap() as f32;
     let y = call_method_or_get_field!(
         env,
         viewport_class_mapping,
-        "y",
-        true
+        "getY",
+        true,
+        &[]
     ).unwrap().i().unwrap() as f32;
     let width = call_method_or_get_field!(
         env,
         viewport_class_mapping,
-        "width",
-        true
+        "getWidth",
+        true,
+        &[]
     ).unwrap().i().unwrap() as f32;
     let height = call_method_or_get_field!(
         env,
         viewport_class_mapping,
-        "height",
-        true
+        "getHeight",
+        true,
+        &[]
     ).unwrap().i().unwrap() as f32;
 
     [x, y, width, height]
 }
 
-pub fn get_matrix_16<'a>(env: JNIEnv<'a>, matrix_class_mapping: &'a ClassMapping<'a>) -> [f32; 16] {
-    let mut matrix = [0.0; 16];
+pub fn world_to_screen<'a>(env: JNIEnv<'a>, entity_pos: [f64; 3]) -> [f32; 2] {
+    let entity_pos = entity_pos.map(|c| c as f32);
+    let entity_pos_vec = Vec3::new(entity_pos[0], entity_pos[1], entity_pos[2]);
 
-    for i in 0..4 {
-        for j in 0..4 {
-            let field_name = format!("m{}{}", i, j);
-            let field = call_method_or_get_field!(
-                env,
-                matrix_class_mapping,
-                field_name.as_str(),
-                true
-            ).unwrap().f().unwrap();
-
-            matrix[i * 4 + j] = field;
-        }
-    }
-
-    matrix
+    let view_projection_matrix = get_view_projection_matrix();
+    let mut result = view_projection_matrix * Vec4::new(entity_pos_vec.x, entity_pos_vec.y, entity_pos_vec.z, 1.0_f32);
+    result = result / result.w;
+    return [result.x, result.y];
 }
 
-pub fn world_to_screen<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, player: &'a ClassMapping, entity_pos: [f64; 3]) -> [f64; 2] {
-    let camera_position = get_player_pos(env, mappings_manager, player);
-    let mut camera_position = [entity_pos[0] - camera_position[0], entity_pos[1] - camera_position[1], entity_pos[2] - camera_position[2]];
-    let [pitch, yaw] = get_pitch_and_yaw(
-        env,
-        get_camera(
-            env,
-            mappings_manager,
-            get_game_renderer(
-                env,
-                mappings_manager,
-                get_minecraft_client(
-                    env,
-                    mappings_manager
-                )
-            )
-        )
-    ).map(|c| c as f64);
-    // x and z might need to be swapped
-    camera_position[2] *= yaw.cos();
-    camera_position[0] *= yaw.sin();
-    camera_position[2] *= pitch.cos();
+pub fn get_camera_direction(pitch: f32, yaw: f32) -> Vec3 {
+    let pitch = pitch.to_radians();
+    let yaw = yaw.to_radians();
 
-    camera_position[1] *= pitch.sin();
+    Vec3::new(
+        pitch.cos() * yaw.cos(),
+        pitch.sin(),
+        pitch.cos() * yaw.sin()
+    )
+}
 
-    camera_position[0] /= camera_position[2] * 2.0;
-    camera_position[1] /= camera_position[2] * 2.0;
-
-    [camera_position[0], camera_position[1]]
+pub fn get_view_projection_matrix() -> Mat4 {
+    let aspect = (1920.0_f32 / 1080.0_f32) as f32;
+    let proj = perspective(aspect, 90.0_f32.to_radians(), 0.1_f32, 1000.0_f32);
+    let cam_look_vec = get_camera_direction(0.0_f32, 0.0_f32);
+    let view = look_at(&Vec3::new(0.0_f32, 0.0_f32, 0.0_f32), &cam_look_vec, &Vec3::new(0.0_f32, 1.0_f32, 0.0_f32));
+    proj * view
 }
 
 pub fn get_game_renderer<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> &'a ClassMapping<'a> {
