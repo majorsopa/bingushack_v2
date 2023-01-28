@@ -86,6 +86,9 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
                         }
                         self.__prev_enabled = *self.__enabled_bool_setting.0.get_bool();
                     }
+                    if !*self.__enabled_bool_setting.0.get_bool() {
+                        return;
+                    }
                     #unwrapped;
                     #matched;
                 }

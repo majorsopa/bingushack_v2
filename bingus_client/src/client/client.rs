@@ -95,9 +95,7 @@ pub fn run_client() {
                     keys_multimap.entry(key as i32).or_insert_with(Vec::new).push(i);
                 }
 
-                if *module.get_enabled().0.get_bool() {
-                    module.tick();
-                }
+                module.tick();
             }
             for (key, modules_vec) in keys_multimap {
                 if unsafe { GetAsyncKeyState(key) } & 0x01 == 1 {
