@@ -74,6 +74,7 @@ impl MappingsManager<'_> {
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bg", "()Z", false);
             add_method!("calculateBoundingBox", "ao", "()Ldzz;", false);
+            add_method!("getNetworkHandler", "I", "()Leza;", false);
 
             add_method!("getInstance", "N", "()Lejf;", true);
         });
@@ -137,6 +138,7 @@ impl MappingsManager<'_> {
             add_method!("isAlive", "br", "()Z", false);
             add_method!("getPos", "dd", "()Leae;", false);
             add_method!("getId", "ah", "()I", false);
+            add_method!("getStringUUID", "ct", "()Ljava/lang/String;", false);
         });
         add_mapping!(new_self, "HitResult", "eac", {
             add_method!("getType", "c", "()Leac$a;", false);
@@ -224,6 +226,10 @@ impl MappingsManager<'_> {
             add_field!("x", "c", "D", false);
             add_field!("y", "d", "D", false);
             add_field!("z", "e", "D", false);
+
+            add_method!("distanceToSqr", "c", "(DDD)D", false);
+            add_method!("subtract", "a", "(DDD)Leae;", false);
+            add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
         });
         add_mapping!(new_self, "RenderTickCounter", "ejt", {
             add_field!("partialTick", "a", "F", false);
@@ -242,13 +248,88 @@ impl MappingsManager<'_> {
             add_field!("maxX", "d", "D", false);
             add_field!("maxY", "e", "D", false);
             add_field!("maxZ", "f", "D", false);
+
+            add_method!("offset", "c", "(Leae;)Ldzz;", false);
         });
         add_mapping!(new_self, "LivingEntity", "beg", {
-
+            add_method!("getAttributeInstance", "a", "(Lbfe;)Lbff;", false);
+            add_method!("hasStatusEffect", "a", "(Lbdi;)Z", false);
+            add_method!("getStatusEffect", "b", "(Lbdi;)Lbdk;", false);
         });
         add_mapping!(new_self, "Camera", "eir", {
             add_field!("pitch", "j", "F", false);
             add_field!("yaw", "k", "F", false);
+        });
+        add_mapping!(new_self, "ClientPlayNetworkHandler", "eza", {
+            add_method!("getPlayerListEntry", "a", "(Ljava/lang/String;)Leze;", false);
+        });
+        add_mapping!(new_self, "GameMode", "cjt", {
+            add_field!("SURVIVAL", "a", "Lcjt;", true);
+            add_field!("CREATIVE", "b", "Lcjt;", true);
+            add_field!("ADVENTURE", "c", "Lcjt;", true);
+            add_field!("SPECTATOR", "d", "Lcjt;", true);
+        });
+        add_mapping!(new_self, "PlayerListEntry", "eze", {
+            add_method!("getGameMode", "e", "()Lcjt;", false);
+        });
+        add_mapping!(new_self, "EntityAttributes", "bfj", {
+            add_field!("GENERIC_ARMOR_TOUGHNESS", "j", "Lbfe;", true);
+        });
+        add_mapping!(new_self, "EntityAttribute", "bfe", {
+
+        });
+        add_mapping!(new_self, "EntityAttributeInstance", "bff", {
+
+        });
+        add_mapping!(new_self, "Explosion", "cjo", {
+            add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);
+        });
+        add_mapping!(new_self, "DestructionType", "cjo$a", {
+            add_field!("DESTROY_WITH_DECAY", "c", "Lcjo$a;", true);
+        });
+        add_mapping!(new_self, "StatusEffects", "bdm", {
+            add_field!("RESISTANCE", "k", "Lbdi;", true);
+        });
+        add_mapping!(new_self, "StatusEffectInstance", "bdk", {
+            add_method!("getAmplifier", "d", "()I", false);
+        });
+        add_mapping!(new_self, "MathHelper", "aoc", {
+            add_method!("lerp", "d", "(DDD)D", true);
+        });
+        add_mapping!(new_self, "RaycastContext", "cjf", {
+            add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
+            add_method!("getEnd", "a", "()Leae;", false);
+            add_method!("getStart", "b", "()Leae;", false);
+        });
+        add_mapping!(new_self, "BlockHitResult", "eaa", {
+            add_method!("getPos", "a", "()Lgp;", false);
+
+            // for getType method cast it up to a HitResult i think
+            add_method!("createMissed", "a", "(Leae;Lgv;Lgp;)Leaa;", true);
+        });
+        add_mapping!(new_self, "BlockPos", "gp", {
+            add_method!("<init>", "<init>", "<init>(Lhu;)V", true);
+        });
+        add_mapping!(new_self, "BlockView", "cjc", {
+            add_method!("raycast", "a", "(Leae;Leae;Ljava/lang/Object;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;", true);  // lambdas be like
+        });
+        add_mapping!(new_self, "VoxelShape", "eax", {
+            add_method!("raycast", "a", "(Leae;Leae;Lgp;)Leaa;", false);
+        });
+        add_mapping!(new_self, "VoxelShapes", "eau", {
+            add_method!("empty", "a", "()Leax;", true);
+        });
+        add_mapping!(new_self, "Direction", "gv", {
+            add_method!("getFacing", "a", "(FFF)Lgv;", true);
+        });
+        add_mapping!(new_self, "Vec3i", "hu", {
+            add_method!("<init>", "<init>", "<init>(DDD)V", true);
+        });
+        add_mapping!(new_self, "ShapeType", "cjf$a", {
+            add_field!("COLLIDER", "a", "Lcjf$a;", true);
+        });
+        add_mapping!(new_self, "FluidHandling", "cjf$b", {
+            add_field!("NONE", "a", "Lcjf$b;", true);
         });
 
         new_self
