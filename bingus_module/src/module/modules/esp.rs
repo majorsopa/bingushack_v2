@@ -91,7 +91,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         return;
     }
     for entity in entity_list {
-        rects.push(world_to_screen(env, entity.entity_pos));
+        rects.push(world_to_screen(entity.entity_pos));
     }
     send_chat_message(env, mappings_manager, player, &*format!("{:#?}", rects));
 }
