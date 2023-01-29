@@ -308,7 +308,7 @@ impl MappingsManager<'_> {
             add_method!("createMissed", "a", "(Leae;Lgv;Lgp;)Leaa;", true);
         });
         add_mapping!(new_self, "BlockPos", "gp", {
-            add_method!("<init>", "<init>", "<init>(Lhu;)V", true);
+            add_method!("<init>", "<init>", "(Lhu;)V", true);
         });
         add_mapping!(new_self, "BlockView", "cjc", {
             add_method!("raycast", "a", "(Leae;Leae;Ljava/lang/Object;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;", true);  // lambdas be like
@@ -323,13 +323,23 @@ impl MappingsManager<'_> {
             add_method!("getFacing", "a", "(FFF)Lgv;", true);
         });
         add_mapping!(new_self, "Vec3i", "hu", {
-            add_method!("<init>", "<init>", "<init>(DDD)V", true);
+            add_method!("<init>", "<init>", "(DDD)V", true);
         });
         add_mapping!(new_self, "ShapeType", "cjf$a", {
             add_field!("COLLIDER", "a", "Lcjf$a;", true);
         });
         add_mapping!(new_self, "FluidHandling", "cjf$b", {
             add_field!("NONE", "a", "Lcjf$b;", true);
+        });
+        add_mapping!(new_self, "Function", "java/util/function/Function", {
+            add_method!("identity", "identity", "()Ljava/util/function/Function;", true);
+
+            add_method!("apply", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+        });
+        add_mapping!(new_self, "BiFunction", "java/util/function/BiFunction", {
+            add_method!("identity", "identity", "()Ljava/util/function/BiFunction;", true);
+
+            add_method!("apply", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         });
 
         new_self

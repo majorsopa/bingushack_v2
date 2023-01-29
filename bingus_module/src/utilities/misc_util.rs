@@ -174,3 +174,25 @@ pub fn bounding_box_minmax_array<'a>(
 
     [min_x, min_y, min_z, max_x, max_y, max_z]
 }
+
+pub fn make_raycast_miss_lambda<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, raycast_context: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    let function = mappings_manager.get("Function").unwrap();
+    apply_object!(
+        function,
+        call_method_or_get_field!(
+            env,
+            function,
+            "identity",
+            true,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+    // function is an object but it doesn't do anything yet
+    // time to apply a closure
+
+    let closure_to_apply = Box::new(|raycast_context_object| -> jni::sys::jobject {
+
+    });
+
+    function
+}
