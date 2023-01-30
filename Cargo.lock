@@ -283,6 +283,7 @@ dependencies = [
  "obfstr",
  "once_cell",
  "public-ip",
+ "tokio",
  "uniqueid",
  "webhook",
  "widestring",
