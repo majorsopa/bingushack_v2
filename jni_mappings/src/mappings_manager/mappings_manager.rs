@@ -353,6 +353,9 @@ impl MappingsManager<'_> {
             add_field!("OBSIDIAN", "ce", "Lcmt;", true);
             add_field!("AIR", "a", "Lcmt;", true);
         });
+        add_mapping!(new_self, "MutableBlockPos", "gp$a", {
+            add_method!("<init>", "<init>", "(DDD)V", true);
+        });
 
         new_self
     }
