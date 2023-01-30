@@ -27,7 +27,7 @@ static mut NEW_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
 static mut OLD_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
 
 
-pub fn message_box(text: &str) {
+fn message_box(text: &str) {
     let caption = CString::new("bingushack").unwrap();
     let text = CString::new(text).unwrap();
     unsafe {
@@ -71,15 +71,13 @@ macro_rules! exit_thread {
 }
 
 unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
-    /*async {
-        client_webhook().await.unwrap();
-    };
-    */
-    // can't make this an async function
-    // await the above somehow?
-    tokio::task::spawn_blocking(|| async {
-        client_webhook().await.unwrap();
-    });
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(async {
+            client_webhook().await.unwrap();
+        });
 
 
     // check hwid, only on release
