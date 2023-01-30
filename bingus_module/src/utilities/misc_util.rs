@@ -175,24 +175,462 @@ pub fn bounding_box_minmax_array<'a>(
     [min_x, min_y, min_z, max_x, max_y, max_z]
 }
 
-pub fn make_raycast_miss_lambda<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, raycast_context: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
-    let function = mappings_manager.get("Function").unwrap();
-    apply_object!(
-        function,
-        call_method_or_get_field!(
+pub fn raycast_replacement<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    world: &'a ClassMapping<'a>,
+    start_vec3d: &'a ClassMapping<'a>,
+    end_vec3d: &'a ClassMapping<'a>,
+    raycast_context: &'a ClassMapping<'a>,
+    obby_pos: &'a ClassMapping<'a>,
+    ignore_terrain: bool
+) -> &'a ClassMapping<'a> {
+    let hit_closure = |raycast_context: &'a ClassMapping<'a>, block_pos: &'a ClassMapping<'a>| {
+        let block_state = mappings_manager.get("BlockState").unwrap();
+        if env.is_same_object(
+            obby_pos.get_object().unwrap(),
+            block_pos.get_object().unwrap()
+        ).unwrap() {
+            let obsidian_block = mappings_manager.get("Block").unwrap();
+            apply_object!(
+                obsidian_block,
+                call_method_or_get_field!(
+                    env,
+                    mappings_manager.get("Blocks").unwrap(),
+                    "OBSIDIAN",
+                    true
+                ).unwrap().l().unwrap()
+            );
+            let obby_default_state = call_method_or_get_field!(
+                env,
+                obsidian_block,
+                "getDefaultState",
+                false,
+                &[]
+            ).unwrap().l().unwrap();
+            apply_object!(
+                block_state,
+                obby_default_state
+            );
+        } else {
+            let world = mappings_manager.get("World").unwrap();
+            apply_object!(
+                world,
+                call_method_or_get_field!(
+                    env,
+                    raycast_context,
+                    "world",
+                    false
+                ).unwrap().l().unwrap()
+            );
+            let block = call_method_or_get_field!(
+                env,
+                world,
+                "getBlockState",
+                false,
+                &[
+                    JValue::Object(block_pos.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap();
+            apply_object!(
+                block_state,
+                block
+            );
+
+            let block = mappings_manager.get("Block").unwrap();
+            apply_object!(
+                block,
+                call_method_or_get_field!(
+                    env,
+                    block_state,
+                    "getBlock",
+                    false,
+                    &[]
+                ).unwrap().l().unwrap()
+            );
+            let blast_resistance = call_method_or_get_field!(
+                env,
+                block,
+                "getBlastResistance",
+                false,
+                &[]
+            ).unwrap().f().unwrap();
+
+            if blast_resistance < 600.0 && ignore_terrain {
+                let air_block = mappings_manager.get("Block").unwrap();
+                apply_object!(
+                    air_block,
+                    call_method_or_get_field!(
+                        env,
+                        mappings_manager.get("Blocks").unwrap(),
+                        "AIR",
+                        true
+                    ).unwrap().l().unwrap()
+                );
+                let air_default_state = call_method_or_get_field!(
+                    env,
+                    air_block,
+                    "getDefaultState",
+                    false,
+                    &[]
+                ).unwrap().l().unwrap();
+                apply_object!(
+                    block_state,
+                    air_default_state
+                );
+            }
+        }
+
+        let raycast_start = mappings_manager.get("Vec3d").unwrap();
+        apply_object!(
+            raycast_start,
+            call_method_or_get_field!(
+                env,
+                raycast_context,
+                "getStart",
+                false,
+                &[]
+            ).unwrap().l().unwrap()
+        );
+        let raycast_end = mappings_manager.get("Vec3d").unwrap();
+        apply_object!(
+            raycast_end,
+            call_method_or_get_field!(
+                env,
+                raycast_context,
+                "getEnd",
+                false,
+                &[]
+            ).unwrap().l().unwrap()
+        );
+
+        let voxel_shape = mappings_manager.get("VoxelShape").unwrap();
+        apply_object!(
+            voxel_shape,
+            call_method_or_get_field!(
+                env,
+                raycast_context,
+                "getBlockShape",
+                false,
+                &[
+                    JValue::Object(block_state.get_object().unwrap()),
+                    JValue::Object(world.get_object().unwrap()),
+                    JValue::Object(block_pos.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+
+        let block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+        apply_object!(
+            block_hit_result,
+            call_method_or_get_field!(
+                env,
+                world,
+                "raycastBlock",
+                false,
+                &[
+                    JValue::Object(raycast_start.get_object().unwrap()),
+                    JValue::Object(raycast_end.get_object().unwrap()),
+                    JValue::Object(block_pos.get_object().unwrap()),
+                    JValue::Object(voxel_shape.get_object().unwrap()),
+                    JValue::Object(block_state.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+
+        let other_voxel_shape = mappings_manager.get("VoxelShape").unwrap();
+        apply_object!(
+            other_voxel_shape,
+            call_method_or_get_field!(
+                env,
+                mappings_manager.get("VoxelShapes").unwrap(),
+                "empty",
+                true,
+                &[]
+            ).unwrap().l().unwrap()
+        );
+
+        let other_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+        apply_object!(
+            other_block_hit_result,
+            call_method_or_get_field!(
+                env,
+                other_voxel_shape,
+                "raycast",
+                false,
+                &[
+                    JValue::Object(raycast_start.get_object().unwrap()),
+                    JValue::Object(raycast_end.get_object().unwrap()),
+                    JValue::Object(block_pos.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+
+        let d = if env.is_same_object(block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
+            f64::MAX
+        } else {
+            let get_coords_from = mappings_manager.get("BlockPos").unwrap();
+            apply_object!(
+                get_coords_from,
+                call_method_or_get_field!(
+                    env,
+                    block_hit_result,
+                    "getPos",
+                    false,
+                    &[]
+                ).unwrap().l().unwrap()
+            );
+            let x = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getX",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+            let y = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getY",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+            let z = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getZ",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+
+            call_method_or_get_field!(
+                env,
+                raycast_start,
+                "distanceToSqr",
+                false,
+                &[
+                    JValue::Double(x),
+                    JValue::Double(y),
+                    JValue::Double(z)
+                ]
+            ).unwrap().d().unwrap()
+        };
+        let e = if env.is_same_object(other_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
+            f64::MAX
+        } else {
+            let get_coords_from = mappings_manager.get("BlockPos").unwrap();
+            apply_object!(
+                get_coords_from,
+                call_method_or_get_field!(
+                    env,
+                    other_block_hit_result,
+                    "getPos",
+                    false,
+                    &[]
+                ).unwrap().l().unwrap()
+            );
+            let x = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getX",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+            let y = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getY",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+            let z = call_method_or_get_field!(
+                env,
+                get_coords_from,
+                "getZ",
+                false,
+                &[]
+            ).unwrap().i().unwrap() as f64;
+
+            call_method_or_get_field!(
+                env,
+                raycast_start,
+                "distanceToSqr",
+                false,
+                &[
+                    JValue::Double(x),
+                    JValue::Double(y),
+                    JValue::Double(z)
+                ]
+            ).unwrap().d().unwrap()
+        };
+
+        if d <= e {
+            block_hit_result
+        } else {
+            other_block_hit_result
+        }
+    };
+
+    if env.is_same_object(start_vec3d.get_object().unwrap(), end_vec3d.get_object().unwrap()).unwrap() {
+        // miss closure
+    } else {
+        // hit
+        let math_helper = mappings_manager.get("MathHelper").unwrap();
+        // holy bananas
+        let d = call_method_or_get_field!(
             env,
-            function,
-            "identity",
+            math_helper,
+            "lerp",
             true,
-            &[]
-        ).unwrap().l().unwrap()
-    );
-    // function is an object but it doesn't do anything yet
-    // time to apply a closure
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "x",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "x",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let e = call_method_or_get_field!(
+            env,
+            math_helper,
+            "lerp",
+            true,
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "y",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "y",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let f = call_method_or_get_field!(
+            env,
+            math_helper,
+            "lerp",
+            true,
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "z",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "z",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let g = call_method_or_get_field!(
+            env,
+            math_helper,
+            "lerp",
+            true,
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "x",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "x",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let h = call_method_or_get_field!(
+            env,
+            math_helper,
+            "lerp",
+            true,
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "y",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "y",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let i = call_method_or_get_field!(
+            env,
+            math_helper,
+            "lerp",
+            true,
+            &[
+                JValue::Double(-1.0E-7),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "z",
+                    false
+                ).unwrap().d().unwrap()),
+                JValue::Double(call_method_or_get_field!(
+                    env,
+                    end_vec3d,
+                    "z",
+                    false
+                ).unwrap().d().unwrap())
+            ]
+        ).unwrap().d().unwrap();
+        let j = call_method_or_get_field!(
+            env,
+            math_helper,
+            "floor",
+            true,
+            &[
+                JValue::Double(g)
+            ]
+        ).unwrap().i().unwrap();
+        let k = call_method_or_get_field!(
+            env,
+            math_helper,
+            "floor",
+            true,
+            &[
+                JValue::Double(h)
+            ]
+        ).unwrap().i().unwrap();
+        let l = call_method_or_get_field!(
+            env,
+            math_helper,
+            "floor",
+            true,
+            &[
+                JValue::Double(i)
+            ]
+        ).unwrap().i().unwrap();
 
-    let closure_to_apply = Box::new(|raycast_context_object| -> jni::sys::jobject {
-
-    });
-
-    function
+        // hit closure
+    }
+    todo!()
 }

@@ -153,6 +153,8 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "ClientWorld", "eyz", {
             add_method!("sendPacketToServer", "a", "(Luh;)V", false);
             add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);
+            add_method!("getBlockState", "a_", "(Lgp;)Lcyt;", false);
+            add_method!("raycastBlock", "a", "(Leae;Leae;Lgp;Leax;Lcyt;)Leaa;", false);  // might not work, is a method of BlockView which i think is a superclass of this?
         });
         add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
             add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
@@ -295,11 +297,13 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "MathHelper", "aoc", {
             add_method!("lerp", "d", "(DDD)D", true);
+            add_method!("sign", "k", "(D)I", true);
         });
         add_mapping!(new_self, "RaycastContext", "cjf", {
             add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
             add_method!("getEnd", "a", "()Leae;", false);
             add_method!("getStart", "b", "()Leae;", false);
+            add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
         });
         add_mapping!(new_self, "BlockHitResult", "eaa", {
             add_method!("getPos", "a", "()Lgp;", false);
@@ -309,9 +313,13 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "BlockPos", "gp", {
             add_method!("<init>", "<init>", "(Lhu;)V", true);
+
+            add_method!("getX", "u", "()I", false);
+            add_method!("getY", "v", "()I", false);
+            add_method!("getZ", "w", "()I", false);
         });
         add_mapping!(new_self, "BlockView", "cjc", {
-            add_method!("raycast", "a", "(Leae;Leae;Ljava/lang/Object;Ljava/util/function/BiFunction;Ljava/util/function/Function;)Ljava/lang/Object;", true);  // lambdas be like
+
         });
         add_mapping!(new_self, "VoxelShape", "eax", {
             add_method!("raycast", "a", "(Leae;Leae;Lgp;)Leaa;", false);
@@ -322,24 +330,28 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "Direction", "gv", {
             add_method!("getFacing", "a", "(FFF)Lgv;", true);
         });
-        add_mapping!(new_self, "Vec3i", "hu", {
-            add_method!("<init>", "<init>", "(DDD)V", true);
-        });
+        //add_mapping!(new_self, "Vec3i", "hu", {
+        //    add_method!("<init>", "<init>", "(DDD)V", true);
+        //});
         add_mapping!(new_self, "ShapeType", "cjf$a", {
             add_field!("COLLIDER", "a", "Lcjf$a;", true);
         });
         add_mapping!(new_self, "FluidHandling", "cjf$b", {
             add_field!("NONE", "a", "Lcjf$b;", true);
         });
-        add_mapping!(new_self, "Function", "java/util/function/Function", {
-            add_method!("identity", "identity", "()Ljava/util/function/Function;", true);
-
-            add_method!("apply", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+        add_mapping!(new_self, "BlockState", "cyt", {  // extends AbstractBlockState
+            add_method!("getBlock", "b", "()Lcmt;", false);
         });
-        add_mapping!(new_self, "BiFunction", "java/util/function/BiFunction", {
-            add_method!("identity", "identity", "()Ljava/util/function/BiFunction;", true);
-
-            add_method!("apply", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        add_mapping!(new_self, "Block", "cmt", {
+            add_method!("getBlastResistance", "e", "()F", false);
+            add_method!("getDefaultState", "n", "()Lcyt;", false);
+        });
+        //add_mapping!(new_self, "AbstractBlockState", "cys$a", {
+        //    add_method!("getBlock", "b", "()Lcmt;", false);
+        //});
+        add_mapping!(new_self, "Blocks", "cmu", {
+            add_field!("OBSIDIAN", "ce", "Lcmt;", true);
+            add_field!("AIR", "a", "Lcmt;", true);
         });
 
         new_self
