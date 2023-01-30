@@ -469,6 +469,89 @@ pub fn raycast_replacement<'a>(
             other_block_hit_result
         }
     };
+    let miss_closure = || {
+        let make_missed_with = mappings_manager.get("Vec3d").unwrap();
+        let end_x = call_method_or_get_field!(
+            env,
+            end_vec3d,
+            "getX",
+            false,
+            &[]
+        ).unwrap().d().unwrap();
+        let end_y = call_method_or_get_field!(
+            env,
+            end_vec3d,
+            "getY",
+            false,
+            &[]
+        ).unwrap().d().unwrap();
+        let end_z = call_method_or_get_field!(
+            env,
+            end_vec3d,
+            "getZ",
+            false,
+            &[]
+        ).unwrap().d().unwrap();
+        apply_object!(
+            make_missed_with,
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "subtract",
+                false,
+                &[
+                    JValue::Double(end_x),
+                    JValue::Double(end_y),
+                    JValue::Double(end_z)
+                ]
+            ).unwrap().l().unwrap()
+        );
+
+        let missed_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+        let direction = mappings_manager.get("Direction").unwrap();
+        apply_object!(
+            direction,
+            call_method_or_get_field!(
+                env,
+                direction,
+                "getFacing",
+                true,
+                &[
+                    JValue::Double(end_x),
+                    JValue::Double(end_y),
+                    JValue::Double(end_z)
+                ]
+            ).unwrap().l().unwrap()
+        );
+        let missed_block_pos = mappings_manager.get("BlockPos").unwrap();
+        apply_object!(
+            missed_block_pos,
+            call_method_or_get_field!(
+                env,
+                missed_block_pos,
+                "<init>",
+                true,
+                &[
+                    JValue::Object(end_vec3d.get_object().unwrap()),  // this might break
+                ]
+            ).unwrap().l().unwrap()
+        );
+        apply_object!(
+            missed_block_hit_result,
+            call_method_or_get_field!(
+                env,
+                missed_block_hit_result,
+                "createMissed",
+                false,
+                &[
+                    JValue::Object(end_vec3d.get_object().unwrap()),
+                    JValue::Object(direction.get_object().unwrap()),
+                    JValue::Object(missed_block_pos.get_object().unwrap()),
+                ]
+            ).unwrap().l().unwrap()
+        );
+        missed_block_hit_result
+    };
 
     if env.is_same_object(start_vec3d.get_object().unwrap(), end_vec3d.get_object().unwrap()).unwrap() {
         // miss closure
@@ -630,7 +713,14 @@ pub fn raycast_replacement<'a>(
             ]
         ).unwrap().i().unwrap();
 
-        // hit closure
+        let maybe_null_object = mappings_manager.get("BlockHitResult").unwrap();
+        //apply_object!(
+        //    maybe_null_object,
+        //    hit_closure(
+        //        raycast_context,
+        //        bl
+        //    )
+        //)
     }
     todo!()
 }
