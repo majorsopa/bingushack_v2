@@ -9,10 +9,13 @@ bingus_client = { path = "../bingus_client" }
 bingus_module = { path = "../bingus_module" }
 crochet = "0.1.1"
 once_cell = "1.17.0"
-gl = "0.14.0"  # glu-sys = "0.1.4"
+gl = "0.14.0"
 widestring = "1.0.2"
 obfstr = "0.4.1"
 uniqueid = "0.2.6"
+webhook = "2.1.2"
+tokio = { version = "1.25.0", features = ["macros", "rt-multi-thread"]}
+public-ip = "0.2.2"
 
 [lib]
 crate-type = ["dylib"]
