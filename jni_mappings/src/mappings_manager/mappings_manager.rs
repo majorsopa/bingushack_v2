@@ -298,6 +298,7 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "MathHelper", "aoc", {
             add_method!("lerp", "d", "(DDD)D", true);
             add_method!("sign", "k", "(D)I", true);
+            add_method!("fractionalPart", "g", "(D)D", true);
         });
         add_mapping!(new_self, "RaycastContext", "cjf", {
             add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
@@ -355,6 +356,7 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "MutableBlockPos", "gp$a", {
             add_method!("<init>", "<init>", "(DDD)V", true);
+            add_method!("set", "d", "(III)Lgp$a;", false);
         });
 
         new_self

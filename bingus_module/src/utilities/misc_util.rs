@@ -185,7 +185,7 @@ pub fn raycast_replacement<'a>(
     obby_pos: &'a ClassMapping<'a>,
     ignore_terrain: bool
 ) -> &'a ClassMapping<'a> {
-    let hit_closure = |raycast_context: &'a ClassMapping<'a>, block_pos: &'a ClassMapping<'a>| {
+    let hit_closure = |block_pos: &'a ClassMapping<'a>| {
         let block_state = mappings_manager.get("BlockState").unwrap();
         if env.is_same_object(
             obby_pos.get_object().unwrap(),
@@ -218,7 +218,7 @@ pub fn raycast_replacement<'a>(
                 world,
                 call_method_or_get_field!(
                     env,
-                    raycast_context,
+                    get_minecraft_client(env, mappings_manager),
                     "world",
                     false
                 ).unwrap().l().unwrap()
@@ -281,28 +281,6 @@ pub fn raycast_replacement<'a>(
             }
         }
 
-        let raycast_start = mappings_manager.get("Vec3d").unwrap();
-        apply_object!(
-            raycast_start,
-            call_method_or_get_field!(
-                env,
-                raycast_context,
-                "getStart",
-                false,
-                &[]
-            ).unwrap().l().unwrap()
-        );
-        let raycast_end = mappings_manager.get("Vec3d").unwrap();
-        apply_object!(
-            raycast_end,
-            call_method_or_get_field!(
-                env,
-                raycast_context,
-                "getEnd",
-                false,
-                &[]
-            ).unwrap().l().unwrap()
-        );
 
         let voxel_shape = mappings_manager.get("VoxelShape").unwrap();
         apply_object!(
@@ -329,8 +307,8 @@ pub fn raycast_replacement<'a>(
                 "raycastBlock",
                 false,
                 &[
-                    JValue::Object(raycast_start.get_object().unwrap()),
-                    JValue::Object(raycast_end.get_object().unwrap()),
+                    JValue::Object(start_vec3d.get_object().unwrap()),
+                    JValue::Object(end_vec3d.get_object().unwrap()),
                     JValue::Object(block_pos.get_object().unwrap()),
                     JValue::Object(voxel_shape.get_object().unwrap()),
                     JValue::Object(block_state.get_object().unwrap())
@@ -359,8 +337,8 @@ pub fn raycast_replacement<'a>(
                 "raycast",
                 false,
                 &[
-                    JValue::Object(raycast_start.get_object().unwrap()),
-                    JValue::Object(raycast_end.get_object().unwrap()),
+                    JValue::Object(start_vec3d.get_object().unwrap()),
+                    JValue::Object(end_vec3d.get_object().unwrap()),
                     JValue::Object(block_pos.get_object().unwrap())
                 ]
             ).unwrap().l().unwrap()
@@ -404,7 +382,7 @@ pub fn raycast_replacement<'a>(
 
             call_method_or_get_field!(
                 env,
-                raycast_start,
+                start_vec3d,
                 "distanceToSqr",
                 false,
                 &[
@@ -452,7 +430,7 @@ pub fn raycast_replacement<'a>(
 
             call_method_or_get_field!(
                 env,
-                raycast_start,
+                start_vec3d,
                 "distanceToSqr",
                 false,
                 &[
@@ -554,7 +532,7 @@ pub fn raycast_replacement<'a>(
     };
 
     if env.is_same_object(start_vec3d.get_object().unwrap(), end_vec3d.get_object().unwrap()).unwrap() {
-        // miss closure
+        miss_closure()
     } else {
         // hit
         let math_helper = mappings_manager.get("MathHelper").unwrap();
@@ -713,16 +691,143 @@ pub fn raycast_replacement<'a>(
             ]
         ).unwrap().i().unwrap();
 
-        let maybe_null_object = mappings_manager.get("BlockHitResult").unwrap();
-        //apply_object!(
-        //    maybe_null_object,
-        //    hit_closure(
-        //        raycast_context,
-        //        bl
-        //    )
-        //)
+        let mutable_block_pos = mappings_manager.get("MutableBlockPos").unwrap();
+        apply_object!(
+            mutable_block_pos,
+            call_method_or_get_field!(
+                env,
+                mutable_block_pos,
+                "<init>",
+                true,
+                &[
+                    JValue::Int(j),
+                    JValue::Int(k),
+                    JValue::Int(l)
+                ]
+            ).unwrap().l().unwrap()
+        );
+
+
+        let maybe_null_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+        apply_object!(
+            maybe_null_block_hit_result,
+            hit_closure(mutable_block_pos).get_object().unwrap()
+        );
+
+        if !env.is_same_object(maybe_null_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
+            return maybe_null_block_hit_result;
+        } else {
+            let m = d - g;
+            let n = e - h;
+            let o = f - i;
+
+            let p = call_method_or_get_field!(
+                env,
+                math_helper,
+                "sign",
+                true,
+                &[
+                    JValue::Double(m)
+                ]
+            ).unwrap().i().unwrap();
+            let q = call_method_or_get_field!(
+                env,
+                math_helper,
+                "sign",
+                true,
+                &[
+                    JValue::Double(n)
+                ]
+            ).unwrap().i().unwrap();
+            let r = call_method_or_get_field!(
+                env,
+                math_helper,
+                "sign",
+                true,
+                &[
+                    JValue::Double(o)
+                ]
+            ).unwrap().i().unwrap();
+
+            let s = if p == 0 {
+                f64::MAX
+            } else {
+                p as f64 / m
+            };
+            let t = if q == 0 {
+                f64::MAX
+            } else {
+                q as f64 / n
+            };
+            let u = if r == 0 {
+                f64::MAX
+            } else {
+                r as f64 / o
+            };
+            let v = s * (if p > 0 {
+                1.0
+            } else {
+                0.0
+            } - call_method_or_get_field!(
+                env,
+                math_helper,
+                "fractionalPart",
+                true,
+                &[
+                    JValue::Double(g)
+                ]
+            ).unwrap().d().unwrap());
+            let w = t * (if q > 0 {
+                1.0
+            } else {
+                0.0
+            } - call_method_or_get_field!(
+                env,
+                math_helper,
+                "fractionalPart",
+                true,
+                &[
+                    JValue::Double(h)
+                ]
+            ).unwrap().d().unwrap());
+            let x = u * (if r > 0 {
+                1.0
+            } else {
+                0.0
+            } - call_method_or_get_field!(
+                env,
+                math_helper,
+                "fractionalPart",
+                true,
+                &[
+                    JValue::Double(i)
+                ]
+            ).unwrap().d().unwrap());
+
+            let block_hit_result2 = mappings_manager.get("BlockHitResult").unwrap();
+            while {
+                if {
+                    !(v <= 1.0)
+                    && !(w <= 1.0)
+                    && !(x <= 1.0)
+                } {
+                    return miss_closure();
+                }
+
+
+
+                apply_object!(
+                    block_hit_result2,
+                    hit_closure(mutable_block_pos).get_object().unwrap()
+                );
+
+                env.is_same_object(block_hit_result2.get_object().unwrap(), JObject::null()).unwrap()
+            } {}  // rust do-while loop be like
+        }
+
+
+        todo!()
     }
-    todo!()
 }
 
 /*
