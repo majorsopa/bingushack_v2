@@ -663,7 +663,7 @@ pub fn raycast_replacement<'a>(
                 ).unwrap().d().unwrap())
             ]
         ).unwrap().d().unwrap();
-        let j = call_method_or_get_field!(
+        let mut j = call_method_or_get_field!(
             env,
             math_helper,
             "floor",
@@ -672,7 +672,7 @@ pub fn raycast_replacement<'a>(
                 JValue::Double(g)
             ]
         ).unwrap().i().unwrap();
-        let k = call_method_or_get_field!(
+        let mut k = call_method_or_get_field!(
             env,
             math_helper,
             "floor",
@@ -681,7 +681,7 @@ pub fn raycast_replacement<'a>(
                 JValue::Double(h)
             ]
         ).unwrap().i().unwrap();
-        let l = call_method_or_get_field!(
+        let mut l = call_method_or_get_field!(
             env,
             math_helper,
             "floor",
@@ -764,7 +764,7 @@ pub fn raycast_replacement<'a>(
             } else {
                 r as f64 / o
             };
-            let v = s * (if p > 0 {
+            let mut v = s * (if p > 0 {
                 1.0
             } else {
                 0.0
@@ -777,7 +777,7 @@ pub fn raycast_replacement<'a>(
                     JValue::Double(g)
                 ]
             ).unwrap().d().unwrap());
-            let w = t * (if q > 0 {
+            let mut w = t * (if q > 0 {
                 1.0
             } else {
                 0.0
@@ -790,7 +790,7 @@ pub fn raycast_replacement<'a>(
                     JValue::Double(h)
                 ]
             ).unwrap().d().unwrap());
-            let x = u * (if r > 0 {
+            let mut x = u * (if r > 0 {
                 1.0
             } else {
                 0.0
@@ -814,8 +814,39 @@ pub fn raycast_replacement<'a>(
                     return miss_closure();
                 }
 
+                // literally copy-pasted from the Java code LOL
+                if v < w {
+                    if v < x {
+                        j += p;
+                        v += s;
+                    } else {
+                        l += r;
+                        x += u;
+                    }
+                } else if w < x {
+                    k += q;
+                    w += t;
+                } else {
+                    l += r;
+                    x += u;
+                }
 
 
+
+                apply_object!(
+                    mutable_block_pos,
+                    call_method_or_get_field!(
+                        env,
+                        mutable_block_pos,
+                        "set",
+                        false,
+                        &[
+                            JValue::Int(j),
+                            JValue::Int(k),
+                            JValue::Int(l)
+                        ]
+                    ).unwrap().l().unwrap()
+                );
                 apply_object!(
                     block_hit_result2,
                     hit_closure(mutable_block_pos).get_object().unwrap()
@@ -823,10 +854,9 @@ pub fn raycast_replacement<'a>(
 
                 env.is_same_object(block_hit_result2.get_object().unwrap(), JObject::null()).unwrap()
             } {}  // rust do-while loop be like
+
+            block_hit_result2
         }
-
-
-        todo!()
     }
 }
 
