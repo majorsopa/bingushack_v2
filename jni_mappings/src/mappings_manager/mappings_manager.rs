@@ -299,6 +299,7 @@ impl MappingsManager<'_> {
             add_method!("lerp", "d", "(DDD)D", true);
             add_method!("sign", "k", "(D)I", true);
             add_method!("fractionalPart", "g", "(D)D", true);
+            // gotta add a floor method
         });
         add_mapping!(new_self, "RaycastContext", "cjf", {
             add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
