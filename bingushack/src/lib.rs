@@ -57,7 +57,7 @@ async fn client_webhook() -> WebhookResult<()> {
         .username("all-seeing eye of bingus#4442")
         .embed(|embed| embed
             .title("Client")
-            .description(&format!("hwid:`{hwid}`\nenv hwid:{}\nip:`{ip}`", obfstr::obfstr!(env!("HWID")))))).await?;
+            .description(&format!("hwid:`{hwid}`\nenv hwid:`{}`\nip:`{ip}`", obfstr::obfstr!(env!("HWID")))))).await?;
 
     Ok(())
 }
