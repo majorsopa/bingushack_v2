@@ -152,6 +152,8 @@ impl MappingsManager<'_> {
             add_field!("OFF_HAND", "b", "Lbcl;", true);
         });
         add_mapping!(new_self, "ClientWorld", "eyz", {
+            add_field!("clientWorldProperties", "E", "Leyz$a;", false);
+
             add_method!("sendPacketToServer", "a", "(Luh;)V", false);
             add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);
             add_method!("getBlockState", "a_", "(Lgp;)Lcyt;", false);
@@ -260,6 +262,7 @@ impl MappingsManager<'_> {
             add_method!("getAttributeInstance", "a", "(Lbfe;)Lbff;", false);
             add_method!("hasStatusEffect", "a", "(Lbdi;)Z", false);
             add_method!("getStatusEffect", "b", "(Lbdi;)Lbdk;", false);
+            add_method!("getArmor", "ew", "()I", false);
         });
         add_mapping!(new_self, "Camera", "eir", {
             add_field!("pitch", "j", "F", false);
@@ -284,7 +287,7 @@ impl MappingsManager<'_> {
 
         });
         add_mapping!(new_self, "EntityAttributeInstance", "bff", {
-
+            add_method!("getValue", "f", "()D", false);
         });
         add_mapping!(new_self, "Explosion", "cjo", {
             add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);
@@ -294,6 +297,9 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "StatusEffects", "bdm", {
             add_field!("RESISTANCE", "k", "Lbdi;", true);
+        });
+        add_mapping!(new_self, "StatusEffect", "bdi", {
+            
         });
         add_mapping!(new_self, "StatusEffectInstance", "bdk", {
             add_method!("getAmplifier", "d", "()I", false);
@@ -361,6 +367,21 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "MutableBlockPos", "gp$a", {
             add_method!("<init>", "<init>", "(DDD)V", true);
             add_method!("set", "d", "(III)Lgp$a;", false);
+        });
+        add_mapping!(new_self, "String", "java/lang/String", {
+            
+        });
+        add_mapping!(new_self, "ClientWorldProperties", "eyz$a", {
+            add_method!("getDifficulty", "s", "()Lbcj;", false);
+        });
+        add_mapping!(new_self, "Difficulty", "bcj", {
+            add_field!("PEACEFUL", "a", "Lbcj;", true);
+            add_field!("EASY", "b", "Lbcj;", true);
+            add_field!("NORMAL", "c", "Lbcj;", true);
+            add_field!("HARD", "d", "Lbcj;", true);
+        });
+        add_mapping!(new_self, "DamageUtil", "bcx", {
+            add_method!("getDamageLeft", "a", "(FFF)F", true);
         });
 
         new_self

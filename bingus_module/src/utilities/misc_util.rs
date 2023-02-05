@@ -876,7 +876,6 @@ pub fn get_exposure<'a>(
     mappings_manager: &'a MappingsManager,
     source_vec3d: &'a ClassMapping<'a>,
     entity: &'a ClassMapping<'a>,
-    player_pos: &'a ClassMapping<'a>,
     obby_pos: &'a ClassMapping<'a>,
     ignore_terrain: bool,
 ) -> f64 {
@@ -896,6 +895,7 @@ pub fn get_exposure<'a>(
             &[]
         ).unwrap().l().unwrap()
     );
+    let player_pos = get_entity_pos_vec3d(env, mappings_manager, entity);
     let v = mappings_manager.get("Vec3d").unwrap();
     let [x, y, z] = [
         call_method_or_get_field!(
@@ -1174,3 +1174,336 @@ pub fn new_raycast_context<'a>(
     );
     raycast_context
 }
+
+pub fn crystal_damage<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    player_to_attack: &'a ClassMapping<'a>,
+    crystal_vec3d: &'a ClassMapping<'a>,
+    block_pos: &'a ClassMapping<'a>,
+    ignore_terrain: bool
+) -> f64 {
+    let world = match get_world_checked(env, mappings_manager, get_minecraft_client(env, mappings_manager)) {
+        Some(world) => world,
+        None => return 0.0
+    };
+
+    let entity_player = mappings_manager.get("Entity").unwrap();
+    apply_object!(
+        entity_player,
+        player_to_attack.get_object().unwrap()
+    );
+
+    let player_pos = get_entity_pos_vec3d(env, mappings_manager, entity_player);
+
+    if env.is_same_object(player_to_attack.get_object().unwrap(), JObject::null()).unwrap() {
+        return 0.0;
+    }
+
+    let player_list_entry = get_player_list_entry_by_uuid(env, mappings_manager, entity_player);
+
+    let gamemode = mappings_manager.get("GameMode").unwrap();
+    if env.is_same_object(player_list_entry.get_object().unwrap(), JObject::null()).unwrap() {
+        apply_object!(
+            gamemode,
+            call_method_or_get_field!(
+                env,
+                gamemode,
+                "SPECTATOR",
+                true
+            ).unwrap().l().unwrap()
+        );
+    } else {
+        apply_object!(
+            gamemode,
+            call_method_or_get_field!(
+                env,
+                player_list_entry,
+                "getGameMode",
+                false,
+                &[]
+            ).unwrap().l().unwrap()
+        );
+    }
+    if env.is_same_object(
+        gamemode.get_object().unwrap(),
+        call_method_or_get_field!(
+            env,
+            gamemode,
+            "CREATIVE",
+            true
+        ).unwrap().l().unwrap()
+    ).unwrap() {
+        return 0.0;
+    }
+
+    let [crystal_x, crystal_y, crystal_z] = get_entity_pos_array(env, mappings_manager, entity_player);
+
+    let mod_distance = call_method_or_get_field!(
+        env,
+        player_pos,
+        "distanceToSqr",
+        false,
+        &[
+            JValue::Double(crystal_x),
+            JValue::Double(crystal_y),
+            JValue::Double(crystal_z)
+        ]
+    ).unwrap().d().unwrap().sqrt();
+    if mod_distance > 12.0 {
+        return 0.0;
+    }
+
+    let exposure = get_exposure(
+        env,
+        mappings_manager,
+        crystal_vec3d,
+        entity_player,
+        block_pos,
+        ignore_terrain
+    );
+    let impact = (1.0 - mod_distance / 12.0) * exposure;
+    let mut damage = (impact * impact + impact) / 2.0 * 7.0 * (6.0 * 2.0) + 1.0;
+    damage = get_damage_for_difficulty(env, mappings_manager, world, damage);
+
+    let living_entity_player = mappings_manager.get("LivingEntity").unwrap();
+    apply_object!(
+        living_entity_player,
+        player_to_attack.get_object().unwrap()
+    );
+    let b = call_method_or_get_field!(
+        env,
+        living_entity_player,
+        "getArmor",
+        false,
+        &[]
+    ).unwrap().i().unwrap();
+    let c = {
+        let entity_attribute_instance = mappings_manager.get("EntityAttributeInstance").unwrap();
+        let generic_armor_instance = mappings_manager.get("EntityAttribute").unwrap();
+        let attributes_enum = mappings_manager.get("EntityAttributes").unwrap();
+        apply_object!(
+            generic_armor_instance,
+            call_method_or_get_field!(
+                env,
+                attributes_enum,
+                "GENERIC_ARMOR_TOUGHNESS",
+                true
+            ).unwrap().l().unwrap()
+        );
+        apply_object!(
+            entity_attribute_instance,
+            call_method_or_get_field!(
+                env,
+                living_entity_player,
+                "getAttributeInstance",
+                false,
+                &[
+                    JValue::Object(generic_armor_instance.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+        call_method_or_get_field!(
+            env,
+            entity_attribute_instance,
+            "getValue",
+            false,
+            &[]
+        ).unwrap().d().unwrap()
+    };
+
+    damage = get_damage_left(
+        env,
+        mappings_manager,
+        damage as f32,
+        b as f32,
+        c as f32,
+    );
+    damage = resistance_reduction(env, mappings_manager, living_entity_player, damage);
+
+    todo!()
+}
+
+pub fn get_player_list_entry_by_uuid<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    entity_player: &'a ClassMapping<'a>
+) -> &'a ClassMapping<'a> {
+    let minecraft_client = get_minecraft_client(env, mappings_manager);
+
+
+    let uuid = mappings_manager.get("String").unwrap();
+    apply_object!(
+        uuid,
+        call_method_or_get_field!(
+            env,
+            entity_player,
+            "getStringUUID",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+
+    let client_play_network_handler = mappings_manager.get("ClientPlayNetworkHandler").unwrap();
+    apply_object!(
+        client_play_network_handler,
+        call_method_or_get_field!(
+            env,
+            minecraft_client,
+            "getNetworkHandler",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+
+    let player_list_entry = mappings_manager.get("PlayerListEntry").unwrap();
+    apply_object!(
+        player_list_entry,
+        call_method_or_get_field!(
+            env,
+            client_play_network_handler,
+            "getPlayerListEntry",
+            false,
+            &[
+                JValue::Object(uuid.get_object().unwrap())
+            ]
+        ).unwrap().l().unwrap()
+    );
+
+    player_list_entry
+}
+
+pub fn get_damage_for_difficulty<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    world: &'a ClassMapping<'a>,
+    damage: f64
+) -> f64 {
+    match get_world_difficulty(env, mappings_manager, world) {
+        0 => 0.0,
+        1 => {
+            let tmp_dmg = damage / 2.0 + 1.0;
+            if tmp_dmg < damage {
+                tmp_dmg
+            } else {
+                damage
+            }
+        },
+        2 => damage,
+        _ => damage * 3.0 / 2.0,
+    }
+}
+
+pub fn get_damage_left<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    a: f32,
+    b: f32,
+    c: f32
+) -> f64 {
+    let damage_util = mappings_manager.get("DamageUtil").unwrap();
+    call_method_or_get_field!(
+        env,
+        damage_util,
+        "getDamageLeft",
+        true,
+        &[
+            JValue::Float(a),
+            JValue::Float(b),
+            JValue::Float(c)
+        ]
+    ).unwrap().f().unwrap() as f64
+}
+
+pub fn resistance_reduction<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    living_entity_player: &'a ClassMapping<'a>,
+    mut damage: f64
+) -> f64 {
+    let status_effects = mappings_manager.get("StatusEffects").unwrap();
+    let resistance_effect = mappings_manager.get("StatusEffect").unwrap();
+    apply_object!(
+        resistance_effect,
+        call_method_or_get_field!(
+            env,
+            status_effects,
+            "RESISTANCE",
+            true
+        ).unwrap().l().unwrap()
+    );
+
+    if call_method_or_get_field!(
+        env,
+        living_entity_player,
+        "hasStatusEffect",
+        false,
+        &[
+            JValue::Object(resistance_effect.get_object().unwrap())
+        ]
+    ).unwrap().z().unwrap() {
+        let lvl_instance = mappings_manager.get("StatusEffectInstance").unwrap();
+        apply_object!(
+            lvl_instance,
+            call_method_or_get_field!(
+                env,
+                living_entity_player,
+                "getStatusEffect",
+                false,
+                &[
+                    JValue::Object(resistance_effect.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+        let lvl = call_method_or_get_field!(
+            env,
+            lvl_instance,
+            "getAmplifier",
+            false,
+            &[]
+        ).unwrap().i().unwrap() + 1;
+
+        damage *= 1.0 - (0.2 * lvl as f64);
+    }
+
+    if damage < 0.0 {
+        0.0
+    } else {
+        damage
+    }
+}
+
+pub fn blast_prot_reduction<'a>(
+    env: JNIEnv<'a>,
+    mappings_manager: &'a MappingsManager,
+    living_entity_player: &'a ClassMapping<'a>,
+    mut damage: f64
+) -> f64 {
+
+}
+
+/*
+public static double crystalDamage(PlayerEntity player, Vec3d playerPos, Vec3d crystal, BlockPos obsidianPos, boolean ignoreTerrain) {
+        if (player == null) return 0;
+        PlayerListEntry playerListEntry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
+        GameMode gameMode;
+        if (playerListEntry == null) gameMode = GameMode.SPECTATOR;
+        else gameMode = playerListEntry.getGameMode();
+        if (gameMode == GameMode.CREATIVE) return 0;
+
+        double modDistance = Math.sqrt(playerPos.squaredDistanceTo(crystal));
+        if (modDistance > 12) return 0;
+
+        double exposure = getExposure(crystal, player, playerPos, obsidianPos, ignoreTerrain);
+        double impact = (1 - (modDistance / 12)) * exposure;
+        double damage = ((impact * impact + impact) / 2 * 7 * (6 * 2) + 1);
+
+        damage = getDamageForDifficulty(damage);
+        damage = getDamageLeft((float) damage, (float) player.getArmor(), (float) player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
+        damage = resistanceReduction(player, damage);
+
+        Explosion explosion = new Explosion(MC.world, null, crystal.x, crystal.y, crystal.z, 6, false, Explosion.DestructionType.DESTROY_WITH_DECAY);
+        damage = blastProtReduction(player, damage, explosion);
+
+        return damage < 0 ? 0 : damage;
+    } */
