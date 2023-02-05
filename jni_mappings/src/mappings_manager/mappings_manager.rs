@@ -263,6 +263,7 @@ impl MappingsManager<'_> {
             add_method!("hasStatusEffect", "a", "(Lbdi;)Z", false);
             add_method!("getStatusEffect", "b", "(Lbdi;)Lbdk;", false);
             add_method!("getArmor", "ew", "()I", false);
+            add_method!("getArmorItems", "bI", "()Ljava/lang/Iterable;", false);
         });
         add_mapping!(new_self, "Camera", "eir", {
             add_field!("pitch", "j", "F", false);
@@ -290,7 +291,9 @@ impl MappingsManager<'_> {
             add_method!("getValue", "f", "()D", false);
         });
         add_mapping!(new_self, "Explosion", "cjo", {
-            add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);
+            add_method!("getCausingEntity", "e", "()Lbeg;", false);
+
+            add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);  // world, Nullable entity, Nullable damageSource, Nullable explosionBehavior, x, y, z, power, createFire, destructionType
         });
         add_mapping!(new_self, "DestructionType", "cjo$a", {
             add_field!("DESTROY_WITH_DECAY", "c", "Lcjo$a;", true);
@@ -382,6 +385,18 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "DamageUtil", "bcx", {
             add_method!("getDamageLeft", "a", "(FFF)F", true);
+        });
+        add_mapping!(new_self, "EnchantmentHelper", "chs", {
+            add_method!("getProtectionAmount", "a", "(Ljava/lang/Iterable;Lbcz;)I", true);
+        });
+        add_mapping!(new_self, "DamageSource", "bcz", {
+            add_method!("setScaledWithDifficulty", "w", "()Lbcz;", false);
+            add_method!("setExplosive", "d", "()Lbcz;", false);
+
+            add_method!("<init>", "<init>", "(Ljava/lang/String;)V", true);
+        });
+        add_mapping!(new_self, "EntityDamageSource", "bda", {
+            add_method!("<init>", "<init>", "(Ljava/lang/String;Lbdr;)V", true);
         });
 
         new_self

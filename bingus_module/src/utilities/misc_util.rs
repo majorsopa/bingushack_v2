@@ -1321,7 +1321,47 @@ pub fn crystal_damage<'a>(
     );
     damage = resistance_reduction(env, mappings_manager, living_entity_player, damage);
 
-    todo!()
+    let explosion = mappings_manager.get("Explosion").unwrap();
+    apply_object!(
+        explosion,
+        call_method_or_get_field!(
+            env,
+            explosion,
+            "<init>",
+            true,
+            &[
+                JValue::Object(world.get_object().unwrap()),
+                JValue::Object(JObject::null()),
+                JValue::Object(JObject::null()),
+                JValue::Object(JObject::null()),
+                JValue::Double(crystal_x),
+                JValue::Double(crystal_y),
+                JValue::Double(crystal_z),
+                JValue::Float(6.0),
+                JValue::Bool(0),  // false
+                JValue::Object({
+                    let destruction_type = mappings_manager.get("DestructionType").unwrap();
+                    apply_object!(
+                        destruction_type,
+                        call_method_or_get_field!(
+                            env,
+                            destruction_type,
+                            "DESTROY_WITH_DECAY",
+                            true
+                        ).unwrap().l().unwrap()
+                    );
+                    destruction_type.get_object().unwrap()
+                })
+            ]
+        ).unwrap().l().unwrap()
+    );
+    damage = blast_prot_reduction(env, mappings_manager, living_entity_player, damage, explosion);
+
+    if damage < 0.0 {
+        0.0
+    } else {
+        damage
+    }
 }
 
 pub fn get_player_list_entry_by_uuid<'a>(
@@ -1477,9 +1517,129 @@ pub fn blast_prot_reduction<'a>(
     env: JNIEnv<'a>,
     mappings_manager: &'a MappingsManager,
     living_entity_player: &'a ClassMapping<'a>,
-    mut damage: f64
+    mut damage: f64,
+    explosion: &'a ClassMapping<'a>
 ) -> f64 {
+    let armor_iterable = mappings_manager.get("Iterable").unwrap();
+    apply_object!(
+        armor_iterable,
+        call_method_or_get_field!(
+            env,
+            living_entity_player,
+            "getArmorItems",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+    let damage_source = explosion_replacement(env, mappings_manager, explosion);
 
+    let enchantment_helper = mappings_manager.get("EnchantmentHelper").unwrap();
+    let mut prot_level = call_method_or_get_field!(
+        env,
+        enchantment_helper,
+        "getProtectionAmount",
+        true,
+        &[
+            JValue::Object(armor_iterable.get_object().unwrap()),
+            JValue::Object(damage_source.get_object().unwrap())
+        ]
+    ).unwrap().i().unwrap();
+
+    if prot_level > 20 {
+        prot_level = 20;
+    }
+
+    damage *= 1.0 - (prot_level as f64 / 25.0);
+
+    if damage < 0.0 {
+        0.0
+    } else {
+        damage
+    }
+}
+
+pub fn explosion_replacement<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, explosion: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    let attacker_living_entity = if !env.is_same_object(explosion.get_object().unwrap(), JObject::null()).unwrap() {
+        let causing_living_entity = mappings_manager.get("LivingEntity").unwrap();
+        apply_object!(
+            causing_living_entity,
+            call_method_or_get_field!(
+                env,
+                explosion,
+                "getCausingEntity",
+                false,
+                &[]
+            ).unwrap().l().unwrap()
+        );
+        causing_living_entity
+    } else {
+        let null_object = mappings_manager.get("Object").unwrap();
+        apply_object!(
+            null_object,
+            JObject::null()
+        );
+        null_object
+    };
+
+    _explosion_replacement_living_entity(env, mappings_manager, attacker_living_entity)
+}
+
+pub fn _explosion_replacement_living_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, attacker_living_entity: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    let damage_source = mappings_manager.get("DamageSource").unwrap();
+    let damage_source = if !env.is_same_object(attacker_living_entity.get_object().unwrap(), JObject::null()).unwrap() {
+        apply_object!(
+            damage_source,  // different on purpose!
+            call_method_or_get_field!(
+                env,
+                mappings_manager.get("EntityDamageSource").unwrap(),  // different on purpose!
+                "<init>",
+                true,
+                &[
+                    JValue::Object(env.new_string("explosion.player").unwrap().into()),
+                    JValue::Object(attacker_living_entity.get_object().unwrap())
+                ]
+            ).unwrap().l().unwrap()
+        );
+        damage_source
+    } else {
+        apply_object!(
+            damage_source,
+            call_method_or_get_field!(
+                env,
+                damage_source,
+                "<init>",
+                true,
+                &[
+                    JValue::Object(env.new_string("explosion").unwrap().into())
+                ]
+            ).unwrap().l().unwrap()
+        );
+        damage_source
+    };
+
+    apply_object!(
+        damage_source,
+        call_method_or_get_field!(
+            env,
+            damage_source,
+            "setScaledWithDifficulty",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+    apply_object!(
+        damage_source,
+        call_method_or_get_field!(
+            env,
+            damage_source,
+            "setExplosive",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+
+
+    damage_source
 }
 
 /*
