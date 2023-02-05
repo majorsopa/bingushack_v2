@@ -175,6 +175,44 @@ pub fn bounding_box_minmax_array<'a>(
     [min_x, min_y, min_z, max_x, max_y, max_z]
 }
 
+pub fn math_helper_lerp<'a>(env: JNIEnv<'a>, math_helper: &'a ClassMapping<'a>, a: f64, b: f64, c: f64) -> f64 {
+    call_method_or_get_field!(
+        env,
+        math_helper,
+        "lerp",
+        true,
+        &[
+            JValue::Double(a),
+            JValue::Double(b),
+            JValue::Double(c)
+        ]
+    ).unwrap().d().unwrap()
+}
+
+pub fn math_helper_floor<'a>(env: JNIEnv<'a>, math_helper: &'a ClassMapping<'a>, a: f64) -> i32 {
+    call_method_or_get_field!(
+        env,
+        math_helper,
+        "floor",
+        true,
+        &[
+            JValue::Double(a)
+        ]
+    ).unwrap().i().unwrap()
+}
+
+pub fn math_helper_sign<'a>(env: JNIEnv<'a>, math_helper: &'a ClassMapping<'a>, a: f64) -> i32 {
+    call_method_or_get_field!(
+        env,
+        math_helper,
+        "sign",
+        true,
+        &[
+            JValue::Double(a)
+        ]
+    ).unwrap().i().unwrap()
+}
+
 pub fn raycast_replacement<'a>(
     env: JNIEnv<'a>,
     mappings_manager: &'a MappingsManager,
@@ -558,159 +596,111 @@ pub fn raycast_replacement<'a>(
         // hit
         let math_helper = mappings_manager.get("MathHelper").unwrap();
         // holy bananas
-        let d = call_method_or_get_field!(
+        let d = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "x",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "x",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let e = call_method_or_get_field!(
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "x",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "x",
+                false
+            ).unwrap().d().unwrap()
+        );
+        let e = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "y",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "y",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let f = call_method_or_get_field!(
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "y",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "y",
+                false
+            ).unwrap().d().unwrap()
+        );
+        let f = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "z",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "z",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let g = call_method_or_get_field!(
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "z",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "z",
+                false
+            ).unwrap().d().unwrap()
+        );
+        let g = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "x",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "x",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let h = call_method_or_get_field!(
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "x",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "x",
+                false
+            ).unwrap().d().unwrap(),
+        );
+        let h = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "y",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "y",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let i = call_method_or_get_field!(
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "y",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "y",
+                false
+            ).unwrap().d().unwrap()
+        );
+        let i = math_helper_lerp(
             env,
             math_helper,
-            "lerp",
-            true,
-            &[
-                JValue::Double(-1.0E-7),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    start_vec3d,
-                    "z",
-                    false
-                ).unwrap().d().unwrap()),
-                JValue::Double(call_method_or_get_field!(
-                    env,
-                    end_vec3d,
-                    "z",
-                    false
-                ).unwrap().d().unwrap())
-            ]
-        ).unwrap().d().unwrap();
-        let j = call_method_or_get_field!(
-            env,
-            math_helper,
-            "floor",
-            true,
-            &[
-                JValue::Double(g)
-            ]
-        ).unwrap().i().unwrap();
-        let k = call_method_or_get_field!(
-            env,
-            math_helper,
-            "floor",
-            true,
-            &[
-                JValue::Double(h)
-            ]
-        ).unwrap().i().unwrap();
-        let l = call_method_or_get_field!(
-            env,
-            math_helper,
-            "floor",
-            true,
-            &[
-                JValue::Double(i)
-            ]
-        ).unwrap().i().unwrap();
+            -1.0E-7,
+            call_method_or_get_field!(
+                env,
+                start_vec3d,
+                "z",
+                false
+            ).unwrap().d().unwrap(),
+            call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "z",
+                false
+            ).unwrap().d().unwrap()
+        );
+        let mut j = math_helper_floor(env, math_helper, g);
+        let mut k = math_helper_floor(env, math_helper, h);
+        let mut l = math_helper_floor(env, math_helper, i);
 
         let mutable_block_pos = mappings_manager.get("MutableBlockPos").unwrap();
         apply_object!(
@@ -785,7 +775,7 @@ pub fn raycast_replacement<'a>(
             } else {
                 r as f64 / o
             };
-            let v = s * (if p > 0 {
+            let mut v = s * (if p > 0 {
                 1.0
             } else {
                 0.0
@@ -798,7 +788,7 @@ pub fn raycast_replacement<'a>(
                     JValue::Double(g)
                 ]
             ).unwrap().d().unwrap());
-            let w = t * (if q > 0 {
+            let mut w = t * (if q > 0 {
                 1.0
             } else {
                 0.0
@@ -811,7 +801,7 @@ pub fn raycast_replacement<'a>(
                     JValue::Double(h)
                 ]
             ).unwrap().d().unwrap());
-            let x = u * (if r > 0 {
+            let mut x = u * (if r > 0 {
                 1.0
             } else {
                 0.0
@@ -851,306 +841,64 @@ pub fn raycast_replacement<'a>(
     }
 }
 
-pub fn get_exposure<'a>(
-    env: JNIEnv<'a>,
-    mappings_manager: &'a MappingsManager,
-    source_vec3d: &'a ClassMapping<'a>,
-    entity: &'a ClassMapping<'a>,
-    player_pos: &'a ClassMapping<'a>,
-    obby_pos: &'a ClassMapping<'a>,
-    ignore_terrain: bool,
-) -> f64 {
-    let world = match get_world_checked(env, mappings_manager, get_minecraft_client(env, mappings_manager)) {
-        Some(world) => world,
-        None => return 0.0,
-    };
+/*
+static <T, C> T raycast(Vec3d start, Vec3d end, C context, BiFunction<C, BlockPos, T> blockHitFactory, Function<C, T> missFactory) {
+        if (start.equals(end)) {
+            return missFactory.apply(context);
+        } else {
+            double d = MathHelper.lerp(-1.0E-7, end.x, start.x);
+            double e = MathHelper.lerp(-1.0E-7, end.y, start.y);
+            double f = MathHelper.lerp(-1.0E-7, end.z, start.z);
+            double g = MathHelper.lerp(-1.0E-7, start.x, end.x);
+            double h = MathHelper.lerp(-1.0E-7, start.y, end.y);
+            double i = MathHelper.lerp(-1.0E-7, start.z, end.z);
+            int j = MathHelper.floor(g);
+            int k = MathHelper.floor(h);
+            int l = MathHelper.floor(i);
+            BlockPos.Mutable mutable = new BlockPos.Mutable(j, k, l);
+            T object = blockHitFactory.apply(context, mutable);
+            if (object != null) {
+                return object;
+            } else {
+                double m = d - g;
+                double n = e - h;
+                double o = f - i;
+                int p = MathHelper.sign(m);
+                int q = MathHelper.sign(n);
+                int r = MathHelper.sign(o);
+                double s = p == 0 ? Double.MAX_VALUE : (double)p / m;
+                double t = q == 0 ? Double.MAX_VALUE : (double)q / n;
+                double u = r == 0 ? Double.MAX_VALUE : (double)r / o;
+                double v = s * (p > 0 ? 1.0 - MathHelper.fractionalPart(g) : MathHelper.fractionalPart(g));
+                double w = t * (q > 0 ? 1.0 - MathHelper.fractionalPart(h) : MathHelper.fractionalPart(h));
+                double x = u * (r > 0 ? 1.0 - MathHelper.fractionalPart(i) : MathHelper.fractionalPart(i));
 
-    let box_class = mappings_manager.get("Box").unwrap();
-    apply_object!(
-        box_class,
-        call_method_or_get_field!(
-            env,
-            entity,
-            "calculateBoundingBox",
-            false,
-            &[]
-        ).unwrap().l().unwrap()
-    );
-    let v = mappings_manager.get("Vec3d").unwrap();
-    let [x, y, z] = [
-        call_method_or_get_field!(
-            env,
-            player_pos,
-            "x",
-            false
-        ).unwrap().d().unwrap(),
-        call_method_or_get_field!(
-            env,
-            player_pos,
-            "y",
-            false
-        ).unwrap().d().unwrap(),
-        call_method_or_get_field!(
-            env,
-            player_pos,
-            "z",
-            false
-        ).unwrap().d().unwrap()
-    ];
-    apply_object!(
-        v,
-        call_method_or_get_field!(
-            env,
-            player_pos,
-            "subtract",
-            false,
-            &[
-                JValue::Double(x),
-                JValue::Double(y),
-                JValue::Double(z)
-            ]
-        ).unwrap().l().unwrap()
-    );
-    apply_object!(
-        box_class,
-        call_method_or_get_field!(
-            env,
-            box_class,
-            "offset",
-            false,
-            &[JValue::Object(v.get_object().unwrap())]
-        ).unwrap().l().unwrap()
-    );
-
-    let d = 1.0 / (call_method_or_get_field!(
-        env,
-        box_class,
-        "maxX",
-        false
-    ).unwrap().d().unwrap() - call_method_or_get_field!(
-        env,
-        box_class,
-        "minX",
-        false
-    ).unwrap().d().unwrap() * 2.0 + 1.0);
-    let e = 1.0 / (call_method_or_get_field!(
-        env,
-        box_class,
-        "maxY",
-        false
-    ).unwrap().d().unwrap() - call_method_or_get_field!(
-        env,
-        box_class,
-        "minY",
-        false
-    ).unwrap().d().unwrap() * 2.0 + 1.0);
-    let f = 1.0 / (call_method_or_get_field!(
-        env,
-        box_class,
-        "maxZ",
-        false
-    ).unwrap().d().unwrap() - call_method_or_get_field!(
-        env,
-        box_class,
-        "minZ",
-        false
-    ).unwrap().d().unwrap() * 2.0 + 1.0);
-    let g = (1.0 - call_method_or_get_field!(
-        env,
-        mappings_manager.get("MathHelper").unwrap(),
-        "floor",
-        true,
-        &[
-            JValue::Double(1.0 / d)
-        ]
-    ).unwrap().d().unwrap() * d) / 2.0;
-    let h = (1.0 - call_method_or_get_field!(
-        env,
-        mappings_manager.get("MathHelper").unwrap(),
-        "floor",
-        true,
-        &[
-            JValue::Double(1.0 / f)
-        ]
-    ).unwrap().d().unwrap() * f) / 2.0;
-
-    if {
-        !(d < 0.0)
-        && !(e < 0.0)
-        && !(f < 0.0)
-    } {
-        let mut i = 0;
-        let mut j = 0;
-
-        let math_helper = mappings_manager.get("MathHelper").unwrap();
-
-        let mut k = 0.0;
-        while k <= 1.0 {
-            let mut l = 0.0;
-            while l <= 1.0 {
-                let mut m = 0.0;
-                while m <= 1.0 {
-                    let n = call_method_or_get_field!(
-                        env,
-                        math_helper,
-                        "lerp",
-                        true,
-                        &[
-                            JValue::Double(k),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "minX",
-                                false
-                            ).unwrap().d().unwrap()),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "maxX",
-                                false
-                            ).unwrap().d().unwrap())
-                        ]
-                    ).unwrap().d().unwrap();
-                    let o = call_method_or_get_field!(
-                        env,
-                        math_helper,
-                        "lerp",
-                        true,
-                        &[
-                            JValue::Double(l),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "minY",
-                                false
-                            ).unwrap().d().unwrap()),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "maxY",
-                                false
-                            ).unwrap().d().unwrap())
-                        ]
-                    ).unwrap().d().unwrap();
-                    let p = call_method_or_get_field!(
-                        env,
-                        math_helper,
-                        "lerp",
-                        true,
-                        &[
-                            JValue::Double(m),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "minZ",
-                                false
-                            ).unwrap().d().unwrap()),
-                            JValue::Double(call_method_or_get_field!(
-                                env,
-                                box_class,
-                                "maxZ",
-                                false
-                            ).unwrap().d().unwrap())
-                        ]
-                    ).unwrap().d().unwrap();
-
-                    let vec3d = mappings_manager.get("Vec3d").unwrap();
-                    apply_object!(
-                        vec3d,
-                        call_method_or_get_field!(
-                            env,
-                            vec3d,
-                            "<init>",
-                            true,
-                            &[
-                                JValue::Double(n + g),
-                                JValue::Double(o),
-                                JValue::Double(p + h)
-                            ]
-                        ).unwrap().l().unwrap()
-                    );
-                    let collider = mappings_manager.get("ShapeType").unwrap();
-                    apply_object!(
-                        collider,
-                        call_method_or_get_field!(
-                            env,
-                            collider,
-                            "COLLIDER",
-                            true
-                        ).unwrap().l().unwrap()
-                    );
-                    let fluid_handling = mappings_manager.get("FluidHandling").unwrap();
-                    apply_object!(
-                        fluid_handling,
-                        call_method_or_get_field!(
-                            env,
-                            fluid_handling,
-                            "NONE",
-                            true
-                        ).unwrap().l().unwrap()
-                    );
-                    let raycast_context = new_raycast_context(env, mappings_manager, vec3d, source_vec3d, collider, fluid_handling, entity);
-                    if env.is_same_object(
-                        raycast_replacement(env, mappings_manager, world, raycast_context, obby_pos, ignore_terrain).get_object().unwrap(),
-                        {
-                            let hit_result_type = mappings_manager.get("HitResultType").unwrap();
-                            apply_object!(
-                                hit_result_type,
-                                call_method_or_get_field!(
-                                    env,
-                                    hit_result_type,
-                                    "MISS",
-                                    true
-                                ).unwrap().l().unwrap()
-                            );
-                            hit_result_type
-                        }.get_object().unwrap()
-                    ).unwrap() {
-                        i += 1;
+                Object object2;
+                do {
+                    if (!(v <= 1.0) && !(w <= 1.0) && !(x <= 1.0)) {
+                        return missFactory.apply(context);
                     }
-                    j += 1;
 
+                    if (v < w) {
+                        if (v < x) {
+                            j += p;
+                            v += s;
+                        } else {
+                            l += r;
+                            x += u;
+                        }
+                    } else if (w < x) {
+                        k += q;
+                        w += t;
+                    } else {
+                        l += r;
+                        x += u;
+                    }
 
-                    m += f;
-                }
+                    object2 = blockHitFactory.apply(context, mutable.set(j, k, l));
+                } while(object2 == null);
 
-                l += e;
+                return object2;
             }
-
-            k += d;
         }
-
-        i as f64 / j as f64
-    } else {
-        0.0
-    }
-}
-
-pub fn new_raycast_context<'a>(
-    env: JNIEnv<'a>,
-    mappings_manager: &'a MappingsManager,
-    vec3d: &'a ClassMapping<'a>,
-    source_vec3d: &'a ClassMapping<'a>,
-    shape_type: &'a ClassMapping<'a>,
-    fluid_handling: &'a ClassMapping<'a>,
-    entity: &'a ClassMapping<'a>,
-) -> &'a ClassMapping<'a> {
-    let raycast_context = mappings_manager.get("RaycastContext").unwrap();
-    apply_object!(
-        raycast_context,
-        call_method_or_get_field!(
-            env,
-            raycast_context,
-            "<init>",
-            true,
-            &[
-                JValue::Object(vec3d.get_object().unwrap()),
-                JValue::Object(source_vec3d.get_object().unwrap()),
-                JValue::Object(shape_type.get_object().unwrap()),
-                JValue::Object(fluid_handling.get_object().unwrap()),
-                JValue::Object(entity.get_object().unwrap())
-            ]
-        ).unwrap().l().unwrap()
-    );
-    raycast_context
-}
+    } */
