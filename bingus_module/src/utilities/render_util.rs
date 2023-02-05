@@ -59,7 +59,7 @@ pub fn world_to_screen<'a>(entity_pos: [f64; 3]) -> [f32; 2] {
     let view_projection_matrix = get_view_projection_matrix();
     let mut result = view_projection_matrix * Vec4::new(entity_pos_vec.x, entity_pos_vec.y, entity_pos_vec.z, 1.0_f32);
     result = result / result.w;
-    return [result.x, result.y];
+    [result.x, result.y]
 }
 
 pub fn get_camera_direction(pitch: f32, yaw: f32) -> Vec3 {
@@ -74,7 +74,7 @@ pub fn get_camera_direction(pitch: f32, yaw: f32) -> Vec3 {
 }
 
 pub fn get_view_projection_matrix() -> Mat4 {
-    let aspect = (1920.0_f32 / 1080.0_f32) as f32;
+    let aspect = 1920.0_f32 / 1080.0_f32;
     let proj = perspective(aspect, 90.0_f32.to_radians(), 0.1_f32, 1000.0_f32);
     let cam_look_vec = get_camera_direction(0.0_f32, 0.0_f32);
     let view = look_at(&Vec3::new(0.0_f32, 0.0_f32, 0.0_f32), &cam_look_vec, &Vec3::new(0.0_f32, 1.0_f32, 0.0_f32));

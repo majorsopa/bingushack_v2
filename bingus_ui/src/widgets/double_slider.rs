@@ -183,7 +183,7 @@ impl <'a> DoubleSlider<'a> {
     }
 
     fn value_from_position(&self, position: f64, position_range: RangeInclusive<f64>) -> f64 {
-        let normalized = remap_clamp(position, position_range, 0.0..=1.0) as f64;
+        let normalized = remap_clamp(position, position_range, 0.0..=1.0);
         value_from_normalized(normalized, self.range(), &self.spec)
     }
 
@@ -295,7 +295,7 @@ impl <'a> DoubleSlider<'a> {
                 for i in 0..2 {
                     let new_position = prev_position[i] + kb_step;
                     let new_value = match self.step {
-                        Some(step) => prev_value[i] + (kb_step as f64 * step),
+                        Some(step) => prev_value[i] + (kb_step * step),
                         None if self.smart_aim => {
                             let aim_radius = ui.input().aim_radius() as f64;
                             emath::smart_aim::best_in_range_f64(

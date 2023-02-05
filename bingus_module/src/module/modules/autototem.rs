@@ -71,7 +71,7 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
         }
 
         // swap totem to offhand
-        if found_totem_slots.len() > 0 {
+        if !found_totem_slots.is_empty() {
             if *autototem.hotbar_only.0.get_bool() {
                 let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
                 if let Some(hotbar_totem) = hotbar_totem {

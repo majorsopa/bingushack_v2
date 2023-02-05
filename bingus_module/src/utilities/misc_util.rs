@@ -726,7 +726,7 @@ pub fn raycast_replacement<'a>(
         );
 
         if !env.is_same_object(maybe_null_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
-            return maybe_null_block_hit_result;
+            maybe_null_block_hit_result
         } else {
             let m = d - g;
             let n = e - h;
@@ -817,11 +817,9 @@ pub fn raycast_replacement<'a>(
 
             let block_hit_result2 = mappings_manager.get("BlockHitResult").unwrap();
             while {
-                if {
-                    !(v <= 1.0)
-                    && !(w <= 1.0)
-                    && !(x <= 1.0)
-                } {
+                if !(v <= 1.0)
+                && !(w <= 1.0)
+                && !(x <= 1.0) {
                     return miss_closure();
                 }
 
@@ -994,11 +992,9 @@ pub fn get_exposure<'a>(
         ]
     ).unwrap().d().unwrap() * f) / 2.0;
 
-    if {
-        !(d < 0.0)
-        && !(e < 0.0)
-        && !(f < 0.0)
-    } {
+    if !(d < 0.0)
+    && !(e < 0.0)
+    && !(f < 0.0) {
         let mut i = 0;
         let mut j = 0;
 

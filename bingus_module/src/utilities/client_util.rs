@@ -73,9 +73,9 @@ pub fn get_targeted_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsMa
         ).unwrap().l().unwrap()
     );
     if env.is_same_object(targeted_entity.get_object().unwrap(), JObject::null()).unwrap() {
-        return None;
+        None
     } else {
-        return Some(targeted_entity);
+        Some(targeted_entity)
     }
 }
 

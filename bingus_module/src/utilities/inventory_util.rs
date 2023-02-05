@@ -46,14 +46,12 @@ pub fn swap_slots<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, mi
 
     let sync_id = get_sync_id(env, current_screen_handler);
 
-    let pickup_slot_action = JValue::from(
-        call_method_or_get_field!(
+    let pickup_slot_action = call_method_or_get_field!(
             env,
             mappings_manager.get("SlotActionType").unwrap(),
             "SWAP",
             true
-        ).unwrap()
-    );
+        ).unwrap();
 
 
     click_slot(env, player, interaction_manager, sync_id, to_index, from_index, pickup_slot_action);
@@ -89,10 +87,10 @@ pub fn get_focused_slot_checked<'a>(env: JNIEnv<'a>, mappings_manager: &'a Mappi
     let slot = mappings_manager.get("Slot").unwrap();
     let focused_slot = call_method_or_get_field!(env, handled_screen, "focusedSlot", false).unwrap().l().unwrap();
     if env.is_same_object(focused_slot, JObject::null()).unwrap() {
-        return None;
+        None
     } else {
         apply_object!(slot, focused_slot);
-        return Some(slot);
+        Some(slot)
     }
 }
 

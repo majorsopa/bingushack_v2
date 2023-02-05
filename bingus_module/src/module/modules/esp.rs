@@ -1,8 +1,8 @@
-use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}, borrow::Borrow};
+use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}};
 use once_cell::sync::OnceCell;
 use pixels::{SurfaceTexture, Pixels};
-use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::{LogicalSize, PhysicalSize}, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
-use winapi::{shared::windef::{HGLRC, HDC}, um::{wingdi::{wglGetCurrentContext, wglGetCurrentDC, wglMakeCurrent, GetDeviceCaps, LOGPIXELSX, LOGPIXELSY}, winuser::{GetSystemMetrics, SM_CXSCREEN, SM_CYSCREEN}}};
+use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::{LogicalSize}, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
+use winapi::{shared::windef::{HGLRC, HDC}, um::{wingdi::{wglGetCurrentContext, wglGetCurrentDC, wglMakeCurrent, GetDeviceCaps, LOGPIXELSX, LOGPIXELSY}}};
 
 use crate::crate_prelude::*;
 
@@ -14,7 +14,7 @@ static mut ESP_HDC: Option<HDC> = None;
 static DIMENSIONS: OnceCell<[i32; 2]> = OnceCell::new();
 
 
-fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
+fn tick(_esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     unsafe {
         if ESP_JOINHANDLE.is_none() {
             return;
@@ -66,15 +66,13 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
                 entity
             };
 
-            if {
-                env.is_same_object(entity.get_object().unwrap(), JObject::null()).unwrap() ||
-                !is_instance_of(env, entity, mappings_manager.get("LivingEntity").unwrap()) ||
-                get_entity_id(env, entity) == get_entity_id(env, {
-                    let entity = mappings_manager.get("Entity").unwrap();
-                    apply_object!(entity, player.get_object().unwrap());
-                    entity
-                })
-            } {
+            if env.is_same_object(entity.get_object().unwrap(), JObject::null()).unwrap() ||
+            !is_instance_of(env, entity, mappings_manager.get("LivingEntity").unwrap()) ||
+            get_entity_id(env, entity) == get_entity_id(env, {
+                let entity = mappings_manager.get("Entity").unwrap();
+                apply_object!(entity, player.get_object().unwrap());
+                entity
+            }) {
                 continue;
             }
 
@@ -93,7 +91,7 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     for entity in entity_list {
         rects.push(world_to_screen(entity.entity_pos));
     }
-    send_chat_message(env, mappings_manager, player, &*format!("{:#?}", rects));
+    send_chat_message(env, mappings_manager, player, &format!("{rects:#?}"));
 }
 
 
@@ -193,7 +191,6 @@ fn on_enable() {
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
-                        return;
                     }
                 }
             });
