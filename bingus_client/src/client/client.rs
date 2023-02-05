@@ -1,7 +1,7 @@
-use std::{sync::{Mutex, Arc, atomic::AtomicPtr}, collections::HashMap, borrow::BorrowMut};
+use std::{sync::{Mutex, Arc}, collections::HashMap};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
-use eframe::{egui, EventLoopBuilder};
+use eframe::egui;
 use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
