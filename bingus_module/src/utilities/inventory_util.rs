@@ -97,3 +97,20 @@ pub fn get_focused_slot_checked<'a>(env: JNIEnv<'a>, mappings_manager: &'a Mappi
 pub fn get_slot_index<'a>(env: JNIEnv<'a>, slot: &'a ClassMapping) -> i32 {
     call_method_or_get_field!(env, slot, "index", false).unwrap().i().unwrap()
 }
+
+pub fn shift_click_slot<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, slot: i32) {
+    let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
+
+    let current_screen_handler = get_screen_handler(env, mappings_manager, player);
+
+    let sync_id = get_sync_id(env, current_screen_handler);
+
+    let quick_move_slot_action = call_method_or_get_field!(
+        env,
+        mappings_manager.get("SlotActionType").unwrap(),
+        "QUICK_MOVE",
+        true
+    ).unwrap();
+
+    click_slot(env, player, interaction_manager, sync_id, slot, 0, quick_move_slot_action);
+}

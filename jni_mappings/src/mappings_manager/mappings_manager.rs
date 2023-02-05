@@ -121,6 +121,7 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "SlotActionType", "bzp", {
             add_field!("PICKUP", "a", "Lbzp;", true);
             add_field!("SWAP", "c", "Lbzp;", true);
+            add_field!("QUICK_MOVE", "b", "Lbzp;", true);
         });
         add_mapping!(new_self, "Optional", "java/util/Optional", {
             add_method!("isPresent", "isPresent", "()Z", false);

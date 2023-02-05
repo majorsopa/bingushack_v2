@@ -1,7 +1,7 @@
 use crate::crate_prelude::*;
 
 
-fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
+fn tick(totem_assist: &mut TotemAssist, env: JNIEnv, mappings_manager: &MappingsManager) {
     let minecraft_client = get_minecraft_client(env, mappings_manager);
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
         Some(player) => player,
@@ -11,11 +11,6 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
     let offhand_item_id = get_raw_id_of_item_object(env, mappings_manager, get_offhand_item(env, mappings_manager, player));
 
     let totem_raw_id = get_raw_id_of_item(env, mappings_manager, "TOTEM_OF_UNDYING");
-
-    if offhand_item_id == totem_raw_id {
-        return;
-    }
-
 
     let handled_screen = {
         let handled_screen = mappings_manager.get("HandledScreen").unwrap();
@@ -62,20 +57,29 @@ fn tick(env: JNIEnv, mappings_manager: &MappingsManager) {
         None => return,
     };
 
-    swap_slots(env, mappings_manager, minecraft_client, player, 45, focused_slot_index);
+    if offhand_item_id != totem_raw_id {  // if no offhand totem
+        swap_slots(env, mappings_manager, minecraft_client, player, 45, focused_slot_index);
+    } else {  // move to hotbar
+        if !*totem_assist.fill_hotbar.0.get_bool() || focused_slot_index < 10 {
+            return;
+        }
+
+        shift_click_slot(env, mappings_manager, minecraft_client, player, focused_slot_index);
+    }
 }
 
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "TotemAssist", tick_method = "tick(_env, _mappings_manager)")]
+#[bingus_module(name = "TotemAssist", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[fill_hotbar]")]
 pub struct TotemAssist {
-
+    fill_hotbar: (BingusSetting, &'static str, Option<[f32; 2]>),
 }
 
 impl MakeNewBingusModule for TotemAssist {
     fn new() -> Self {
         Self {
+            fill_hotbar: (BingusSetting::BoolSetting(true.into()), "fill hotbar", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             __env: None,
