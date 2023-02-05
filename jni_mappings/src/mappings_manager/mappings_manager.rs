@@ -145,6 +145,7 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "HitResultType", "eac$a", {
             add_field!("ENTITY", "c", "Leac$a;", true);
+            add_field!("MISS", "a", "Leac$a;", true);
         });
         add_mapping!(new_self, "Hand", "bcl", {
             add_field!("MAIN_HAND", "a", "Lbcl;", true);
@@ -232,6 +233,8 @@ impl MappingsManager<'_> {
             add_method!("distanceToSqr", "c", "(DDD)D", false);
             add_method!("subtract", "a", "(DDD)Leae;", false);
             add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
+
+            add_method!("<init>", "<init>", "(DDD)V", true);
         });
         add_mapping!(new_self, "RenderTickCounter", "ejt", {
             add_field!("partialTick", "a", "F", false);
