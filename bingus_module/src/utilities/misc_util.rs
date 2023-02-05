@@ -1178,7 +1178,7 @@ pub fn new_raycast_context<'a>(
 pub fn crystal_damage<'a>(
     env: JNIEnv<'a>,
     mappings_manager: &'a MappingsManager,
-    player_to_attack: &'a ClassMapping<'a>,
+    player_to_hurt: &'a ClassMapping<'a>,
     crystal_vec3d: &'a ClassMapping<'a>,
     block_pos: &'a ClassMapping<'a>,
     ignore_terrain: bool
@@ -1191,12 +1191,12 @@ pub fn crystal_damage<'a>(
     let entity_player = mappings_manager.get("Entity").unwrap();
     apply_object!(
         entity_player,
-        player_to_attack.get_object().unwrap()
+        player_to_hurt.get_object().unwrap()
     );
 
     let player_pos = get_entity_pos_vec3d(env, mappings_manager, entity_player);
 
-    if env.is_same_object(player_to_attack.get_object().unwrap(), JObject::null()).unwrap() {
+    if env.is_same_object(player_to_hurt.get_object().unwrap(), JObject::null()).unwrap() {
         return 0.0;
     }
 
@@ -1269,7 +1269,7 @@ pub fn crystal_damage<'a>(
     let living_entity_player = mappings_manager.get("LivingEntity").unwrap();
     apply_object!(
         living_entity_player,
-        player_to_attack.get_object().unwrap()
+        player_to_hurt.get_object().unwrap()
     );
     let b = call_method_or_get_field!(
         env,
