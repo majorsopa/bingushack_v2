@@ -52,7 +52,7 @@ pub fn get_viewport<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager) 
     [x, y, width, height]
 }
 
-pub fn world_to_screen<'a>(entity_pos: [f64; 3]) -> [f32; 2] {
+pub fn world_to_screen(entity_pos: [f64; 3]) -> [f32; 2] {
     let entity_pos = entity_pos.map(|c| c as f32);
     let entity_pos_vec = Vec3::new(entity_pos[0], entity_pos[1], entity_pos[2]);
 
