@@ -1,11 +1,11 @@
-use std::{sync::{Mutex, Arc}, collections::HashMap};
+use std::{sync::{Mutex, Arc}, collections::HashMap, ptr::null_mut, ffi::CString};
 
 use bingus_module::{prelude::{BingusModule, populate_modules, BingusModuleTrait}, GHOST_MODE};
 use eframe::egui;
 use bingus_ui::{module_widget, toggle};
 
 use jni_mappings::{get_javavm, MappingsManager};
-use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
+use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::{GetAsyncKeyState, FindWindowA}}};
 use winit::platform::windows::EventLoopBuilderExtWindows;
 
 use crate::MODULES;
@@ -13,6 +13,18 @@ use crate::MODULES;
 
 static mut CLICKGUI_CONTEXT: Option<HGLRC> = None;
 static mut CLICKGUI_HDC: Option<HDC> = None;
+
+// stolen from the main bingushack package
+pub unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {
+    for window_name in window_names {
+        let window_name = CString::new(*window_name).unwrap();
+        let hwnd = FindWindowA(null_mut(), window_name.as_ptr());
+        if !hwnd.is_null() {
+            return Some(hwnd);
+        }
+    }
+    None
+}
 
 pub struct BingusClient {
     modules: Arc<Mutex<Vec<BingusModule>>>,
@@ -39,8 +51,6 @@ impl eframe::App for BingusClient {
             }
         }
 
-        GHOST_MODE.get_or_init(|| Arc::new(Mutex::new(true)));
-
 
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -48,7 +58,8 @@ impl eframe::App for BingusClient {
             ui.label("for keybinds,");
             ui.hyperlink("https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
             ui.separator();
-            ui.add(toggle(&mut GHOST_MODE.get().unwrap().lock().unwrap()));
+            ui.label("ghost mode");
+            ui.add(toggle(&mut GHOST_MODE.wait().lock().unwrap().0));
             for (i, module) in self.modules.lock().unwrap().iter_mut().enumerate() {
                 ui.push_id(i, |ui| {
                     ui.add(module_widget(module));
@@ -83,7 +94,14 @@ pub fn run_client() {
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
         let mappings_manager = Arc::new(MappingsManager::new(jni_env));
         for module in modules.lock().unwrap().iter_mut() {
-            module.init(jni_env, &mut Arc::clone(&mappings_manager));
+            module.init(jni_env, &mut Arc::clone(&mappings_manager), &mut Arc::new(
+                unsafe { match get_hwnd(
+                    &["Minecraft 1.19.3", "Minecraft 1.19.3 - Multiplayer (3rd-party Server)", "Minecraft 1.19.3 - Singleplayer"]
+                ) {
+                    Some(hwnd) => hwnd,
+                    None => panic!(),
+                } }
+            ));
         }
         loop {
             let mut keys_multimap: HashMap<i32, Vec<usize>> = HashMap::new();

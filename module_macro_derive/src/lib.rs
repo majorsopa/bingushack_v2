@@ -29,12 +29,22 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
     let DeriveInput { ident, .. } = input;
 
 
+    let check_ghost_mode = quote! {{
+        let ghost_mode: &(bool, AtomicPtr<winapi::shared::windef::HWND>) = &*GHOST_MODE.get().unwrap().lock().unwrap();
+        if ghost_mode.0 && unsafe {
+            GetForegroundWindow() != *ghost_mode.1.load(std::sync::atomic::Ordering::Relaxed)
+        } {
+            return;
+        }
+    }};
+
     let init = quote! {
-        fn init(&mut self, jni_env: JNIEnv<'static>, mappings_manager: &mut Arc<MappingsManager<'static>>) {
+        fn init(&mut self, jni_env: JNIEnv<'static>, mappings_manager: &mut Arc<MappingsManager<'static>>, hwnd: &mut Arc<winapi::shared::windef::HWND>) {
             let jni_env: *mut JNIEnv<'static> = Box::into_raw(Box::new(jni_env));
             self.__env = Some(AtomicPtr::new(jni_env));
             let mappings_manager: *mut MappingsManager<'static> = unsafe { Arc::get_mut_unchecked(mappings_manager) };  // bruh
             self.__mappings_manager = Some(Arc::new(AtomicPtr::new(mappings_manager)));
+            let _ = GHOST_MODE.get_or_init(|| Arc::new(Mutex::new((true, AtomicPtr::new(unsafe { Arc::get_mut_unchecked(hwnd) })))));
         }
     };
 
@@ -90,6 +100,7 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
                         return;
                     }
                     #unwrapped;
+                    #check_ghost_mode;
                     #matched;
                 }
             }

@@ -219,6 +219,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
 
 
 
+// copied in bingus_client because im lazy i guess
 unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {
     for window_name in window_names {
         let window_name = CString::new(*window_name).unwrap();

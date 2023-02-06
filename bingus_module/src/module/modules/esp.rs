@@ -1,4 +1,4 @@
-use std::{thread::JoinHandle, sync::{Arc, Mutex, mpsc::{Receiver, Sender}}};
+use std::{thread::JoinHandle, sync::{Arc, mpsc::{Receiver, Sender}}};
 use once_cell::sync::OnceCell;
 use pixels::{SurfaceTexture, Pixels};
 use tao::{event_loop::{EventLoop, ControlFlow}, window::WindowBuilder, dpi::{LogicalSize}, platform::{run_return::EventLoopExtRunReturn, windows::EventLoopExtWindows}, event::Event};
