@@ -1,8 +1,8 @@
 use std::{sync::{Mutex, Arc}, collections::HashMap};
 
-use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
+use bingus_module::{prelude::{BingusModule, populate_modules, BingusModuleTrait}, GHOST_MODE};
 use eframe::egui;
-use bingus_ui::module_widget;
+use bingus_ui::{module_widget, toggle};
 
 use jni_mappings::{get_javavm, MappingsManager};
 use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
@@ -39,6 +39,8 @@ impl eframe::App for BingusClient {
             }
         }
 
+        GHOST_MODE.get_or_init(|| Arc::new(Mutex::new(true)));
+
 
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -46,6 +48,7 @@ impl eframe::App for BingusClient {
             ui.label("for keybinds,");
             ui.hyperlink("https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
             ui.separator();
+            ui.add(toggle(&mut GHOST_MODE.get().unwrap().lock().unwrap()));
             for (i, module) in self.modules.lock().unwrap().iter_mut().enumerate() {
                 ui.push_id(i, |ui| {
                     ui.add(module_widget(module));
