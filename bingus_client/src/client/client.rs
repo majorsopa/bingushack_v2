@@ -58,8 +58,8 @@ impl eframe::App for BingusClient {
             ui.label("for keybinds,");
             ui.hyperlink("https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes");
             ui.separator();
-            ui.label("ghost mode");
-            ui.add(toggle(&mut GHOST_MODE.wait().lock().unwrap().0));
+            //ui.label("ghost mode");
+            //ui.add(toggle(&mut GHOST_MODE.wait().lock().unwrap().0));
             for (i, module) in self.modules.lock().unwrap().iter_mut().enumerate() {
                 ui.push_id(i, |ui| {
                     ui.add(module_widget(module));
