@@ -3,7 +3,7 @@ use crate::crate_prelude::*;
 
 #[enum_dispatch]
 pub trait BingusModuleTrait {
-    fn init(&mut self, jni_env: JNIEnv<'static>, mappings_manager: &mut Arc<MappingsManager<'static>>, hwnd: &mut Arc<winapi::shared::windef::HWND>);
+    fn init(&mut self, jni_env: JNIEnv<'static>, mappings_manager: &mut Arc<MappingsManager<'static>>);
     fn get_name(&self) -> &'static str;
 
     fn tick(&mut self);

@@ -1,8 +1,8 @@
 use std::{sync::{Mutex, Arc}, collections::HashMap, ptr::null_mut, ffi::CString};
 
-use bingus_module::{prelude::{BingusModule, populate_modules, BingusModuleTrait}, GHOST_MODE};
+use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
-use bingus_ui::{module_widget, toggle};
+use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
 use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::{GetAsyncKeyState, FindWindowA}}};
@@ -94,14 +94,7 @@ pub fn run_client() {
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
         let mappings_manager = Arc::new(MappingsManager::new(jni_env));
         for module in modules.lock().unwrap().iter_mut() {
-            module.init(jni_env, &mut Arc::clone(&mappings_manager), &mut Arc::new(
-                unsafe { match get_hwnd(
-                    &["Minecraft 1.19.3", "Minecraft 1.19.3 - Multiplayer (3rd-party Server)", "Minecraft 1.19.3 - Singleplayer"]
-                ) {
-                    Some(hwnd) => hwnd,
-                    None => panic!(),
-                } }
-            ));
+            module.init(jni_env, &mut Arc::clone(&mappings_manager));
         }
         loop {
             let mut keys_multimap: HashMap<i32, Vec<usize>> = HashMap::new();
