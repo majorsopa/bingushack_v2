@@ -139,7 +139,7 @@ pub extern "stdcall" fn DllMain(
 ) -> i32 {
     match fdw_reason {
         DLL_PROCESS_ATTACH => {
-            crochet::enable!(swapbuffers_hook).expect("could not enable swapbuffers hook");
+            //crochet::enable!(swapbuffers_hook).expect("could not enable swapbuffers hook");
             unsafe {
                 let bingus_thread = CreateThread(
                     null_mut(),
@@ -154,7 +154,7 @@ pub extern "stdcall" fn DllMain(
             true as i32
         }
         DLL_PROCESS_DETACH => {
-            crochet::disable!(swapbuffers_hook).expect("could not disable swapbuffers hook");
+            //crochet::disable!(swapbuffers_hook).expect("could not disable swapbuffers hook");
 
             true as i32
         }
