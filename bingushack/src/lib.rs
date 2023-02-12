@@ -163,6 +163,7 @@ pub extern "stdcall" fn DllMain(
 }
 
 
+// causes some issues with ejection
 #[crochet::hook("opengl32.dll", "wglSwapBuffers")]
 fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
     FIRST_RENDER.call_once(|| {
