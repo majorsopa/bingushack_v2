@@ -30,12 +30,12 @@ pub fn derive_bingus_module(input: TokenStream) -> TokenStream {
 
 
     let check_ghost_mode = quote! {{
-        let ghost_mode: &(bool, AtomicPtr<winapi::shared::windef::HWND>) = &*GHOST_MODE.get().unwrap().lock().unwrap();
-        if ghost_mode.0 && unsafe {
-            GetForegroundWindow() != *ghost_mode.1.load(std::sync::atomic::Ordering::Relaxed)
-        } {
-            return;
-        }
+        //let ghost_mode: &(bool, AtomicPtr<winapi::shared::windef::HWND>) = &*GHOST_MODE.get().unwrap().lock().unwrap();
+        //if ghost_mode.0 && unsafe {
+        //    GetForegroundWindow() != *ghost_mode.1.load(std::sync::atomic::Ordering::Relaxed)
+        //} {
+        //    return;
+        //}
     }};
 
     let init = quote! {
