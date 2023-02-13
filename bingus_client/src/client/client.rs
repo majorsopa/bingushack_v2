@@ -1,4 +1,4 @@
-use std::{sync::{Mutex, Arc}, collections::HashMap, ptr::null_mut, ffi::CString};
+use std::{sync::{Mutex, Arc}, collections::HashMap};
 
 use bingus_module::prelude::{BingusModule, populate_modules, BingusModuleTrait};
 use eframe::egui;
