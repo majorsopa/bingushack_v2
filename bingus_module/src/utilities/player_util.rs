@@ -104,7 +104,6 @@ pub fn swing_hand<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, pl
                 if main_hand { "MAIN_HAND" } else { "OFF_HAND" },
                 true
             ).unwrap(),
-            JValue::from(false),
         ]
     ).unwrap();
 }

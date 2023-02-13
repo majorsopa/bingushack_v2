@@ -47,13 +47,19 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
     }
 
 
+    let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
     call_method_or_get_field!(
         env,
-        minecraft_client,
-        "doAttack",
+        interaction_manager,
+        "attackEntity",
         false,
-        &[]
+        &[
+            JValue::from(player.get_object().unwrap()),
+            JValue::from(targeted_entity.get_object().unwrap())
+        ]
     ).unwrap();
+
+    swing_hand(env, mappings_manager, player, true);
 }
 
 #[derive(BingusModuleTrait)]

@@ -75,6 +75,7 @@ impl MappingsManager<'_> {
             add_method!("doAttack", "bg", "()Z", false);
             add_method!("calculateBoundingBox", "ao", "()Ldzz;", false);
             add_method!("getNetworkHandler", "I", "()Leza;", false);
+            add_method!("handleBlockBreaking", "g", "(Z)V", false);
 
             add_method!("getInstance", "N", "()Lejf;", true);
         });
@@ -86,7 +87,7 @@ impl MappingsManager<'_> {
             add_method!("displayClientMessage", "a", "(Lss;Z)V", false);
             add_method!("isUsingItem", "eZ", "()Z", false);
             add_method!("getAttackCooldownProgress", "w", "(F)F", false);
-            add_method!("swingHand", "a", "(Lbcl;Z)V", false);
+            add_method!("swingHand", "a", "(Lbcl;)V", false);
         });
         add_mapping!(new_self, "ItemStack", "cdt", {
             add_method!("getItem", "c", "()Lcdp;", false);
@@ -114,6 +115,7 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "InteractionManager", "ezd", {
             add_method!("clickSlot", "a", "(IIILbzp;Lbwp;)V", false);
             add_method!("attackEntity", "a", "(Lbwp;Lbdr;)V", false);
+            add_method!("cancelBlockBreaking", "b", "()V", false);
         });
         add_mapping!(new_self, "ScreenHandler", "bzg", {
             add_field!("syncId", "j", "I", false);
