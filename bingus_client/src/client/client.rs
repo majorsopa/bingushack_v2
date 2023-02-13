@@ -5,7 +5,7 @@ use eframe::egui;
 use bingus_ui::module_widget;
 
 use jni_mappings::{get_javavm, MappingsManager};
-use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::{GetAsyncKeyState, FindWindowA}}};
+use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
 use winit::platform::windows::EventLoopBuilderExtWindows;
 
 use crate::MODULES;
@@ -14,17 +14,6 @@ use crate::MODULES;
 static mut CLICKGUI_CONTEXT: Option<HGLRC> = None;
 static mut CLICKGUI_HDC: Option<HDC> = None;
 
-// stolen from the main bingushack package
-pub unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {
-    for window_name in window_names {
-        let window_name = CString::new(*window_name).unwrap();
-        let hwnd = FindWindowA(null_mut(), window_name.as_ptr());
-        if !hwnd.is_null() {
-            return Some(hwnd);
-        }
-    }
-    None
-}
 
 pub struct BingusClient {
     modules: Arc<Mutex<Vec<BingusModule>>>,
