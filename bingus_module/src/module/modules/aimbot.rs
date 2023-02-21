@@ -1,7 +1,18 @@
 use crate::crate_prelude::*;
 
 fn tick(aimbot: &mut Aimbot, env: JNIEnv, mappings_manager: &MappingsManager) {
+    // get the entity position
 
+    // get pitch
+
+    // get yaw
+}
+
+// returns the delta that should be achieved by the next rotation
+// rn it's only linear
+fn next_smooth_rotation(pitch_and_yaw: [f32; 2], goal: [f32; 2], interval: [f32; 2]) -> [f32; 2] {
+    let ret: [f32; 2] = [0.0, 0.0];
+    todo!()
 }
 
 #[derive(BingusModuleTrait)]
