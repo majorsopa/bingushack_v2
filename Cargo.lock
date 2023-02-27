@@ -232,6 +232,7 @@ dependencies = [
  "eframe",
  "jni",
  "jni_mappings",
+ "jvm-rs",
  "once_cell",
  "winapi",
  "winit",
@@ -1976,6 +1977,7 @@ name = "jni_mappings"
 version = "0.1.0"
 dependencies = [
  "jni",
+ "jvm-rs",
  "mappings_macro",
 ]
 
@@ -1986,6 +1988,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49409df3e3bf0856b916e2ceaca09ee28e6871cf7d9ce97a692cacfdb2a25a47"
 dependencies = [
  "wasm-bindgen",
+]
+
+[[package]]
+name = "jvm-rs"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d956176f9a6cad3413e68b6b7e528b61a9b4db9c0b6448ca37621acaeafa5aaf"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]

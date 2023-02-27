@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 jni = { version = "0.20.0", features = ["invocation"] }
 mappings_macro = { path = "../mappings_macro" }
+jvm-rs = "0.2.0"
