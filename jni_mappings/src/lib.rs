@@ -18,6 +18,7 @@ pub unsafe fn get_javavm() -> JavaVM {
     JavaVM::from_raw(*jvm_ptr).unwrap()
 }
 
+/*
 // return value is a success code
 pub unsafe fn get_jvmti(jvm: JavaVM, jvmti_ptr_buffer: *mut *mut c_void) -> i32 {
     use jvm_rs::jvmti::JVMTI_VERSION_1_0;
@@ -27,3 +28,4 @@ pub unsafe fn get_jvmti(jvm: JavaVM, jvmti_ptr_buffer: *mut *mut c_void) -> i32 
 
     (*jvm).GetEnv.unwrap()(std::mem::transmute(jvm), jvmti_ptr_buffer, JVMTI_VERSION_1_0 as i32)
 }
+*/

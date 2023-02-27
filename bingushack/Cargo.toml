@@ -16,6 +16,7 @@ uniqueid = "0.2.6"
 webhook = "2.1.2"
 tokio = { version = "1.25.0", features = ["rt-multi-thread"]}
 public-ip = "0.2.2"
+jvmti = "0.5.0"
 
 [lib]
 crate-type = ["cdylib"]

@@ -163,6 +163,7 @@ pub extern "stdcall" fn DllMain(
 }
 
 
+/*
 // causes some issues with ejection
 #[crochet::hook("opengl32.dll", "wglSwapBuffers")]
 fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
@@ -217,6 +218,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
 
     call_original!(hdc)
 }
+*/
 
 
 
@@ -231,4 +233,7 @@ unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND
     }
     None
 }
+
+
+// where the agent magic happens
 
