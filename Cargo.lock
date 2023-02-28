@@ -232,11 +232,14 @@ dependencies = [
  "eframe",
  "jni",
  "jni_mappings",
- "jvm-rs",
  "once_cell",
  "winapi",
  "winit",
 ]
+
+[[package]]
+name = "bingus_mixin"
+version = "0.1.0"
 
 [[package]]
 name = "bingus_module"

@@ -7,7 +7,7 @@ use super::SigHolder;
 
 #[derive(Debug, Default)]
 pub struct MappingsManager<'a> {
-    mappings: HashMap<&'static str, ClassMapping<'a>>
+    mappings: HashMap<&'static str, ClassMapping<'a>>,
 }
 
 impl MappingsManager<'_> {
@@ -18,11 +18,7 @@ impl MappingsManager<'_> {
                 macro_rules! add_field {
                     ($key_name:literal, $ob_name:literal, $sig:literal, $is_static:literal) => {
                         let sig = SigHolder::new($ob_name, $sig);
-                        $cm.add_field(
-                            $key_name,
-                            sig,
-                            $is_static,
-                        )
+                        $cm.add_field($key_name, sig, $is_static)
                     };
                 }
 
@@ -30,11 +26,7 @@ impl MappingsManager<'_> {
                 macro_rules! add_method {
                     ($key_name:literal, $ob_name:literal, $sig:literal, $is_static:literal) => {
                         let sig = SigHolder::new($ob_name, $sig);
-                        $cm.add_method(
-                            $key_name,
-                            sig,
-                            $is_static,
-                        )
+                        $cm.add_method($key_name, sig, $is_static)
                     };
                 }
             };
@@ -107,7 +99,7 @@ impl MappingsManager<'_> {
             add_method!("chatHud", "d", "()Lela;", false);
         });
         add_mapping!(new_self, "ChatHud", "ela", {
-            add_method!("addMessage", "a", "(Lss;Ltd;ILejb;Z)V", false);  // Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh
+            add_method!("addMessage", "a", "(Lss;Ltd;ILejb;Z)V", false); // Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh
         });
         add_mapping!(new_self, "Text", "ss", {
             add_method!("of", "a", "(Ljava/lang/String;)Lss;", true);
@@ -130,7 +122,12 @@ impl MappingsManager<'_> {
             add_method!("get", "get", "()Ljava/lang/Object;", false);
         });
         add_mapping!(new_self, "DebugRenderer", "fgz", {
-            add_method!("getTargetedEntity", "a", "(Lbdr;I)Ljava/util/Optional;", true);
+            add_method!(
+                "getTargetedEntity",
+                "a",
+                "(Lbdr;I)Ljava/util/Optional;",
+                true
+            );
         });
         add_mapping!(new_self, "Entity", "bdr", {
             add_field!("hurtTime", "aK", "I", false);
@@ -160,7 +157,12 @@ impl MappingsManager<'_> {
             add_method!("sendPacketToServer", "a", "(Luh;)V", false);
             add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);
             add_method!("getBlockState", "a_", "(Lgp;)Lcyt;", false);
-            add_method!("raycastBlock", "a", "(Leae;Leae;Lgp;Leax;Lcyt;)Leaa;", false);  // might not work, is a method of BlockView which i think is a superclass of this?
+            add_method!(
+                "raycastBlock",
+                "a",
+                "(Leae;Leae;Lgp;Leax;Lcyt;)Leaa;",
+                false
+            ); // might not work, is a method of BlockView which i think is a superclass of this?
         });
         add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
             add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
@@ -173,9 +175,7 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "HandledScreen", "epz", {
             add_field!("focusedSlot", "u", "Lcax;", false);
         });
-        add_mapping!(new_self, "Screen", "epb", {
-
-        });
+        add_mapping!(new_self, "Screen", "epb", {});
         add_mapping!(new_self, "GameRenderer", "fdo", {
             add_field!("fovMultiplier", "p", "F", false);
 
@@ -192,19 +192,38 @@ impl MappingsManager<'_> {
 
             add_method!("valueOf", "valueOf", "(I)Ljava/lang/Integer;", true);
         });
-        add_mapping!(new_self, "Object", "java/lang/Object", {
-            
-        });
-        add_mapping!(new_self, "Viewport", "com/mojang/blaze3d/platform/GlStateManager$m", {  // static enum
-            add_method!("getX", "a", "()I", true);
-            add_method!("getY", "b", "()I", true);
-            add_method!("getWidth", "c", "()I", true);
-            add_method!("getHeight", "d", "()I", true);
-        });
-        add_mapping!(new_self, "RenderSystem", "com/mojang/blaze3d/systems/RenderSystem", {
-            add_method!("getModelViewMatrix", "getModelViewMatrix", "()Lorg/joml/Matrix4f;", true);
-            add_method!("getProjectionMatrix", "getProjectionMatrix", "()Lorg/joml/Matrix4f;", true);
-        });
+        add_mapping!(new_self, "Object", "java/lang/Object", {});
+        add_mapping!(
+            new_self,
+            "Viewport",
+            "com/mojang/blaze3d/platform/GlStateManager$m",
+            {
+                // static enum
+                add_method!("getX", "a", "()I", true);
+                add_method!("getY", "b", "()I", true);
+                add_method!("getWidth", "c", "()I", true);
+                add_method!("getHeight", "d", "()I", true);
+            }
+        );
+        add_mapping!(
+            new_self,
+            "RenderSystem",
+            "com/mojang/blaze3d/systems/RenderSystem",
+            {
+                add_method!(
+                    "getModelViewMatrix",
+                    "getModelViewMatrix",
+                    "()Lorg/joml/Matrix4f;",
+                    true
+                );
+                add_method!(
+                    "getProjectionMatrix",
+                    "getProjectionMatrix",
+                    "()Lorg/joml/Matrix4f;",
+                    true
+                );
+            }
+        );
         add_mapping!(new_self, "Matrix4f", "org/joml/Matrix4f", {
             // bruh
             add_field!("m00", "m00", "F", false);
@@ -273,7 +292,12 @@ impl MappingsManager<'_> {
             add_field!("yaw", "k", "F", false);
         });
         add_mapping!(new_self, "ClientPlayNetworkHandler", "eza", {
-            add_method!("getPlayerListEntry", "a", "(Ljava/lang/String;)Leze;", false);
+            add_method!(
+                "getPlayerListEntry",
+                "a",
+                "(Ljava/lang/String;)Leze;",
+                false
+            );
         });
         add_mapping!(new_self, "GameMode", "cjt", {
             add_field!("SURVIVAL", "a", "Lcjt;", true);
@@ -287,16 +311,19 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "EntityAttributes", "bfj", {
             add_field!("GENERIC_ARMOR_TOUGHNESS", "j", "Lbfe;", true);
         });
-        add_mapping!(new_self, "EntityAttribute", "bfe", {
-
-        });
+        add_mapping!(new_self, "EntityAttribute", "bfe", {});
         add_mapping!(new_self, "EntityAttributeInstance", "bff", {
             add_method!("getValue", "f", "()D", false);
         });
         add_mapping!(new_self, "Explosion", "cjo", {
             add_method!("getCausingEntity", "e", "()Lbeg;", false);
 
-            add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);  // world, Nullable entity, Nullable damageSource, Nullable explosionBehavior, x, y, z, power, createFire, destructionType
+            add_method!(
+                "<init>",
+                "<init>",
+                "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V",
+                true
+            ); // world, Nullable entity, Nullable damageSource, Nullable explosionBehavior, x, y, z, power, createFire, destructionType
         });
         add_mapping!(new_self, "DestructionType", "cjo$a", {
             add_field!("DESTROY_WITH_DECAY", "c", "Lcjo$a;", true);
@@ -304,9 +331,7 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "StatusEffects", "bdm", {
             add_field!("RESISTANCE", "k", "Lbdi;", true);
         });
-        add_mapping!(new_self, "StatusEffect", "bdi", {
-            
-        });
+        add_mapping!(new_self, "StatusEffect", "bdi", {});
         add_mapping!(new_self, "StatusEffectInstance", "bdk", {
             add_method!("getAmplifier", "d", "()I", false);
         });
@@ -317,7 +342,12 @@ impl MappingsManager<'_> {
             // gotta add a floor method
         });
         add_mapping!(new_self, "RaycastContext", "cjf", {
-            add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
+            add_method!(
+                "<init>",
+                "<init>",
+                "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V",
+                true
+            );
             add_method!("getEnd", "a", "()Leae;", false);
             add_method!("getStart", "b", "()Leae;", false);
             add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
@@ -335,9 +365,7 @@ impl MappingsManager<'_> {
             add_method!("getY", "v", "()I", false);
             add_method!("getZ", "w", "()I", false);
         });
-        add_mapping!(new_self, "BlockView", "cjc", {
-
-        });
+        add_mapping!(new_self, "BlockView", "cjc", {});
         add_mapping!(new_self, "VoxelShape", "eax", {
             add_method!("raycast", "a", "(Leae;Leae;Lgp;)Leaa;", false);
         });
@@ -356,7 +384,8 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "FluidHandling", "cjf$b", {
             add_field!("NONE", "a", "Lcjf$b;", true);
         });
-        add_mapping!(new_self, "BlockState", "cyt", {  // extends AbstractBlockState
+        add_mapping!(new_self, "BlockState", "cyt", {
+            // extends AbstractBlockState
             add_method!("getBlock", "b", "()Lcmt;", false);
         });
         add_mapping!(new_self, "Block", "cmt", {
@@ -374,9 +403,7 @@ impl MappingsManager<'_> {
             add_method!("<init>", "<init>", "(DDD)V", true);
             add_method!("set", "d", "(III)Lgp$a;", false);
         });
-        add_mapping!(new_self, "String", "java/lang/String", {
-            
-        });
+        add_mapping!(new_self, "String", "java/lang/String", {});
         add_mapping!(new_self, "ClientWorldProperties", "eyz$a", {
             add_method!("getDifficulty", "s", "()Lbcj;", false);
         });
@@ -390,7 +417,12 @@ impl MappingsManager<'_> {
             add_method!("getDamageLeft", "a", "(FFF)F", true);
         });
         add_mapping!(new_self, "EnchantmentHelper", "chs", {
-            add_method!("getProtectionAmount", "a", "(Ljava/lang/Iterable;Lbcz;)I", true);
+            add_method!(
+                "getProtectionAmount",
+                "a",
+                "(Ljava/lang/Iterable;Lbcz;)I",
+                true
+            );
         });
         add_mapping!(new_self, "DamageSource", "bcz", {
             add_method!("setScaledWithDifficulty", "w", "()Lbcz;", false);
@@ -407,7 +439,10 @@ impl MappingsManager<'_> {
 
     pub fn get(&self, name: &str) -> Option<&ClassMapping> {
         unsafe {
-            self.mappings.get(name).map(|r| std::mem::transmute::<&ClassMapping, &ClassMapping>(r))  // i don't know why this transmute is legal but it is so cope
+            self.mappings
+                .get(name)
+                .map(|r| std::mem::transmute::<&ClassMapping, &ClassMapping>(r))
+            // i don't know why this transmute is legal but it is so cope
         }
     }
 }

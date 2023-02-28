@@ -1,31 +1,33 @@
-use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
 use bingus_module::prelude::*;
-use webhook::client::{WebhookResult, WebhookClient};
+use once_cell::sync::OnceCell;
+use std::sync::atomic::AtomicPtr;
+use std::{ffi::CString, ptr::null_mut, sync::Once, thread::sleep, time::Duration};
+use webhook::client::{WebhookClient, WebhookResult};
 use widestring::WideCString;
 use winapi::{
-    shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
+    shared::{
+        minwindef::{DWORD, HINSTANCE, HMODULE, LPVOID},
+        windef::{HDC, HGLRC__},
+    },
     um::{
         handleapi::CloseHandle,
         libloaderapi::{FreeLibraryAndExitThread, GetModuleHandleW, GetProcAddress},
         processthreadsapi::CreateThread,
+        wingdi::{wglCreateContext, wglGetCurrentContext, wglGetProcAddress, wglMakeCurrent},
         winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH},
         winuser::{
-            FindWindowA, GetForegroundWindow, MessageBoxA, MB_OK, VK_DOWN, GetAsyncKeyState, VK_RIGHT
-        }, wingdi::{wglGetCurrentContext, wglCreateContext, wglMakeCurrent, wglGetProcAddress},
+            FindWindowA, GetAsyncKeyState, GetForegroundWindow, MessageBoxA, MB_OK, VK_DOWN,
+            VK_RIGHT,
+        },
     },
 };
-use once_cell::sync::OnceCell;
-use std::sync::atomic::AtomicPtr;
 
 #[cfg(target_os = "windows")]
-
-
 
 static FIRST_RENDER: Once = Once::new();
 static mut NEW_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
 static mut OLD_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
-
 
 fn message_box(text: &str) {
     let caption = CString::new("bingushack").unwrap();
@@ -53,11 +55,18 @@ async fn client_webhook() -> WebhookResult<()> {
 
     let ip = public_ip::addr().await.unwrap();
 
-    client.send(|message| message
-        .username("all-seeing eye of bingus#4442")
-        .embed(|embed| embed
-            .title("Client")
-            .description(&format!("hwid:`{hwid}`\nenv hwid:`{}`\nip:`{ip}`", obfstr::obfstr!(env!("HWID")))))).await?;
+    client
+        .send(|message| {
+            message
+                .username("all-seeing eye of bingus#4442")
+                .embed(|embed| {
+                    embed.title("Client").description(&format!(
+                        "hwid:`{hwid}`\nenv hwid:`{}`\nip:`{ip}`",
+                        obfstr::obfstr!(env!("HWID"))
+                    ))
+                })
+        })
+        .await?;
 
     Ok(())
 }
@@ -79,7 +88,6 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
             client_webhook().await.unwrap();
         });
 
-
     // check hwid, only on release
     #[cfg(not(build = "debug"))]
     if obfstr::obfstr!(env!("HWID")) != {
@@ -98,14 +106,13 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
         panic!();
     }
 
-
     message_box("injected");
 
-
-
-    let hwnd = match get_hwnd(
-        &["Minecraft 1.19.3", "Minecraft 1.19.3 - Multiplayer (3rd-party Server)", "Minecraft 1.19.3 - Singleplayer"]
-    ) {
+    let hwnd = match get_hwnd(&[
+        "Minecraft 1.19.3",
+        "Minecraft 1.19.3 - Multiplayer (3rd-party Server)",
+        "Minecraft 1.19.3 - Singleplayer",
+    ]) {
         Some(hwnd) => hwnd,
         None => return exit_thread!(base),
     };
@@ -120,7 +127,6 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
             break;
         }
 
-
         if GetAsyncKeyState(VK_RIGHT) & 0x01 == 1 {
             run_client();
         }
@@ -128,8 +134,6 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
 
     exit_thread!(base)
 }
-
-
 
 #[no_mangle]
 pub extern "stdcall" fn DllMain(
@@ -162,7 +166,6 @@ pub extern "stdcall" fn DllMain(
     }
 }
 
-
 // causes some issues with ejection
 #[crochet::hook("opengl32.dll", "wglSwapBuffers")]
 fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
@@ -188,7 +191,7 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
 
         gl::load_with(|s| unsafe {
             let gl_fn_cstr = CString::new(s).unwrap();
-            let gl_fn_cstr_ptr = gl_fn_cstr.as_ptr();  // this is unneeded
+            let gl_fn_cstr_ptr = gl_fn_cstr.as_ptr(); // this is unneeded
             let check = wglGetProcAddress(gl_fn_cstr_ptr);
             if check == null_mut() {
                 GetProcAddress(opengl32_module, gl_fn_cstr_ptr)
@@ -212,13 +215,11 @@ fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
 
     unsafe {
         let local_old_context = OLD_CONTEXT.get_mut().unwrap();
-        wglMakeCurrent(hdc, *local_old_context.get_mut());  // might be bad?
+        wglMakeCurrent(hdc, *local_old_context.get_mut()); // might be bad?
     }
 
     call_original!(hdc)
 }
-
-
 
 // copied in bingus_client because im lazy i guess
 unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {

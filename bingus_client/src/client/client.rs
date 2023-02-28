@@ -7,7 +7,6 @@ use bingus_ui::module_widget;
 use jni_mappings::{get_javavm, MappingsManager, get_jvmti};
 use winapi::{shared::windef::{HDC, HGLRC}, um::{wingdi::{wglGetCurrentDC, wglGetCurrentContext, wglMakeCurrent}, winuser::GetAsyncKeyState}};
 use winit::platform::windows::EventLoopBuilderExtWindows;
-use jvm_rs::jvmti::jvmtiInterface_1_;
 
 use crate::MODULES;
 
@@ -82,11 +81,6 @@ pub fn run_client() {
     let running_modules = std::thread::spawn(move || {
         let jvm = unsafe { get_javavm() };
         let jni_env = unsafe { std::mem::transmute(jvm.attach_current_thread_as_daemon().unwrap()) };
-        let jvmti = Vec::with_capacity(1).as_mut_ptr();
-        unsafe {
-            get_jvmti(jvm, jvmti);
-        }
-        let jvmti: *mut jvmtiInterface_1_ = unsafe { std::mem::transmute(*jvmti) };
         let mappings_manager = Arc::new(MappingsManager::new(jni_env));
         for module in modules.lock().unwrap().iter_mut() {
             module.init(jni_env, &mut Arc::clone(&mappings_manager));
@@ -115,7 +109,7 @@ pub fn run_client() {
             }
 
 
-            std::thread::sleep(std::time::Duration::from_millis(1));
+            std::thread::sleep(std::time::Duration::from_millis(50));  // todo test if it makes autototem slower
             if modules_rx.try_recv().is_ok() {
                 break;
             }
