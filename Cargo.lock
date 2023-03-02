@@ -232,7 +232,6 @@ dependencies = [
  "eframe",
  "jni",
  "jni_mappings",
- "jvm-rs",
  "once_cell",
  "winapi",
  "winit",
@@ -281,7 +280,6 @@ dependencies = [
  "bingus_module",
  "crochet",
  "gl",
- "jvmti",
  "obfstr",
  "once_cell",
  "public-ip",
@@ -628,7 +626,7 @@ dependencies = [
  "crochet_macro",
  "detour2",
  "dlopen2",
- "lazy_static 1.4.0",
+ "lazy_static",
 ]
 
 [[package]]
@@ -881,7 +879,7 @@ checksum = "d23c46a579bfa55f6f09fa8b482f994eefae5ed333823ddfcfddc69a7baf405b"
 dependencies = [
  "cfg-if",
  "generic-array",
- "lazy_static 1.4.0",
+ "lazy_static",
  "libc",
  "libudis86-sys",
  "mmap-fixed-fixed",
@@ -982,7 +980,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "439a1c2ba5611ad3ed731280541d36d2e9c4ac5e7fb818a27b604bdc5a6aa65b"
 dependencies = [
- "lazy_static 1.4.0",
+ "lazy_static",
  "libc",
  "serde",
  "serde_derive",
@@ -1473,7 +1471,7 @@ checksum = "c05aeb6a22b8f62540c194aac980f2115af067bfe15a0734d7277a768d396b31"
 dependencies = [
  "cfg-if",
  "libc",
- "wasi 0.11.0+wasi-snapshot-preview1",
+ "wasi",
 ]
 
 [[package]]
@@ -1978,7 +1976,6 @@ name = "jni_mappings"
 version = "0.1.0"
 dependencies = [
  "jni",
- "jvm-rs",
  "mappings_macro",
 ]
 
@@ -1989,29 +1986,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49409df3e3bf0856b916e2ceaca09ee28e6871cf7d9ce97a692cacfdb2a25a47"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "jvm-rs"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d956176f9a6cad3413e68b6b7e528b61a9b4db9c0b6448ca37621acaeafa5aaf"
-dependencies = [
- "winapi",
-]
-
-[[package]]
-name = "jvmti"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7ac79ec7519346b4495a694b0f2387bef5ba4c826da0dbe86900ab296c12fb2"
-dependencies = [
- "lazy_static 0.2.11",
- "libc",
- "serde",
- "serde_derive",
- "time 0.1.45",
- "toml 0.4.10",
 ]
 
 [[package]]
@@ -2048,12 +2022,6 @@ checksum = "7a53776d271cfb873b17c618af0298445c88afc52837f3e948fa3fafd131f449"
 dependencies = [
  "arrayvec 0.7.2",
 ]
-
-[[package]]
-name = "lazy_static"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76f033c7ad61445c5b347c7382dd1237847eb1bce590fe50365dcb33d546be73"
 
 [[package]]
 name = "lazy_static"
@@ -2222,7 +2190,7 @@ checksum = "e5d732bc30207a6423068df043e3d02e0735b155ad7ce1a6f76fe2baa5b158de"
 dependencies = [
  "libc",
  "log",
- "wasi 0.11.0+wasi-snapshot-preview1",
+ "wasi",
  "windows-sys 0.42.0",
 ]
 
@@ -2299,7 +2267,7 @@ version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07226173c32f2926027b63cce4bcd8076c3552846cbe7925f3aaffeac0a3b92e"
 dependencies = [
- "lazy_static 1.4.0",
+ "lazy_static",
  "libc",
  "log",
  "openssl",
@@ -3281,7 +3249,7 @@ dependencies = [
  "bitflags",
  "calloop",
  "dlib",
- "lazy_static 1.4.0",
+ "lazy_static",
  "log",
  "memmap2",
  "nix 0.24.3",
@@ -3380,7 +3348,7 @@ dependencies = [
  "cfg-expr",
  "heck",
  "pkg-config",
- "toml 0.5.11",
+ "toml",
  "version-compare",
 ]
 
@@ -3409,7 +3377,7 @@ dependencies = [
  "image",
  "instant",
  "jni",
- "lazy_static 1.4.0",
+ "lazy_static",
  "libc",
  "log",
  "ndk 0.6.0",
@@ -3481,17 +3449,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "time"
-version = "0.1.45"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b797afad3f312d1c66a56d11d0316f916356d11bd158fbc6ca6389ff6bf805a"
-dependencies = [
- "libc",
- "wasi 0.10.0+wasi-snapshot-preview1",
- "winapi",
 ]
 
 [[package]]
@@ -3593,15 +3550,6 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.4.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "758664fc71a3a69038656bee8b6be6477d2a6c315a6b81f7081f591bffa4111f"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "toml"
 version = "0.5.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4f7f0dd8d50a853a531c426359045b1998f04219d88799810762cd4ad314234"
@@ -3686,12 +3634,12 @@ dependencies = [
  "data-encoding",
  "futures-channel",
  "futures-util",
- "lazy_static 1.4.0",
+ "lazy_static",
  "log",
  "radix_trie",
  "rand",
  "thiserror",
- "time 0.3.17",
+ "time",
  "tokio",
  "trust-dns-proto",
 ]
@@ -3711,7 +3659,7 @@ dependencies = [
  "futures-util",
  "idna 0.2.3",
  "ipnet",
- "lazy_static 1.4.0",
+ "lazy_static",
  "log",
  "rand",
  "smallvec",
@@ -3870,12 +3818,6 @@ dependencies = [
 
 [[package]]
 name = "wasi"
-version = "0.10.0+wasi-snapshot-preview1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
-
-[[package]]
-name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
@@ -4015,7 +3957,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be12ce1a3c39ec7dba25594b97b42cb3195d54953ddb9d3d95a7c3902bc6e9d4"
 dependencies = [
  "dlib",
- "lazy_static 1.4.0",
+ "lazy_static",
  "pkg-config",
 ]
 
@@ -4026,7 +3968,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96b2a02ac608e07132978689a6f9bf4214949c85998c247abadd4f4129b1aa06"
 dependencies = [
  "dlib",
- "lazy_static 1.4.0",
+ "lazy_static",
  "log",
  "pkg-config",
 ]

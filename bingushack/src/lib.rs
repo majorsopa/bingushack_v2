@@ -1,5 +1,3 @@
-mod agent;
-
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
 use bingus_client::{run_client, MODULES};
 use bingus_module::prelude::*;
@@ -16,13 +14,6 @@ use winapi::{
             FindWindowA, GetForegroundWindow, MessageBoxA, MB_OK, VK_DOWN, GetAsyncKeyState, VK_RIGHT
         }, wingdi::{wglGetCurrentContext, wglCreateContext, wglMakeCurrent, wglGetProcAddress},
     },
-};
-use jvmti::{
-    agent::Agent,
-    config::Config,
-    context::static_context,
-    native::{JavaVMPtr, MutString, ReturnValue, VoidPtr},
-    options::Options,
 };
 use once_cell::sync::OnceCell;
 use std::sync::atomic::AtomicPtr;
@@ -242,44 +233,3 @@ unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND
     }
     None
 }
-
-
-// where the agent magic happens
-#[no_mangle]
-#[allow(non_snake_case, unused_variables)]
-pub extern "C" fn Agent_OnLoad(
-    vm: JavaVMPtr,
-    options: MutString,
-    reserved: VoidPtr,
-) -> ReturnValue {
-    let options = Options::parse(stringify(options));
-
-    if let Some(config) = Config::read_config() {
-        static_context().set_config(config);
-    }
-
-    let mut agent = Agent::new(vm);
-
-    agent.on_garbage_collection_start(Some(on_garbage_collection_start));
-    agent.on_garbage_collection_finish(Some(on_garbage_collection_finish));
-    agent.on_vm_object_alloc(Some(on_object_alloc));
-    agent.on_vm_object_free(Some(on_object_free));
-    agent.on_class_file_load(Some(on_class_file_load));
-    agent.on_method_entry(Some(on_method_entry));
-    agent.on_method_exit(Some(on_method_exit));
-    agent.on_thread_start(Some(on_thread_start));
-    agent.on_thread_end(Some(on_thread_end));
-    agent.on_monitor_wait(Some(on_monitor_wait));
-    agent.on_monitor_waited(Some(on_monitor_waited));
-    agent.on_monitor_contended_enter(Some(on_monitor_contended_enter));
-    agent.on_monitor_contended_entered(Some(on_monitor_contended_entered));
-    agent.on_class_file_load(Some(on_class_file_load));
-
-    agent.update();
-
-    return 0;
-}
-
-#[no_mangle]
-#[allow(non_snake_case, unused_variables)]
-pub extern "C" fn Agent_OnUnload(vm: JavaVMPtr) {}
