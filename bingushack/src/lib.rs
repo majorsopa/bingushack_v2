@@ -1,10 +1,10 @@
-use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
+use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString};
 use bingus_client::{run_client};
 
 use webhook::client::{WebhookResult, WebhookClient};
 
 use winapi::{
-    shared::{minwindef::{DWORD, HINSTANCE, LPVOID}, windef::{HGLRC__}},
+    shared::{minwindef::{DWORD, HINSTANCE, LPVOID}},
     um::{
         handleapi::CloseHandle,
         libloaderapi::{FreeLibraryAndExitThread},
@@ -15,8 +15,8 @@ use winapi::{
         },
     },
 };
-use once_cell::sync::OnceCell;
-use std::sync::atomic::AtomicPtr;
+
+
 
 #[cfg(target_os = "windows")]
 
