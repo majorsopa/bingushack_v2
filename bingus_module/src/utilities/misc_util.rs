@@ -221,378 +221,385 @@ pub fn raycast_replacement<'a>(
     obby_pos: &'a ClassMapping<'a>,
     ignore_terrain: bool
 ) -> &'a ClassMapping<'a> {
-    let start_vec3d = mappings_manager.get("Vec3d").unwrap();
-    apply_object!(
-        start_vec3d,
-        call_method_or_get_field!(
-            env,
-            raycast_context,
-            "getStart",
-            false,
-            &[]
-        ).unwrap().l().unwrap()
-    );
-    let end_vec3d = mappings_manager.get("Vec3d").unwrap();
-    apply_object!(
-        end_vec3d,
-        call_method_or_get_field!(
-            env,
-            raycast_context,
-            "getEnd",
-            false,
-            &[]
-        ).unwrap().l().unwrap()
-    );
-
-    let hit_closure = |block_pos: &'a ClassMapping<'a>| {
-        let block_state = mappings_manager.get("BlockState").unwrap();
-        if env.is_same_object(
-            obby_pos.get_object().unwrap(),
-            block_pos.get_object().unwrap()
-        ).unwrap() {
-            let obsidian_block = mappings_manager.get("Block").unwrap();
-            apply_object!(
-                obsidian_block,
-                call_method_or_get_field!(
-                    env,
-                    mappings_manager.get("Blocks").unwrap(),
-                    "OBSIDIAN",
-                    true
-                ).unwrap().l().unwrap()
-            );
-            let obby_default_state = call_method_or_get_field!(
+    goldberg_stmts! {
+        let start_vec3d = mappings_manager.get("Vec3d").unwrap();
+        apply_object!(
+            start_vec3d,
+            call_method_or_get_field!(
                 env,
-                obsidian_block,
-                "getDefaultState",
+                raycast_context,
+                "getStart",
                 false,
                 &[]
-            ).unwrap().l().unwrap();
-            apply_object!(
-                block_state,
-                obby_default_state
-            );
-        } else {
-            let world = mappings_manager.get("World").unwrap();
-            apply_object!(
-                world,
-                call_method_or_get_field!(
-                    env,
-                    get_minecraft_client(env, mappings_manager),
-                    "world",
-                    false
-                ).unwrap().l().unwrap()
-            );
-            let block = call_method_or_get_field!(
+            ).unwrap().l().unwrap()
+        );
+        let end_vec3d = mappings_manager.get("Vec3d").unwrap();
+        apply_object!(
+            end_vec3d,
+            call_method_or_get_field!(
                 env,
-                world,
-                "getBlockState",
-                false,
-                &[
-                    JValue::Object(block_pos.get_object().unwrap())
-                ]
-            ).unwrap().l().unwrap();
-            apply_object!(
-                block_state,
-                block
-            );
-
-            let block = mappings_manager.get("Block").unwrap();
-            apply_object!(
-                block,
-                call_method_or_get_field!(
-                    env,
-                    block_state,
-                    "getBlock",
-                    false,
-                    &[]
-                ).unwrap().l().unwrap()
-            );
-            let blast_resistance = call_method_or_get_field!(
-                env,
-                block,
-                "getBlastResistance",
+                raycast_context,
+                "getEnd",
                 false,
                 &[]
-            ).unwrap().f().unwrap();
+            ).unwrap().l().unwrap()
+        );
+    }
 
-            if blast_resistance < 600.0 && ignore_terrain {
-                let air_block = mappings_manager.get("Block").unwrap();
+        let hit_closure = |block_pos: ClassMapping<'a>| {
+            goldberg_stmts! {
+            let block_state = mappings_manager.get("BlockState").unwrap();
+            if env.is_same_object(
+                obby_pos.get_object().unwrap(),
+                block_pos.get_object().unwrap()
+            ).unwrap() {
+                let obsidian_block = mappings_manager.get("Block").unwrap();
                 apply_object!(
-                    air_block,
+                    obsidian_block,
                     call_method_or_get_field!(
                         env,
                         mappings_manager.get("Blocks").unwrap(),
-                        "AIR",
+                        "OBSIDIAN",
                         true
                     ).unwrap().l().unwrap()
                 );
-                let air_default_state = call_method_or_get_field!(
+                let obby_default_state = call_method_or_get_field!(
                     env,
-                    air_block,
+                    obsidian_block,
                     "getDefaultState",
                     false,
                     &[]
                 ).unwrap().l().unwrap();
                 apply_object!(
                     block_state,
-                    air_default_state
+                    obby_default_state
                 );
+            } else {
+                let world = mappings_manager.get("World").unwrap();
+                apply_object!(
+                    world,
+                    call_method_or_get_field!(
+                        env,
+                        get_minecraft_client(env, mappings_manager),
+                        "world",
+                        false
+                    ).unwrap().l().unwrap()
+                );
+                let block = call_method_or_get_field!(
+                    env,
+                    world,
+                    "getBlockState",
+                    false,
+                    &[
+                        JValue::Object(block_pos.get_object().unwrap())
+                    ]
+                ).unwrap().l().unwrap();
+                apply_object!(
+                    block_state,
+                    block
+                );
+
+                let block = mappings_manager.get("Block").unwrap();
+                apply_object!(
+                    block,
+                    call_method_or_get_field!(
+                        env,
+                        block_state,
+                        "getBlock",
+                        false,
+                        &[]
+                    ).unwrap().l().unwrap()
+                );
+                let blast_resistance = call_method_or_get_field!(
+                    env,
+                    block,
+                    "getBlastResistance",
+                    false,
+                    &[]
+                ).unwrap().f().unwrap();
+
+                if blast_resistance < 600.0 && ignore_terrain {
+                    let air_block = mappings_manager.get("Block").unwrap();
+                    apply_object!(
+                        air_block,
+                        call_method_or_get_field!(
+                            env,
+                            mappings_manager.get("Blocks").unwrap(),
+                            "AIR",
+                            true
+                        ).unwrap().l().unwrap()
+                    );
+                    let air_default_state = call_method_or_get_field!(
+                        env,
+                        air_block,
+                        "getDefaultState",
+                        false,
+                        &[]
+                    ).unwrap().l().unwrap();
+                    apply_object!(
+                        block_state,
+                        air_default_state
+                    );
+                }
+            }
+
+
+            let voxel_shape = mappings_manager.get("VoxelShape").unwrap();
+            apply_object!(
+                voxel_shape,
+                call_method_or_get_field!(
+                    env,
+                    raycast_context,
+                    "getBlockShape",
+                    false,
+                    &[
+                        JValue::Object(block_state.get_object().unwrap()),
+                        JValue::Object(world.get_object().unwrap()),
+                        JValue::Object(block_pos.get_object().unwrap())
+                    ]
+                ).unwrap().l().unwrap()
+            );
+
+            let block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+            apply_object!(
+                block_hit_result,
+                call_method_or_get_field!(
+                    env,
+                    world,
+                    "raycastBlock",
+                    false,
+                    &[
+                        JValue::Object(start_vec3d.get_object().unwrap()),
+                        JValue::Object(end_vec3d.get_object().unwrap()),
+                        JValue::Object(block_pos.get_object().unwrap()),
+                        JValue::Object(voxel_shape.get_object().unwrap()),
+                        JValue::Object(block_state.get_object().unwrap())
+                    ]
+                ).unwrap().l().unwrap()
+            );
+
+            let other_voxel_shape = mappings_manager.get("VoxelShape").unwrap();
+            apply_object!(
+                other_voxel_shape,
+                call_method_or_get_field!(
+                    env,
+                    mappings_manager.get("VoxelShapes").unwrap(),
+                    "empty",
+                    true,
+                    &[]
+                ).unwrap().l().unwrap()
+            );
+
+            let other_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+            apply_object!(
+                other_block_hit_result,
+                call_method_or_get_field!(
+                    env,
+                    other_voxel_shape,
+                    "raycast",
+                    false,
+                    &[
+                        JValue::Object(start_vec3d.get_object().unwrap()),
+                        JValue::Object(end_vec3d.get_object().unwrap()),
+                        JValue::Object(block_pos.get_object().unwrap())
+                    ]
+                ).unwrap().l().unwrap()
+            );
+
+            let d = if env.is_same_object(block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
+                f64::MAX
+            } else {
+                let get_coords_from = mappings_manager.get("BlockPos").unwrap();
+                apply_object!(
+                    get_coords_from,
+                    call_method_or_get_field!(
+                        env,
+                        block_hit_result,
+                        "getPos",
+                        false,
+                        &[]
+                    ).unwrap().l().unwrap()
+                );
+                let x = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getX",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+                let y = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getY",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+                let z = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getZ",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+
+                call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "distanceToSqr",
+                    false,
+                    &[
+                        JValue::Double(x),
+                        JValue::Double(y),
+                        JValue::Double(z)
+                    ]
+                ).unwrap().d().unwrap()
+            };
+            let e = if env.is_same_object(other_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
+                f64::MAX
+            } else {
+                let get_coords_from = mappings_manager.get("BlockPos").unwrap();
+                apply_object!(
+                    get_coords_from,
+                    call_method_or_get_field!(
+                        env,
+                        other_block_hit_result,
+                        "getPos",
+                        false,
+                        &[]
+                    ).unwrap().l().unwrap()
+                );
+                let x = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getX",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+                let y = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getY",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+                let z = call_method_or_get_field!(
+                    env,
+                    get_coords_from,
+                    "getZ",
+                    false,
+                    &[]
+                ).unwrap().i().unwrap() as f64;
+
+                call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "distanceToSqr",
+                    false,
+                    &[
+                        JValue::Double(x),
+                        JValue::Double(y),
+                        JValue::Double(z)
+                    ]
+                ).unwrap().d().unwrap()
+            };
+
+            if d <= e {
+                block_hit_result
+            } else {
+                other_block_hit_result
             }
         }
-
-
-        let voxel_shape = mappings_manager.get("VoxelShape").unwrap();
-        apply_object!(
-            voxel_shape,
-            call_method_or_get_field!(
-                env,
-                raycast_context,
-                "getBlockShape",
-                false,
-                &[
-                    JValue::Object(block_state.get_object().unwrap()),
-                    JValue::Object(world.get_object().unwrap()),
-                    JValue::Object(block_pos.get_object().unwrap())
-                ]
-            ).unwrap().l().unwrap()
-        );
-
-        let block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
-        apply_object!(
-            block_hit_result,
-            call_method_or_get_field!(
-                env,
-                world,
-                "raycastBlock",
-                false,
-                &[
-                    JValue::Object(start_vec3d.get_object().unwrap()),
-                    JValue::Object(end_vec3d.get_object().unwrap()),
-                    JValue::Object(block_pos.get_object().unwrap()),
-                    JValue::Object(voxel_shape.get_object().unwrap()),
-                    JValue::Object(block_state.get_object().unwrap())
-                ]
-            ).unwrap().l().unwrap()
-        );
-
-        let other_voxel_shape = mappings_manager.get("VoxelShape").unwrap();
-        apply_object!(
-            other_voxel_shape,
-            call_method_or_get_field!(
-                env,
-                mappings_manager.get("VoxelShapes").unwrap(),
-                "empty",
-                true,
-                &[]
-            ).unwrap().l().unwrap()
-        );
-
-        let other_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
-        apply_object!(
-            other_block_hit_result,
-            call_method_or_get_field!(
-                env,
-                other_voxel_shape,
-                "raycast",
-                false,
-                &[
-                    JValue::Object(start_vec3d.get_object().unwrap()),
-                    JValue::Object(end_vec3d.get_object().unwrap()),
-                    JValue::Object(block_pos.get_object().unwrap())
-                ]
-            ).unwrap().l().unwrap()
-        );
-
-        let d = if env.is_same_object(block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
-            f64::MAX
-        } else {
-            let get_coords_from = mappings_manager.get("BlockPos").unwrap();
-            apply_object!(
-                get_coords_from,
-                call_method_or_get_field!(
-                    env,
-                    block_hit_result,
-                    "getPos",
-                    false,
-                    &[]
-                ).unwrap().l().unwrap()
-            );
-            let x = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getX",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-            let y = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getY",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-            let z = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getZ",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-
-            call_method_or_get_field!(
-                env,
-                start_vec3d,
-                "distanceToSqr",
-                false,
-                &[
-                    JValue::Double(x),
-                    JValue::Double(y),
-                    JValue::Double(z)
-                ]
-            ).unwrap().d().unwrap()
-        };
-        let e = if env.is_same_object(other_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
-            f64::MAX
-        } else {
-            let get_coords_from = mappings_manager.get("BlockPos").unwrap();
-            apply_object!(
-                get_coords_from,
-                call_method_or_get_field!(
-                    env,
-                    other_block_hit_result,
-                    "getPos",
-                    false,
-                    &[]
-                ).unwrap().l().unwrap()
-            );
-            let x = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getX",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-            let y = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getY",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-            let z = call_method_or_get_field!(
-                env,
-                get_coords_from,
-                "getZ",
-                false,
-                &[]
-            ).unwrap().i().unwrap() as f64;
-
-            call_method_or_get_field!(
-                env,
-                start_vec3d,
-                "distanceToSqr",
-                false,
-                &[
-                    JValue::Double(x),
-                    JValue::Double(y),
-                    JValue::Double(z)
-                ]
-            ).unwrap().d().unwrap()
-        };
-
-        if d <= e {
-            block_hit_result
-        } else {
-            other_block_hit_result
-        }
     };
-    let miss_closure = || {
-        let make_missed_with = mappings_manager.get("Vec3d").unwrap();
-        let end_x = call_method_or_get_field!(
-            env,
-            end_vec3d,
-            "getX",
-            false,
-            &[]
-        ).unwrap().d().unwrap();
-        let end_y = call_method_or_get_field!(
-            env,
-            end_vec3d,
-            "getY",
-            false,
-            &[]
-        ).unwrap().d().unwrap();
-        let end_z = call_method_or_get_field!(
-            env,
-            end_vec3d,
-            "getZ",
-            false,
-            &[]
-        ).unwrap().d().unwrap();
-        apply_object!(
-            make_missed_with,
-            call_method_or_get_field!(
+        let miss_closure = || {
+            goldberg_stmts! {
+            let make_missed_with = mappings_manager.get("Vec3d").unwrap();
+            let end_x = call_method_or_get_field!(
                 env,
-                start_vec3d,
-                "subtract",
+                end_vec3d,
+                "getX",
                 false,
-                &[
-                    JValue::Double(end_x),
-                    JValue::Double(end_y),
-                    JValue::Double(end_z)
-                ]
-            ).unwrap().l().unwrap()
-        );
+                &[]
+            ).unwrap().d().unwrap();
+            let end_y = call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "getY",
+                false,
+                &[]
+            ).unwrap().d().unwrap();
+            let end_z = call_method_or_get_field!(
+                env,
+                end_vec3d,
+                "getZ",
+                false,
+                &[]
+            ).unwrap().d().unwrap();
+            apply_object!(
+                make_missed_with,
+                call_method_or_get_field!(
+                    env,
+                    start_vec3d,
+                    "subtract",
+                    false,
+                    &[
+                        JValue::Double(end_x),
+                        JValue::Double(end_y),
+                        JValue::Double(end_z)
+                    ]
+                ).unwrap().l().unwrap()
+            );
 
-        let missed_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
-        let direction = mappings_manager.get("Direction").unwrap();
-        apply_object!(
-            direction,
-            call_method_or_get_field!(
-                env,
+            let missed_block_hit_result = mappings_manager.get("BlockHitResult").unwrap();
+            let direction = mappings_manager.get("Direction").unwrap();
+            apply_object!(
                 direction,
-                "getFacing",
-                true,
-                &[
-                    JValue::Double(end_x),
-                    JValue::Double(end_y),
-                    JValue::Double(end_z)
-                ]
-            ).unwrap().l().unwrap()
-        );
-        let missed_block_pos = mappings_manager.get("BlockPos").unwrap();
-        apply_object!(
-            missed_block_pos,
-            call_method_or_get_field!(
-                env,
+                call_method_or_get_field!(
+                    env,
+                    direction,
+                    "getFacing",
+                    true,
+                    &[
+                        JValue::Double(end_x),
+                        JValue::Double(end_y),
+                        JValue::Double(end_z)
+                    ]
+                ).unwrap().l().unwrap()
+            );
+            let missed_block_pos = mappings_manager.get("BlockPos").unwrap();
+            apply_object!(
                 missed_block_pos,
-                "<init>",
-                true,
-                &[
-                    JValue::Object(end_vec3d.get_object().unwrap()),  // this might break
-                ]
-            ).unwrap().l().unwrap()
-        );
-        apply_object!(
-            missed_block_hit_result,
-            call_method_or_get_field!(
-                env,
+                call_method_or_get_field!(
+                    env,
+                    missed_block_pos,
+                    "<init>",
+                    true,
+                    &[
+                        JValue::Object(end_vec3d.get_object().unwrap()),  // this might break
+                    ]
+                ).unwrap().l().unwrap()
+            );
+            apply_object!(
                 missed_block_hit_result,
-                "createMissed",
-                false,
-                &[
-                    JValue::Object(end_vec3d.get_object().unwrap()),
-                    JValue::Object(direction.get_object().unwrap()),
-                    JValue::Object(missed_block_pos.get_object().unwrap()),
-                ]
-            ).unwrap().l().unwrap()
-        );
-        missed_block_hit_result
+                call_method_or_get_field!(
+                    env,
+                    missed_block_hit_result,
+                    "createMissed",
+                    false,
+                    &[
+                        JValue::Object(end_vec3d.get_object().unwrap()),
+                        JValue::Object(direction.get_object().unwrap()),
+                        JValue::Object(missed_block_pos.get_object().unwrap()),
+                    ]
+                ).unwrap().l().unwrap()
+            );
+            missed_block_hit_result
+        }
     };
 
     if env.is_same_object(start_vec3d.get_object().unwrap(), end_vec3d.get_object().unwrap()).unwrap() {
         miss_closure()
     } else {
+        goldberg_stmts! {
         // hit
         let math_helper = mappings_manager.get("MathHelper").unwrap();
         // holy bananas
@@ -701,7 +708,8 @@ pub fn raycast_replacement<'a>(
         let mut j = math_helper_floor(env, math_helper, g);
         let mut k = math_helper_floor(env, math_helper, h);
         let mut l = math_helper_floor(env, math_helper, i);
-
+    }
+    goldberg_stmts! {
         let mutable_block_pos = mappings_manager.get("MutableBlockPos").unwrap();
         apply_object!(
             mutable_block_pos,
@@ -724,10 +732,11 @@ pub fn raycast_replacement<'a>(
             maybe_null_block_hit_result,
             hit_closure(mutable_block_pos).get_object().unwrap()
         );
-
+    }
         if !env.is_same_object(maybe_null_block_hit_result.get_object().unwrap(), JObject::null()).unwrap() {
             maybe_null_block_hit_result
         } else {
+            goldberg_stmts! {
             let m = d - g;
             let n = e - h;
             let o = f - i;
@@ -815,6 +824,7 @@ pub fn raycast_replacement<'a>(
                 ]
             ).unwrap().d().unwrap());
 
+        }
             let block_hit_result2 = mappings_manager.get("BlockHitResult").unwrap();
             while {
                 if !(v <= 1.0)
@@ -1179,184 +1189,186 @@ pub fn crystal_damage<'a>(
     block_pos: &'a ClassMapping<'a>,
     ignore_terrain: bool
 ) -> f64 {
-    let world = match get_world_checked(env, mappings_manager, get_minecraft_client(env, mappings_manager)) {
-        Some(world) => world,
-        None => return 0.0
-    };
+    goldberg_stmts! {
+        let world = match get_world_checked(env, mappings_manager, get_minecraft_client(env, mappings_manager)) {
+            Some(world) => world,
+            None => return 0.0
+        };
 
-    let entity_player = mappings_manager.get("Entity").unwrap();
-    apply_object!(
-        entity_player,
-        player_to_hurt.get_object().unwrap()
-    );
-
-    let player_pos = get_entity_pos_vec3d(env, mappings_manager, entity_player);
-
-    if env.is_same_object(player_to_hurt.get_object().unwrap(), JObject::null()).unwrap() {
-        return 0.0;
-    }
-
-    let player_list_entry = get_player_list_entry_by_uuid(env, mappings_manager, entity_player);
-
-    let gamemode = mappings_manager.get("GameMode").unwrap();
-    if env.is_same_object(player_list_entry.get_object().unwrap(), JObject::null()).unwrap() {
+        let entity_player = mappings_manager.get("Entity").unwrap();
         apply_object!(
-            gamemode,
+            entity_player,
+            player_to_hurt.get_object().unwrap()
+        );
+
+        let player_pos = get_entity_pos_vec3d(env, mappings_manager, entity_player);
+
+        if env.is_same_object(player_to_hurt.get_object().unwrap(), JObject::null()).unwrap() {
+            return 0.0;
+        }
+
+        let player_list_entry = get_player_list_entry_by_uuid(env, mappings_manager, entity_player);
+
+        let gamemode = mappings_manager.get("GameMode").unwrap();
+        if env.is_same_object(player_list_entry.get_object().unwrap(), JObject::null()).unwrap() {
+            apply_object!(
+                gamemode,
+                call_method_or_get_field!(
+                    env,
+                    gamemode,
+                    "SPECTATOR",
+                    true
+                ).unwrap().l().unwrap()
+            );
+        } else {
+            apply_object!(
+                gamemode,
+                call_method_or_get_field!(
+                    env,
+                    player_list_entry,
+                    "getGameMode",
+                    false,
+                    &[]
+                ).unwrap().l().unwrap()
+            );
+        }
+        if env.is_same_object(
+            gamemode.get_object().unwrap(),
             call_method_or_get_field!(
                 env,
                 gamemode,
-                "SPECTATOR",
+                "CREATIVE",
                 true
             ).unwrap().l().unwrap()
+        ).unwrap() {
+            return 0.0;
+        }
+
+        let [crystal_x, crystal_y, crystal_z] = get_entity_pos_array(env, mappings_manager, entity_player);
+
+        let mod_distance = call_method_or_get_field!(
+            env,
+            player_pos,
+            "distanceToSqr",
+            false,
+            &[
+                JValue::Double(crystal_x),
+                JValue::Double(crystal_y),
+                JValue::Double(crystal_z)
+            ]
+        ).unwrap().d().unwrap().sqrt();
+        if mod_distance > 12.0 {
+            return 0.0;
+        }
+
+        let exposure = get_exposure(
+            env,
+            mappings_manager,
+            crystal_vec3d,
+            entity_player,
+            block_pos,
+            ignore_terrain
         );
-    } else {
+        let impact = (1.0 - mod_distance / 12.0) * exposure;
+        let mut damage = (impact * impact + impact) / 2.0 * 7.0 * (6.0 * 2.0) + 1.0;
+        damage = get_damage_for_difficulty(env, mappings_manager, world, damage);
+
+        let living_entity_player = mappings_manager.get("LivingEntity").unwrap();
         apply_object!(
-            gamemode,
+            living_entity_player,
+            player_to_hurt.get_object().unwrap()
+        );
+        let b = call_method_or_get_field!(
+            env,
+            living_entity_player,
+            "getArmor",
+            false,
+            &[]
+        ).unwrap().i().unwrap();
+        let c = {
+            let entity_attribute_instance = mappings_manager.get("EntityAttributeInstance").unwrap();
+            let generic_armor_instance = mappings_manager.get("EntityAttribute").unwrap();
+            let attributes_enum = mappings_manager.get("EntityAttributes").unwrap();
+            apply_object!(
+                generic_armor_instance,
+                call_method_or_get_field!(
+                    env,
+                    attributes_enum,
+                    "GENERIC_ARMOR_TOUGHNESS",
+                    true
+                ).unwrap().l().unwrap()
+            );
+            apply_object!(
+                entity_attribute_instance,
+                call_method_or_get_field!(
+                    env,
+                    living_entity_player,
+                    "getAttributeInstance",
+                    false,
+                    &[
+                        JValue::Object(generic_armor_instance.get_object().unwrap())
+                    ]
+                ).unwrap().l().unwrap()
+            );
             call_method_or_get_field!(
                 env,
-                player_list_entry,
-                "getGameMode",
+                entity_attribute_instance,
+                "getValue",
                 false,
                 &[]
-            ).unwrap().l().unwrap()
-        );
-    }
-    if env.is_same_object(
-        gamemode.get_object().unwrap(),
-        call_method_or_get_field!(
+            ).unwrap().d().unwrap()
+        };
+
+        damage = get_damage_left(
             env,
-            gamemode,
-            "CREATIVE",
-            true
-        ).unwrap().l().unwrap()
-    ).unwrap() {
-        return 0.0;
-    }
-
-    let [crystal_x, crystal_y, crystal_z] = get_entity_pos_array(env, mappings_manager, entity_player);
-
-    let mod_distance = call_method_or_get_field!(
-        env,
-        player_pos,
-        "distanceToSqr",
-        false,
-        &[
-            JValue::Double(crystal_x),
-            JValue::Double(crystal_y),
-            JValue::Double(crystal_z)
-        ]
-    ).unwrap().d().unwrap().sqrt();
-    if mod_distance > 12.0 {
-        return 0.0;
-    }
-
-    let exposure = get_exposure(
-        env,
-        mappings_manager,
-        crystal_vec3d,
-        entity_player,
-        block_pos,
-        ignore_terrain
-    );
-    let impact = (1.0 - mod_distance / 12.0) * exposure;
-    let mut damage = (impact * impact + impact) / 2.0 * 7.0 * (6.0 * 2.0) + 1.0;
-    damage = get_damage_for_difficulty(env, mappings_manager, world, damage);
-
-    let living_entity_player = mappings_manager.get("LivingEntity").unwrap();
-    apply_object!(
-        living_entity_player,
-        player_to_hurt.get_object().unwrap()
-    );
-    let b = call_method_or_get_field!(
-        env,
-        living_entity_player,
-        "getArmor",
-        false,
-        &[]
-    ).unwrap().i().unwrap();
-    let c = {
-        let entity_attribute_instance = mappings_manager.get("EntityAttributeInstance").unwrap();
-        let generic_armor_instance = mappings_manager.get("EntityAttribute").unwrap();
-        let attributes_enum = mappings_manager.get("EntityAttributes").unwrap();
-        apply_object!(
-            generic_armor_instance,
-            call_method_or_get_field!(
-                env,
-                attributes_enum,
-                "GENERIC_ARMOR_TOUGHNESS",
-                true
-            ).unwrap().l().unwrap()
+            mappings_manager,
+            damage as f32,
+            b as f32,
+            c as f32,
         );
+        damage = resistance_reduction(env, mappings_manager, living_entity_player, damage);
+
+        let explosion = mappings_manager.get("Explosion").unwrap();
         apply_object!(
-            entity_attribute_instance,
+            explosion,
             call_method_or_get_field!(
                 env,
-                living_entity_player,
-                "getAttributeInstance",
-                false,
+                explosion,
+                "<init>",
+                true,
                 &[
-                    JValue::Object(generic_armor_instance.get_object().unwrap())
+                    JValue::Object(world.get_object().unwrap()),
+                    JValue::Object(JObject::null()),
+                    JValue::Object(JObject::null()),
+                    JValue::Object(JObject::null()),
+                    JValue::Double(crystal_x),
+                    JValue::Double(crystal_y),
+                    JValue::Double(crystal_z),
+                    JValue::Float(6.0),
+                    JValue::Bool(0),  // false
+                    JValue::Object({
+                        let destruction_type = mappings_manager.get("DestructionType").unwrap();
+                        apply_object!(
+                            destruction_type,
+                            call_method_or_get_field!(
+                                env,
+                                destruction_type,
+                                "DESTROY_WITH_DECAY",
+                                true
+                            ).unwrap().l().unwrap()
+                        );
+                        destruction_type.get_object().unwrap()
+                    })
                 ]
             ).unwrap().l().unwrap()
         );
-        call_method_or_get_field!(
-            env,
-            entity_attribute_instance,
-            "getValue",
-            false,
-            &[]
-        ).unwrap().d().unwrap()
-    };
+        damage = blast_prot_reduction(env, mappings_manager, living_entity_player, damage, explosion);
 
-    damage = get_damage_left(
-        env,
-        mappings_manager,
-        damage as f32,
-        b as f32,
-        c as f32,
-    );
-    damage = resistance_reduction(env, mappings_manager, living_entity_player, damage);
-
-    let explosion = mappings_manager.get("Explosion").unwrap();
-    apply_object!(
-        explosion,
-        call_method_or_get_field!(
-            env,
-            explosion,
-            "<init>",
-            true,
-            &[
-                JValue::Object(world.get_object().unwrap()),
-                JValue::Object(JObject::null()),
-                JValue::Object(JObject::null()),
-                JValue::Object(JObject::null()),
-                JValue::Double(crystal_x),
-                JValue::Double(crystal_y),
-                JValue::Double(crystal_z),
-                JValue::Float(6.0),
-                JValue::Bool(0),  // false
-                JValue::Object({
-                    let destruction_type = mappings_manager.get("DestructionType").unwrap();
-                    apply_object!(
-                        destruction_type,
-                        call_method_or_get_field!(
-                            env,
-                            destruction_type,
-                            "DESTROY_WITH_DECAY",
-                            true
-                        ).unwrap().l().unwrap()
-                    );
-                    destruction_type.get_object().unwrap()
-                })
-            ]
-        ).unwrap().l().unwrap()
-    );
-    damage = blast_prot_reduction(env, mappings_manager, living_entity_player, damage, explosion);
-
-    if damage < 0.0 {
-        0.0
-    } else {
-        damage
+        if damage < 0.0 {
+            0.0
+        } else {
+            damage
+        }
     }
 }
 
@@ -1415,18 +1427,20 @@ pub fn get_damage_for_difficulty<'a>(
     world: &'a ClassMapping<'a>,
     damage: f64
 ) -> f64 {
-    match get_world_difficulty(env, mappings_manager, world) {
-        0 => 0.0,
-        1 => {
-            let tmp_dmg = damage / 2.0 + 1.0;
-            if tmp_dmg < damage {
-                tmp_dmg
-            } else {
-                damage
-            }
-        },
-        2 => damage,
-        _ => damage * 3.0 / 2.0,
+    goldberg_stmts! {
+        match get_world_difficulty(env, mappings_manager, world) {
+            0 => 0.0,
+            1 => {
+                let tmp_dmg = damage / 2.0 + 1.0;
+                if tmp_dmg < damage {
+                    tmp_dmg
+                } else {
+                    damage
+                }
+            },
+            2 => damage,
+            _ => damage * 3.0 / 2.0,
+        }
     }
 }
 
@@ -1637,7 +1651,6 @@ pub fn _explosion_replacement_living_entity<'a>(env: JNIEnv<'a>, mappings_manage
 
     damage_source
 }
-
 /*
 public static double crystalDamage(PlayerEntity player, Vec3d playerPos, Vec3d crystal, BlockPos obsidianPos, boolean ignoreTerrain) {
         if (player == null) return 0;

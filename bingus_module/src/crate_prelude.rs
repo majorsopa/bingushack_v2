@@ -12,3 +12,4 @@ pub use mappings_macro::{apply_object, call_method_or_get_field};
 pub use jni_mappings::ClassMapping;
 pub use std::sync::atomic::AtomicPtr;
 pub use winapi::um::winuser::GetForegroundWindow;
+pub use goldberg::goldberg_stmts;

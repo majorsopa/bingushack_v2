@@ -58,28 +58,31 @@ pub fn swap_slots<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, mi
 }
 
 pub fn swap_offhand_handled<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, slot: i32) {
-    let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
+    goldberg_stmts! {
 
-    let current_screen_handler = get_screen_handler(env, mappings_manager, player);
+        let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
 
-    let sync_id = get_sync_id(env, current_screen_handler);
+        let current_screen_handler = get_screen_handler(env, mappings_manager, player);
 
-    let pickup_slot_action = call_method_or_get_field!(
-        env,
-        mappings_manager.get("SlotActionType").unwrap(),
-        if slot < 9 { "SWAP" } else { "PICKUP" },
-        true
-    ).unwrap();
+        let sync_id = get_sync_id(env, current_screen_handler);
+
+        let pickup_slot_action = call_method_or_get_field!(
+            env,
+            mappings_manager.get("SlotActionType").unwrap(),
+            if slot < 9 { "SWAP" } else { "PICKUP" },
+            true
+        ).unwrap();
 
 
-    if slot < 9 {
-        click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
-    } else {
-        // pick up
-        click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
+        if slot < 9 {
+            click_slot(env, player, interaction_manager, sync_id, 45, slot, pickup_slot_action);
+        } else {
+            // pick up
+            click_slot(env, player, interaction_manager, sync_id, slot, 0, pickup_slot_action);
 
-        // put down
-        click_slot(env, player, interaction_manager, sync_id, 45, 0, pickup_slot_action);
+            // put down
+            click_slot(env, player, interaction_manager, sync_id, 45, 0, pickup_slot_action);
+        }
     }
 }
 
