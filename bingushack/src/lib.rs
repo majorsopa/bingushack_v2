@@ -1,18 +1,18 @@
 use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::Once};
-use bingus_client::{run_client, MODULES};
-use bingus_module::prelude::*;
+use bingus_client::{run_client};
+
 use webhook::client::{WebhookResult, WebhookClient};
-use widestring::WideCString;
+
 use winapi::{
-    shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
+    shared::{minwindef::{DWORD, HINSTANCE, LPVOID}, windef::{HGLRC__}},
     um::{
         handleapi::CloseHandle,
-        libloaderapi::{FreeLibraryAndExitThread, GetModuleHandleW, GetProcAddress},
+        libloaderapi::{FreeLibraryAndExitThread},
         processthreadsapi::CreateThread,
-        winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH},
+        winnt::{DLL_PROCESS_ATTACH},
         winuser::{
             FindWindowA, GetForegroundWindow, MessageBoxA, MB_OK, VK_DOWN, GetAsyncKeyState, VK_RIGHT
-        }, wingdi::{wglGetCurrentContext, wglCreateContext, wglMakeCurrent, wglGetProcAddress},
+        },
     },
 };
 use once_cell::sync::OnceCell;
@@ -20,11 +20,6 @@ use std::sync::atomic::AtomicPtr;
 
 #[cfg(target_os = "windows")]
 
-
-
-static FIRST_RENDER: Once = Once::new();
-static mut NEW_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
-static mut OLD_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
 
 
 fn message_box(text: &str) {
