@@ -35,9 +35,6 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
 
 
-
-
-
     let minecraft_client = get_minecraft_client(env, mappings_manager);
 
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
