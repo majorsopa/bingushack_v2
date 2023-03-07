@@ -246,7 +246,7 @@ pub fn raycast_replacement<'a>(
         );
     }
 
-        let hit_closure = |block_pos: ClassMapping<'a>| {
+        let hit_closure = |block_pos: &ClassMapping<'a>| {
             goldberg_stmts! {
             let block_state = mappings_manager.get("BlockState").unwrap();
             if env.is_same_object(
