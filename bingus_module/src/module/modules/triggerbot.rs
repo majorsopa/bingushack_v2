@@ -69,8 +69,6 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 }
 
 fn on_enable(env: JNIEnv, mappings_manager: &MappingsManager) {
-    // todo: cache original class file
-
     let vm = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
 
     // "Agent_OnLoad" but not really
@@ -81,7 +79,10 @@ fn on_enable(env: JNIEnv, mappings_manager: &MappingsManager) {
     agent.update();
 }
 
-fn on_class_file_load(mut event: ClassFileLoadEvent) -> Option<Vec<u8>> {
+fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
+
+    // todo: cache original class file
+
     println!("class file load");
     println!("class name: {}", event.class_name);
     None
