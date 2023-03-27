@@ -60,7 +60,6 @@ impl Agent {
     pub fn update(&mut self) {
         match self.environment.add_capabilities(&self.capabilities) {
             Ok(caps) => {
-                println!("Current capabilities: {}", caps);
                 self.capabilities = caps;
 
                 match self.environment.set_event_callbacks(self.callbacks.clone()) {
