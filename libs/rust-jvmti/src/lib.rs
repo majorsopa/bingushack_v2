@@ -1,3 +1,17 @@
+#![warn(clippy::all)]
+#![warn(clippy::doc_markdown)]
+#![warn(clippy::dbg_macro)]
+#![warn(clippy::todo)]
+#![warn(clippy::empty_enum)]
+#![warn(clippy::enum_glob_use)]
+#![warn(clippy::pub_enum_variant_names)]
+#![warn(clippy::mem_forget)]
+#![warn(clippy::use_self)]
+#![warn(clippy::filter_map_next)]
+#![warn(clippy::needless_continue)]
+#![warn(clippy::needless_borrow)]
+#![warn(rust_2018_idioms)]
+
 extern crate libc;
 #[macro_use]
 extern crate lazy_static;

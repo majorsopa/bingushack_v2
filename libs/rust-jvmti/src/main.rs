@@ -7,6 +7,7 @@ use std::fs::File;
 use jvmti::bytecode::*;
 use jvmti::bytecode::printer::*;
 
+#[allow(dead_code)]
 fn main2() {
     let class = Classfile::new();
 
