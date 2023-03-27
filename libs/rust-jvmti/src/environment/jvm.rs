@@ -6,7 +6,7 @@ use libc::c_void;
 use std::ptr;
 
 pub trait JVMF {
-    fn get_environment(&self) -> Result<Box<JVMTI>, NativeError>;
+    fn get_environment(&self) -> Result<Box<dyn JVMTI>, NativeError>;
     fn destroy(&self) -> Result<(), NativeError>;
 }
 ///
@@ -28,7 +28,7 @@ impl JVMF for JVMAgent {
 
     /// Return the native JVMTI environment if available (ie. the current thread is attached to it)
     /// otherwise return an error message.
-    fn get_environment(&self) -> Result<Box<JVMTI>, NativeError> {
+    fn get_environment(&self) -> Result<Box<dyn JVMTI>, NativeError> {
         unsafe {
             let mut void_ptr: *mut c_void = ptr::null_mut() as *mut c_void;
             let penv_ptr: *mut *mut c_void = &mut void_ptr as *mut *mut c_void;

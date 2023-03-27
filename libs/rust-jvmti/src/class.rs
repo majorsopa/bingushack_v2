@@ -69,7 +69,7 @@ impl<'a> JavaType<'a> {
             JavaType::Void => "void".to_string(),
             JavaType::Boolean => "boolean".to_string(),
             JavaType::Array(ref inner_type) => format!("{}[]", JavaType::to_string(inner_type)),
-            JavaType::Class(cls) => cls.trim_left_matches("L").trim_right_matches(";").replace(";", "").replace("/", ".").to_string()
+            JavaType::Class(cls) => cls.trim_start_matches("L").trim_right_matches(";").replace(";", "").replace("/", ".").to_string()
         }
     }
 }

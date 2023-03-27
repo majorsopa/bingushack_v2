@@ -39,7 +39,7 @@ impl JVMEmulator {
 }
 
 impl JVMF for JVMEmulator {
-    fn get_environment(&self) -> Result<Box<JVMTI>, NativeError> {
+    fn get_environment(&self) -> Result<Box<dyn JVMTI>, NativeError> {
         Ok(Box::new(JVMEmulator::new()))
     }
 

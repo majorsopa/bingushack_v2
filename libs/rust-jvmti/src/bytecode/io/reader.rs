@@ -619,12 +619,12 @@ impl ClassReader {
                             };
 
                             match frame_type {
-                                tag@0...63 => StackMapFrame::SameFrame { tag: tag },
-                                tag@64...127 => StackMapFrame::SameLocals1StackItemFrame { tag: tag, stack: read_verification_type(&mut reader) },
+                                tag@0..=63 => StackMapFrame::SameFrame { tag: tag },
+                                tag@64..=127 => StackMapFrame::SameLocals1StackItemFrame { tag: tag, stack: read_verification_type(&mut reader) },
                                 247 => StackMapFrame::SameLocals1StackItemFrameExtended { offset_delta: reader.get_u16(), stack: read_verification_type(&mut reader) },
-                                tag@248...250 => StackMapFrame::ChopFrame { tag: tag, offset_delta: reader.get_u16() },
+                                tag@248..=250 => StackMapFrame::ChopFrame { tag: tag, offset_delta: reader.get_u16() },
                                 251 => StackMapFrame::SameFrameExtended { offset_delta: reader.get_u16() },
-                                tag@252...254 => StackMapFrame::AppendFrame { tag: tag, offset_delta: reader.get_u16(), locals: (0..tag - 251).map(|_| read_verification_type(&mut reader)).collect() },
+                                tag@252..=254 => StackMapFrame::AppendFrame { tag: tag, offset_delta: reader.get_u16(), locals: (0..tag - 251).map(|_| read_verification_type(&mut reader)).collect() },
                                 255 => StackMapFrame::FullFrame { offset_delta: reader.get_u16(), locals: {
                                     let n = reader.get_u16();
                                     (0..n).map(|_| read_verification_type(&mut reader)).collect()
@@ -754,23 +754,23 @@ impl ClassReader {
             target_info: match reader.get_u8() {
                 // 0x00 type parameter declaration of generic class or interface
                 // 0x01 type parameter declaration of generic method or constructor
-                subtype @ 0x00...0x01 => TargetInfo::TypeParameter { subtype: subtype, idx: reader.get_u8() },
+                subtype @ 0x00..=0x01 => TargetInfo::TypeParameter { subtype: subtype, idx: reader.get_u8() },
                 // type in extends or implements clause of class declaration (including the direct superclass or direct superinterface of an anonymous class declaration), or in extends clause of interface declaration
                 0x10 => TargetInfo::SuperType { idx: reader.get_u16() },
                 // 0x11 type in bound of type parameter declaration of generic class or interface
                 // 0x12 type in bound of type parameter declaration of generic method or constructor
-                subtype @ 0x11...0x12 => TargetInfo::TypeParameterBound { subtype: subtype, param_idx: reader.get_u8(), bound_index: reader.get_u8() },
+                subtype @ 0x11..=0x12 => TargetInfo::TypeParameterBound { subtype: subtype, param_idx: reader.get_u8(), bound_index: reader.get_u8() },
                 // 0x13 type in field declaration
                 // 0x14 return type of method, or type of newly constructed object
                 // 0x15 receiver type of method or constructor
-                subtype @ 0x13...0x15 => TargetInfo::Empty { subtype: subtype },
+                subtype @ 0x13..=0x15 => TargetInfo::Empty { subtype: subtype },
                 // type in formal parameter declaration of method, constructor, or lambda expression
                 0x16 => TargetInfo::MethodFormalParameter { idx: reader.get_u8() },
                 // type in throws clause of method or constructor
                 0x17 => TargetInfo::Throws { idx: reader.get_u16() },
                 // 0x40 type in local variable declaration
                 // 0x41 type in resource variable declaration
-                subtype @ 0x40...0x41 => TargetInfo::LocalVar { subtype: subtype, target: {
+                subtype @ 0x40..=0x41 => TargetInfo::LocalVar { subtype: subtype, target: {
                     let count = reader.get_u16();
 
                                         //u2 start_pc;    u2 length;        u2 index;
@@ -782,12 +782,12 @@ impl ClassReader {
                 // 0x44 type in new expression
                 // 0x45 type in method reference expression using ::new
                 // 0x46 type in method reference expression using ::Identifier
-                subtype @ 0x43...0x46 => TargetInfo::Offset { subtype: subtype, idx: reader.get_u16() },
+                subtype @ 0x43..=0x46 => TargetInfo::Offset { subtype: subtype, idx: reader.get_u16() },
                 // 0x48 type argument for generic constructor in new expression or explicit constructor invocation statement
                 // 0x49 type argument for generic method in method invocation expression
                 // 0x4A type argument for generic constructor in method reference expression using ::new
                 // 0x4B type argument for generic method in method reference expression using ::Identifier
-                subtype @ 0x47...0x4b => TargetInfo::TypeArgument { subtype: subtype, offset: reader.get_u16(), type_arg_idx: reader.get_u8() },
+                subtype @ 0x47..=0x4b => TargetInfo::TypeArgument { subtype: subtype, offset: reader.get_u16(), type_arg_idx: reader.get_u8() },
                 // TODO replace the below fallback branch with proper error handling
                 _ => TargetInfo::Empty { subtype: 0 }
             },
@@ -863,7 +863,7 @@ impl ClassReader {
 
 // TODO remove pub after testing
 pub struct BlockReader<'a> {
-    source: &'a mut Read,
+    source: &'a mut dyn Read,
     position: usize
 }
 
