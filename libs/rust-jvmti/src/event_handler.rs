@@ -187,15 +187,10 @@ unsafe extern "C" fn local_cb_vm_object_alloc(jvmti_env: *mut jvmtiEnv, jni_env:
 
                     function(ObjectAllocationEvent { class_id: class_id, size: size as i64, thread: current_thread })
                 },
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for VM object allocation")
+        None => {}
     }
 }
 
@@ -214,15 +209,10 @@ unsafe extern "C" fn local_cb_method_entry(jvmti_env: *mut jvmtiEnv, jni_env: *m
                     function(MethodInvocationEvent { method_id: method_id, method_sig: method_sig, class_sig: class_sig, thread: current_thread })
 
                 },
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for method entry")
+        None => {}
     }
 }
 
@@ -241,15 +231,10 @@ unsafe extern "C" fn local_cb_method_exit(jvmti_env: *mut jvmtiEnv, jni_env: *mu
                     function(MethodInvocationEvent { method_id: method_id, method_sig: method_sig, class_sig: class_sig, thread: current_thread })
 
                 },
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         }
-        None => println!("No dynamic callback method was found for method exit")
+        None => {}
     }
 }
 
@@ -263,7 +248,7 @@ unsafe extern "C" fn local_cb_exception(jvmti_env: *mut jvmtiEnv, jni_env: *mut 
 
             function()
         },
-        None => println!("No dynamic callback method was found for exception")
+        None => {}
     }
 }
 
@@ -279,7 +264,7 @@ unsafe extern "C" fn local_cb_exception_catch(jvmti_env: *mut jvmtiEnv, jni_env:
             function()
             */
         },
-        None => println!("No dynamic callback method was found for exception catch")
+        None => {}
     }
 }
 
@@ -290,15 +275,10 @@ unsafe extern "C" fn local_cb_monitor_wait(jvmti_env: *mut jvmtiEnv, jni_env: *m
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for monitor wait")
+        None => {}
     }
 }
 
@@ -309,15 +289,10 @@ unsafe extern "C" fn local_cb_monitor_waited(jvmti_env: *mut jvmtiEnv, jni_env: 
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for monitor entered")
+        None => {}
     }
 }
 
@@ -328,15 +303,10 @@ unsafe extern "C" fn local_cb_monitor_contended_enter(jvmti_env: *mut jvmtiEnv, 
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for monitor contended enter")
+        None => {}
     }
 }
 
@@ -347,15 +317,10 @@ unsafe extern "C" fn local_cb_monitor_contended_entered(jvmti_env: *mut jvmtiEnv
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for monitor contended entered")
+        None => {}
     }
 }
 
@@ -366,15 +331,10 @@ unsafe extern "C" fn local_cb_thread_start(jvmti_env: *mut jvmtiEnv, jni_env: *m
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* we're in the wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for thread start events")
+        None => {}
     }
 
 }
@@ -386,15 +346,10 @@ unsafe extern "C" fn local_cb_thread_end(jvmti_env: *mut jvmtiEnv, jni_env: *mut
             let env = Environment::new(JVMTIEnvironment::new(jvmti_env), JNIEnvironment::new(jni_env));
             match env.get_thread_info(&thread) {
                 Ok(current_thread) => function(current_thread),
-                Err(err) => {
-                    match err {
-                        NativeError::NotAvailable => { /* wrong phase, just ignore this */ },
-                        _ => println!("Couldn't get thread info: {}", translate_error(&err))
-                    }
-                }
+                Err(err) => {}
             }
         },
-        None => println!("No dynamic callback method was found for thread end events")
+        None => {}
     }
 }
 
@@ -405,7 +360,7 @@ unsafe extern "C" fn local_cb_garbage_collection_start(jvmti_env: *mut jvmtiEnv)
             function();
 
         },
-        None => println!("No dynamic callback method was found for garbage collection start events")
+        None => {}
     }
 
 }
@@ -417,7 +372,7 @@ unsafe extern "C" fn local_cb_garbage_collection_finish(jvmti_env: *mut jvmtiEnv
             function();
 
         },
-        None => println!("No dynamic callback method was found for garbage collection finish events")
+        None => {}
     }
 
 }
@@ -444,30 +399,21 @@ unsafe extern "C" fn local_cb_class_file_load_hook(jvmti_env: JVMTIEnvPtr, jni_e
             if let Ok(classfile) = parse_class(&raw_data) {
                 match function(ClassFileLoadEvent { class_name: stringify(name), class: classfile }) {
                     Some(transformed) => {
-                        println!("Transformed class {}", stringify(name));
-
                         match env.allocate(transformed.len()) {
                             Ok(allocation) => {
                                 ptr::copy_nonoverlapping(transformed.as_ptr(), allocation.ptr, allocation.len);
                                 *new_class_data_len = allocation.len as i32;
                                 *new_class_data = allocation.ptr;
                             },
-                            Err(err) => {
-                                println!("Failed to allocate memory")
-                            }
+                            Err(err) => {}
                         }
                     },
                     None => ()
                 }
 
-            } else {
-                println!("Coult not parse class file");
             }
-
-
-            println!("Loading class {} with length {}", stringify(name), class_data_len);
         },
-        None => println!("No dynamic callback method was found for class file load events")
+        None => {}
     }
 }
 
@@ -531,7 +477,7 @@ unsafe extern "C" fn local_cb_field_access(jvmti_env: *mut jvmtiEnv, jni_env: *m
         Some(function) => {
             function();
         },
-        None => println!("No dynamic callback method was found for field access events")
+        None => {}
     }
 }
 
@@ -542,7 +488,7 @@ unsafe extern "C" fn local_cb_field_modification(jvmti_env: *mut jvmtiEnv, jni_e
         Some(function) => {
             function();
         },
-        None => println!("No dynamic callback method was found for field modification events")
+        None => {}
     }
 }
 
@@ -579,7 +525,7 @@ unsafe extern "C" fn local_cb_vm_death(jvmti_env: *mut jvmtiEnv, jni_env: *mut J
         Some(function) => {
             function();
         },
-        None => println!("No dynamic callback method was found for VM death events")
+        None => {}
     }
 }
 
@@ -590,7 +536,7 @@ unsafe extern "C" fn local_cb_vm_init(jvmti_env: *mut jvmtiEnv, jni_env: *mut JN
         Some(function) => {
             function();
         },
-        None => println!("No dynamic callback method was found for VM init events")
+        None => {}
     }
 }
 
@@ -600,6 +546,6 @@ unsafe extern "C" fn local_cb_vm_start(jvmti_env: *mut jvmtiEnv, jni_env: *mut J
         Some(function) => {
             function();
         },
-        None => println!("No dynamic callback method was found for VM start events")
+        None => {}
     }
 }
