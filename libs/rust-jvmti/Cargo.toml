@@ -1,0 +1,14 @@
+[package]
+name = "jvmti"
+version = "0.4.0"
+authors = [ "Alex Pecsi <xea@blacklight.so>" ]
+description = "JVM Monitoring and profiling agent"
+keywords = [ "java", "jvm", "jvmti", "debugger" ]
+
+[dependencies]
+libc = "0.2.*"
+time = "0.1.*"
+lazy_static = "0.2.*"
+toml = "0.4.*"
+serde = "1.0.*"
+serde_derive = "1.0.*"
