@@ -1,7 +1,6 @@
 use super::environment::Environment;
 use super::environment::jni::{JNI, JNIEnvironment};
 use super::environment::jvmti::{JVMTI, JVMTIEnvironment};
-use super::error::{translate_error, NativeError};
 use super::event::*;
 use super::method::MethodId;
 use super::native::*;
