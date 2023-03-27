@@ -25,19 +25,19 @@ fn main() {
                 match ClassReader::read_class(&mut file) {
                     Ok(class) => {
                         match action.as_str() {
-                            "read" => println!("{}", format!("{:#?}", class)),
-                            "print" => println!("{}", ClassfilePrinter::render_lines(&class).iter().map(|line| format!("{}\n", line)).fold(String::new(), |mut acc, x| { acc.push_str(x.as_str()); acc})),
+                            "read" => println!("{}", format!("{class:#?}")),
+                            "print" => println!("{}", ClassfilePrinter::render_lines(&class).iter().map(|line| format!("{line}\n")).fold(String::new(), |mut acc, x| { acc.push_str(x.as_str()); acc})),
                             "counts" => println!("Class: {} Field count: {} Method count: {}", class_name, class.fields.len(), class.methods.len()),
                             "methods" => show_methods(class, class_name),
                             "write" => write_class(&class),
-                            _ => println!("Unknown action: {}", action)
+                            _ => println!("Unknown action: {action}")
                         }
                     },
-                    Err(err) => assert!(false, format!("{:?}", err))
+                    Err(_err) => assert!(false, "{}", "{err:?}")
                 }
 
             },
-            Err(err) => assert!(false, format!("{:?}", err))
+            Err(_err) => assert!(false, "{}", "{err:?}")
         }
     } else {
         println!("Invalid arguments. Usage: jvmti [read|write] <Class file>")
@@ -58,10 +58,10 @@ fn show_methods(class: Classfile, class_name: String ) {
     class.methods.iter().map(|method| {
         method.attributes.iter().map(|a| {
             match a {
-                &jvmti::bytecode::Attribute::Code { max_stack: _, max_locals: _, code: _, exception_table: _, ref attributes } => {
+                jvmti::bytecode::Attribute::Code { max_stack: _, max_locals: _, code: _, exception_table: _, attributes } => {
                     attributes.iter().map(|b| {
                         match b {
-                            &jvmti::bytecode::Attribute::LineNumberTable(ref table) => {
+                            jvmti::bytecode::Attribute::LineNumberTable(table) => {
                                 if table.len() > 1 {
                                     let first = table[0].line_number;
                                     let last = table[table.len() - 1].line_number;
@@ -70,7 +70,7 @@ fn show_methods(class: Classfile, class_name: String ) {
 
                                     println!("Class: {} Method: {} Length: {}", class_name, method_name, last - first);
                                 }
-                                ()
+                                
                             },
                             _ => ()
                         }
