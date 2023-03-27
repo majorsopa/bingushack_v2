@@ -1,8 +1,14 @@
 use std::time::SystemTime;
 
+use jvmti::{native::JavaVMPtr, agent::Agent, runtime::ClassFileLoadEvent, context::static_context};
+
 use crate::crate_prelude::*;
 
 fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsManager) {
+
+    return;  // make this module do nothing for now, debugging
+
+
     let minecraft_client = get_minecraft_client(env, mappings_manager);
 
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {
@@ -62,9 +68,35 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
     swing_hand(env, mappings_manager, player, true);
 }
 
+fn on_enable(env: JNIEnv, mappings_manager: &MappingsManager) {
+    // todo: cache original class file
+
+    let vm = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
+
+    // "Agent_OnLoad" but not really
+    let mut agent = Agent::new(vm);
+
+    agent.on_class_file_load(Some(on_class_file_load));
+
+    agent.update();
+}
+
+fn on_class_file_load(mut event: ClassFileLoadEvent) -> Option<Vec<u8>> {
+    println!("class file load");
+    println!("class name: {}", event.class_name);
+    None
+}
+
+// todo: reset class file on disable
+
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item]")]
+#[bingus_module(
+    name = "Triggerbot (UNSTABLE, FLAGS ON GRIM)",
+    tick_method = "tick(self, _env, _mappings_manager)",
+    on_enable_method = "on_enable(_env, _mappings_manager)",
+    settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item]"
+)]
 pub struct Triggerbot {
     wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
     wait_for_damage_tick: (BingusSetting, &'static str, Option<[f32; 2]>),

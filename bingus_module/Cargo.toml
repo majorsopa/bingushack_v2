@@ -17,3 +17,4 @@ tao = "0.17.0"
 winapi = { version = "0.3.9", features = ["winuser"] }
 nalgebra-glm = "0.18.0"
 noak = "0.5.0"
+jvmti = { path = "../libs/rust-jvmti" }
