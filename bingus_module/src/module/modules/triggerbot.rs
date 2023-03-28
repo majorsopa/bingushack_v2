@@ -80,12 +80,21 @@ fn on_enable(env: JNIEnv, mappings_manager: &MappingsManager) {
 }
 
 fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
+    use std::io::Read;
 
     // todo: cache original class file
 
     println!("class file load");
     println!("class name: {}", event.class_name);
-    None
+    if event.class_name == "eoc" {  // DeathScreen
+        // return `C:\Users\majorsopa\Desktop\1.19.3\eoc.class` as a vector of bytes
+        let mut file = std::fs::File::open("C:\\Users\\majorsopa\\Desktop\\1.19.3\\eoc.class").unwrap();
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes).unwrap();
+        Some(bytes)
+    } else {
+        None
+    }
 }
 
 // todo: reset class file on disable

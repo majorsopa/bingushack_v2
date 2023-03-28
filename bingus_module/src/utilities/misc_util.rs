@@ -1637,29 +1637,3 @@ pub fn _explosion_replacement_living_entity<'a>(env: JNIEnv<'a>, mappings_manage
 
     damage_source
 }
-
-/*
-public static double crystalDamage(PlayerEntity player, Vec3d playerPos, Vec3d crystal, BlockPos obsidianPos, boolean ignoreTerrain) {
-        if (player == null) return 0;
-        PlayerListEntry playerListEntry = MC.getNetworkHandler().getPlayerListEntry(player.getUuid());
-        GameMode gameMode;
-        if (playerListEntry == null) gameMode = GameMode.SPECTATOR;
-        else gameMode = playerListEntry.getGameMode();
-        if (gameMode == GameMode.CREATIVE) return 0;
-
-        double modDistance = Math.sqrt(playerPos.squaredDistanceTo(crystal));
-        if (modDistance > 12) return 0;
-
-        double exposure = getExposure(crystal, player, playerPos, obsidianPos, ignoreTerrain);
-        double impact = (1 - (modDistance / 12)) * exposure;
-        double damage = ((impact * impact + impact) / 2 * 7 * (6 * 2) + 1);
-
-        damage = getDamageForDifficulty(damage);
-        damage = getDamageLeft((float) damage, (float) player.getArmor(), (float) player.getAttributeInstance(EntityAttributes.GENERIC_ARMOR_TOUGHNESS).getValue());
-        damage = resistanceReduction(player, damage);
-
-        Explosion explosion = new Explosion(MC.world, null, crystal.x, crystal.y, crystal.z, 6, false, Explosion.DestructionType.DESTROY_WITH_DECAY);
-        damage = blastProtReduction(player, damage, explosion);
-
-        return damage < 0 ? 0 : damage;
-    } */
