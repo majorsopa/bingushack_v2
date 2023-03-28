@@ -31,6 +31,21 @@ impl Agent {
 
     }
 
+    pub fn new_with_capabilities(vm: JavaVMPtr, capabilities: Capabilities) -> Agent {
+        let jvm_agent = JVMAgent::new(vm);
+
+        match jvm_agent.get_environment() {
+            Ok(environment) => Agent {
+                jvm: Box::new(jvm_agent),
+                capabilities,
+                callbacks: EventCallbacks::new(),
+                environment,
+            },
+            Err(err) => panic!("FATAL: Could not get JVMTI environment: {}", translate_error(&err))
+        }
+
+    }
+
     /// Create a newly initialised but blank JVM `Agent` instance using the provided JVM agent.
     pub fn new_from(jvm: Box<dyn JVMF>) -> Agent {
         match jvm.get_environment() {
