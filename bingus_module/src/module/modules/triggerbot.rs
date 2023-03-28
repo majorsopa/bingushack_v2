@@ -72,7 +72,11 @@ fn on_enable(env: JNIEnv, mappings_manager: &MappingsManager) {
     let vm = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
 
     // "Agent_OnLoad" but not really
-    let mut agent = Agent::new(vm);
+    let mut agent = Agent::new_with_capabilities(vm, jvmti::capabilities::Capabilities {
+        can_retransform_classes: true,
+        can_retransform_any_class: true,
+        ..Default::default()
+    });
 
     agent.on_class_file_load(Some(on_class_file_load));
 
