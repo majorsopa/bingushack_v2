@@ -401,6 +401,9 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "EntityDamageSource", "bda", {
             add_method!("<init>", "<init>", "(Ljava/lang/String;Lbdr;)V", true);
         });
+        //add_mapping!(new_self, "DeathScreen", "eoc", {
+        //    add_method!("init", "b", "()V", false);
+        //});
 
         new_self
     }

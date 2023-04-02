@@ -249,7 +249,6 @@ dependencies = [
  "mappings_macro",
  "module_macro_derive",
  "nalgebra-glm",
- "noak",
  "once_cell",
  "pixels",
  "rand",
@@ -2411,16 +2410,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "memoffset 0.6.5",
-]
-
-[[package]]
-name = "noak"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e0e9bc8f0fd14d834a1537c5e52d5da0e4b6368c78c832b9db8ee87eb2cb63d"
-dependencies = [
- "bitflags",
- "indexmap",
 ]
 
 [[package]]

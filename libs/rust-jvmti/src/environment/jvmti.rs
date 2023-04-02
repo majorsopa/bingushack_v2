@@ -41,7 +41,7 @@ pub trait JVMTI {
 
 pub struct JVMTIEnvironment {
 
-    jvmti: JVMTIEnvPtr
+    pub jvmti: JVMTIEnvPtr
 }
 
 impl JVMTIEnvironment {
