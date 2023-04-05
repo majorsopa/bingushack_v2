@@ -10,7 +10,7 @@ pub struct Agent {
     jvm: Box<dyn JVMF>,
     pub capabilities: Capabilities,
     callbacks: EventCallbacks,
-    environment: Box<dyn JVMTI>
+    pub environment: Box<dyn JVMTI>
 }
 
 impl Agent {
