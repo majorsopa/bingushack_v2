@@ -399,7 +399,7 @@ unsafe extern "C" fn local_cb_class_file_load_hook(jvmti_env: JVMTIEnvPtr, jni_e
                 match function(ClassFileLoadEvent { class_name: stringify(name), class: classfile }) {
                     Some(transformed) => {
                         match env.allocate(transformed.len()) {
-                            Ok(allocation) => {
+                            Ok(mut allocation) => {
                                 ptr::copy_nonoverlapping(transformed.as_ptr(), allocation.ptr, allocation.len);
                                 *new_class_data_len = allocation.len as i32;
                                 *new_class_data = allocation.ptr;
@@ -409,7 +409,6 @@ unsafe extern "C" fn local_cb_class_file_load_hook(jvmti_env: JVMTIEnvPtr, jni_e
                     },
                     None => ()
                 }
-
             }
         },
         None => {}
