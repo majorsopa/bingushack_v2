@@ -1,9 +1,8 @@
 use std::ffi::c_void;
-use std::{time::SystemTime, ops::Deref};
 use jvmti::agent::Agent;
 use jvmti::environment::jvmti::JVMTIEnvironment;
 use jvmti::native::JVMTIEnvPtr;
-use jvmti::runtime::{ClassFileLoadEvent, MethodInvocationEvent};
+use jvmti::runtime::ClassFileLoadEvent;
 use jvmti::native::JavaVMPtr;
 use jvmti::capabilities::Capabilities;
 
