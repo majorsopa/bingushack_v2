@@ -11,24 +11,27 @@ use crate::crate_prelude::*;
 const CLASS_TO_CHANGE: &'static str = "fip";
 
 static mut HOOKED: bool = false;
+static mut CHANGED: bool = false;
 
-fn on_enable(env: JNIEnv) {
-    if unsafe { HOOKED } {
-        return;
-    } else {
+fn on_toggle(env: JNIEnv) {
+    let vm: JavaVMPtr = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
+
+    if unsafe { !HOOKED } {
         unsafe { HOOKED = true; }
+        // "Agent_OnLoad" but not really
+        let mut agent = Agent::new_with_capabilities(vm, Capabilities {
+            can_retransform_classes: true,
+            can_retransform_any_class: true,
+            can_generate_all_class_hook_events: true,
+            ..Default::default()
+        });
+
+        agent.on_class_file_load(Some(on_class_file_load));
+
+        agent.update();
     }
 
 
-    let vm: JavaVMPtr = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
-
-    // "Agent_OnLoad" but not really
-    let mut agent = Agent::new_with_capabilities(vm, Capabilities {
-        can_retransform_classes: true,
-        can_retransform_any_class: true,
-        can_generate_all_class_hook_events: true,
-        ..Default::default()
-    });
 
     let jvmti_env = unsafe {
         use jvmti::native::jvmti_native::jvmtiCapabilities;
@@ -49,9 +52,6 @@ fn on_enable(env: JNIEnv) {
         JVMTIEnvironment::new(env_ptr)
     };
 
-    agent.on_class_file_load(Some(on_class_file_load));
-
-    agent.update();
 
     unsafe {
         (**jvmti_env.jvmti).RetransformClasses.unwrap()(
@@ -71,7 +71,11 @@ fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
     // todo: cache original class file
 
     if event.class_name == CLASS_TO_CHANGE {
-        let bytes = Vec::from(include_bytes!("fip.class").as_slice()); // 202,254,186,190 == 0xCAFEBABE
+        let bytes = match unsafe { CHANGED } {  // 202,254,186,190 == 0xCAFEBABE
+            true => Vec::from(include_bytes!("fip_og.class").as_slice()),
+            false => Vec::from(include_bytes!("fip_modded.class").as_slice()),
+        };
+        unsafe { CHANGED = !CHANGED; }
         Some(bytes)
     } else {
         None
@@ -81,8 +85,9 @@ fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
 #[bingus_module(
-    name = "Chams (buggy, can't be disabled)",
-    on_enable_method = "on_enable(_env)"
+    name = "Chams (buggy with armor)",
+    on_enable_method = "on_toggle(_env)",
+    on_disable_method = "on_toggle(_env)",
 )]
 pub struct Chams {}
 
