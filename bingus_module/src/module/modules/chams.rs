@@ -8,7 +8,7 @@ use jvmti::capabilities::Capabilities;
 
 use crate::crate_prelude::*;
 
-const DEATH_SCREEN_NAME: &'static str = "fip";
+const CLASS_TO_CHANGE: &'static str = "fip";
 
 static mut HOOKED: bool = false;
 
@@ -59,7 +59,7 @@ fn on_enable(env: JNIEnv) {
             1,
             {
                 let jni_env = env.get_native_interface() as jvmti::native::JNIEnvPtr;
-                let fip = std::ffi::CString::new(DEATH_SCREEN_NAME).unwrap();
+                let fip = std::ffi::CString::new(CLASS_TO_CHANGE).unwrap();
                 let fip_ptr: *const std::ffi::c_char  = fip.as_ptr();
                 &(**jni_env).FindClass.unwrap()(jni_env, fip_ptr)
             },
@@ -70,7 +70,7 @@ fn on_enable(env: JNIEnv) {
 fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
     // todo: cache original class file
 
-    if event.class_name == DEATH_SCREEN_NAME {
+    if event.class_name == CLASS_TO_CHANGE {
         let bytes = Vec::from(include_bytes!("fip.class").as_slice()); // 202,254,186,190 == 0xCAFEBABE
         Some(bytes)
     } else {
