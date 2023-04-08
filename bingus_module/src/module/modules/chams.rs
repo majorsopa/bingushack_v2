@@ -8,10 +8,8 @@ use jvmti::capabilities::Capabilities;
 
 use crate::crate_prelude::*;
 
-const CLASS_TO_CHANGE: &'static str = "fip";
-
 static mut HOOKED: bool = false;
-static mut CHANGED: bool = false;
+static mut FJR_CHANGED: bool = false;
 
 fn on_toggle(env: JNIEnv) {
     let vm: JavaVMPtr = env.get_java_vm().unwrap().get_java_vm_pointer() as *mut *const _;
@@ -59,26 +57,25 @@ fn on_toggle(env: JNIEnv) {
             1,
             {
                 let jni_env = env.get_native_interface() as jvmti::native::JNIEnvPtr;
-                let fip = std::ffi::CString::new(CLASS_TO_CHANGE).unwrap();
-                let fip_ptr: *const std::ffi::c_char  = fip.as_ptr();
-                &(**jni_env).FindClass.unwrap()(jni_env, fip_ptr)
+                let cls = std::ffi::CString::new("fjr").unwrap();
+                let cls_ptr: *const std::ffi::c_char  = cls.as_ptr();
+                &(**jni_env).FindClass.unwrap()(jni_env, cls_ptr)
             },
         );
     }
 }
 
 fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
-    // todo: cache original class file
-
-    if event.class_name == CLASS_TO_CHANGE {
-        let bytes = match unsafe { CHANGED } {  // 202,254,186,190 == 0xCAFEBABE
-            true => Vec::from(include_bytes!("fip_og.class").as_slice()),
-            false => Vec::from(include_bytes!("fip_modded.class").as_slice()),
-        };
-        unsafe { CHANGED = !CHANGED; }
-        Some(bytes)
-    } else {
-        None
+    match &*event.class_name {
+        "fjr" => {
+            let bytes = match unsafe { FJR_CHANGED } {  // 202,254,186,190 == 0xCAFEBABE
+                true => Vec::from(include_bytes!("fjr_og.class").as_slice()),
+                false => Vec::from(include_bytes!("fjr_modded.class").as_slice()),
+            };
+            unsafe { FJR_CHANGED = !FJR_CHANGED; }
+            Some(bytes)
+        },
+        _ => None,
     }
 }
 
