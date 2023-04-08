@@ -82,7 +82,7 @@ fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
 #[bingus_module(
-    name = "Chams (buggy with armor)",
+    name = "Chams",
     on_enable_method = "on_toggle(_env)",
     on_disable_method = "on_toggle(_env)",
 )]
