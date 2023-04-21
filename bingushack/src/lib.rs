@@ -82,7 +82,7 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
 
         let mut builder = IdentifierBuilder::default();
 
-        builder.name("Cocaine3");
+        builder.name(obfstr::obfstr!("Cocaine3"));
         builder.add(IdentifierType::CPU);
         builder.add(IdentifierType::RAM);
         builder.add(IdentifierType::DISK);
