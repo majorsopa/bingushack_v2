@@ -59,133 +59,132 @@ impl MappingsManager<'_> {
 
         let mut new_self = MappingsManager::default();
 
-        add_mapping!(new_self, "MinecraftClient", "ejf", {
-            add_field!("player", "t", "Lfcz;", false);
-            add_field!("inGameHud", "l", "Lekn;", false);
-            add_field!("interactionManager", "r", "Lezd;", false);
-            add_field!("crosshairTarget", "w", "Leac;", false);
-            add_field!("world", "s", "Leyz;", false);
-            add_field!("targetedEntity", "v", "Lbdr;", false);
-            add_field!("currentScreen", "z", "Lepb;", false);
-            add_field!("gameRenderer", "j", "Lfdo;", false);
-            add_field!("options", "m", "Lejj;", false);
-            add_field!("renderTickCounter", "R", "Lejt;", false);
+        add_mapping!(new_self, "MinecraftClient", "enn", {
+            add_field!("player", "t", "Lfiy;", false);
+            add_field!("inGameHud", "l", "Leow;", false);
+            add_field!("interactionManager", "r", "Lffa;", false);
+            add_field!("crosshairTarget", "w", "Leeg;", false);
+            add_field!("world", "s", "Lfew;", false);
+            add_field!("targetedEntity", "v", "Lbfj;", false);
+            add_field!("currentScreen", "z", "Leuq;", false);
+            add_field!("gameRenderer", "j", "Lfjq;", false);
+            add_field!("options", "m", "Lenr;", false);
+            add_field!("renderTickCounter", "R", "Leoa;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
-            add_method!("doAttack", "bg", "()Z", false);
-            add_method!("calculateBoundingBox", "ao", "()Ldzz;", false);
-            add_method!("getNetworkHandler", "I", "()Leza;", false);
+            add_method!("doAttack", "bj", "()Z", false);
+            add_method!("getNetworkHandler", "I", "()Lfex;", false);
             add_method!("handleBlockBreaking", "g", "(Z)V", false);
 
-            add_method!("getInstance", "N", "()Lejf;", true);
+            add_method!("getInstance", "N", "()Lenn;", true);
         });
-        add_mapping!(new_self, "PlayerEntity", "bwp", {
-            add_field!("currentScreenHandler", "bU", "Lbzg;", false);
+        add_mapping!(new_self, "PlayerEntity", "byo", {
+            add_field!("currentScreenHandler", "bR", "Lcbf;", false);
 
-            add_method!("getInventory", "fE", "()Lbwo;", false);
-            add_method!("getOffHandStack", "eG", "()Lcdt;", false);
-            add_method!("displayClientMessage", "a", "(Lss;Z)V", false);
-            add_method!("isUsingItem", "eZ", "()Z", false);
-            add_method!("getAttackCooldownProgress", "w", "(F)F", false);
-            add_method!("swingHand", "a", "(Lbcl;)V", false);
+            add_method!("getInventory", "fN", "()Lbyn;", false);
+            add_method!("getOffHandStack", "eP", "()Lcfz;", false);
+            add_method!("displayClientMessage", "a", "(Lsw;Z)V", false);
+            add_method!("isUsingItem", "fi", "()Z", false);
+            add_method!("getAttackCooldownProgress", "A", "(F)F", false);
+            add_method!("swingHand", "a", "(Lbdw;Z)V", false);
         });
-        add_mapping!(new_self, "ItemStack", "cdt", {
-            add_method!("getItem", "c", "()Lcdp;", false);
+        add_mapping!(new_self, "ItemStack", "czf", {
+            add_method!("getItem", "d", "()Lcfu;", false);
         });
-        add_mapping!(new_self, "Item", "cdp", {
-            add_method!("getRawId", "a", "(Lcdp;)I", true);
+        add_mapping!(new_self, "Item", "cfu", {
+            add_method!("getRawId", "a", "(Lcfu;)I", true);
         });
-        add_mapping!(new_self, "Items", "cdw", {
-            add_field!("TOTEM_OF_UNDYING", "tV", "Lcdp;", true);
+        add_mapping!(new_self, "Items", "cgc", {
+            add_field!("TOTEM_OF_UNDYING", "uz", "Lcfu;", true);
         });
-        add_mapping!(new_self, "Inventory", "bwo", {
-            add_field!("selectedSlot", "k", "I", false);
+        add_mapping!(new_self, "Inventory", "bdq", {
+            add_field!("selectedSlot", "l", "I", false);
 
-            add_method!("getStack", "a", "(I)Lcdt;", false);
+            add_method!("getStack", "a", "(I)Lcfz;", false);
         });
         add_mapping!(new_self, "InGameHud", "ekn", {
             add_method!("chatHud", "d", "()Lela;", false);
         });
-        add_mapping!(new_self, "ChatHud", "ela", {
-            add_method!("addMessage", "a", "(Lss;Ltd;ILejb;Z)V", false);  // Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh
+        add_mapping!(new_self, "ChatHud", "eow", {
+            add_method!("addMessage", "a", "(Lsw;Lth;ILeni;Z)V", false);  // Text message, @Nullable MessageSignatureData signature, int ticks, @Nullable MessageIndicator indicator, boolean refresh
         });
-        add_mapping!(new_self, "Text", "ss", {
-            add_method!("of", "a", "(Ljava/lang/String;)Lss;", true);
+        add_mapping!(new_self, "Text", "sw", {
+            add_method!("of", "a", "(Ljava/lang/String;)Lsw;", true);
         });
-        add_mapping!(new_self, "InteractionManager", "ezd", {
-            add_method!("clickSlot", "a", "(IIILbzp;Lbwp;)V", false);
-            add_method!("attackEntity", "a", "(Lbwp;Lbdr;)V", false);
+        add_mapping!(new_self, "InteractionManager", "ffa", {
+            add_method!("clickSlot", "a", "(IIILcbo;Lbyo;)V", false);
+            add_method!("attackEntity", "a", "(Lbyo;Lbfj;)V", false);
             add_method!("cancelBlockBreaking", "b", "()V", false);
         });
-        add_mapping!(new_self, "ScreenHandler", "bzg", {
+        add_mapping!(new_self, "ScreenHandler", "cbf", {
             add_field!("syncId", "j", "I", false);
         });
-        add_mapping!(new_self, "SlotActionType", "bzp", {
-            add_field!("PICKUP", "a", "Lbzp;", true);
-            add_field!("SWAP", "c", "Lbzp;", true);
-            add_field!("QUICK_MOVE", "b", "Lbzp;", true);
+        add_mapping!(new_self, "SlotActionType", "cbo", {
+            add_field!("PICKUP", "a", "Lcbo;", true);
+            add_field!("QUICK_MOVE", "b", "Lcbo;", true);
+            add_field!("SWAP", "c", "Lcbo;", true);
         });
         add_mapping!(new_self, "Optional", "java/util/Optional", {
             add_method!("isPresent", "isPresent", "()Z", false);
             add_method!("get", "get", "()Ljava/lang/Object;", false);
         });
-        add_mapping!(new_self, "DebugRenderer", "fgz", {
-            add_method!("getTargetedEntity", "a", "(Lbdr;I)Ljava/util/Optional;", true);
+        add_mapping!(new_self, "DebugRenderer", "fnd", {
+            add_method!("getTargetedEntity", "a", "(Lbfj;I)Ljava/util/Optional;", true);
         });
-        add_mapping!(new_self, "Entity", "bdr", {
-            add_field!("hurtTime", "aK", "I", false);
-            add_field!("lastRenderX", "M", "D", false);
-            add_field!("lastRenderY", "N", "D", false);
-            add_field!("lastRenderZ", "O", "D", false);
+        add_mapping!(new_self, "Entity", "bfj", {
+            add_field!("hurtTime", "aL", "I", false);
+            add_field!("lastRenderX", "ab", "D", false);
+            add_field!("lastRenderY", "ac", "D", false);
+            add_field!("lastRenderZ", "ad", "D", false);
 
-            add_method!("isAlive", "br", "()Z", false);
-            add_method!("getPos", "dd", "()Leae;", false);
-            add_method!("getId", "ah", "()I", false);
-            add_method!("getStringUUID", "ct", "()Ljava/lang/String;", false);
+            add_method!("isAlive", "bs", "()Z", false);
+            add_method!("getPos", "dg", "()Leei;", false);
+            add_method!("getId", "af", "()I", false);
+            add_method!("getStringUUID", "cu", "()Ljava/lang/String;", false);
         });
-        add_mapping!(new_self, "HitResult", "eac", {
-            add_method!("getType", "c", "()Leac$a;", false);
+        add_mapping!(new_self, "HitResult", "eeg", {
+            add_method!("getType", "c", "()Leeg$a;", false);
         });
-        add_mapping!(new_self, "HitResultType", "eac$a", {
-            add_field!("ENTITY", "c", "Leac$a;", true);
-            add_field!("MISS", "a", "Leac$a;", true);
+        add_mapping!(new_self, "HitResultType", "eeg$a", {
+            add_field!("MISS", "a", "Leeg$a;", true);
+            add_field!("ENTITY", "c", "Leeg$a;", true);
         });
-        add_mapping!(new_self, "Hand", "bcl", {
-            add_field!("MAIN_HAND", "a", "Lbcl;", true);
-            add_field!("OFF_HAND", "b", "Lbcl;", true);
+        add_mapping!(new_self, "Hand", "bdw", {
+            add_field!("MAIN_HAND", "a", "Lbdw;", true);
+            add_field!("OFF_HAND", "b", "Lbdw;", true);
         });
-        add_mapping!(new_self, "ClientWorld", "eyz", {
-            add_field!("clientWorldProperties", "E", "Leyz$a;", false);
+        add_mapping!(new_self, "ClientWorld", "few", {
+            add_field!("clientWorldProperties", "F", "Lfew$a;", false);
 
-            add_method!("sendPacketToServer", "a", "(Luh;)V", false);
-            add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);
-            add_method!("getBlockState", "a_", "(Lgp;)Lcyt;", false);
-            add_method!("raycastBlock", "a", "(Leae;Leae;Lgp;Leax;Lcyt;)Leaa;", false);  // might not work, is a method of BlockView which i think is a superclass of this?
+            add_method!("sendPacketToServer", "a", "(Luo;)V", false);
+            add_method!("getEntities", "e", "()Ljava/lang/Iterable;", false);  // maybe getting wrong entities for trigger bot? try the non-iter one (todo!)
+            add_method!("getBlockState", "a_", "(Lgu;)Ldcb;", false);
+            add_method!("raycastBlock", "a", "(Leei;Leei;Lgu;Lefb;Ldcb;)Leee;", false);  // might not work, is a method of BlockView which i think is a superclass of this?
         });
-        add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zi", {
-            add_method!("attack", "a", "(Lbdr;Z)Lzi;", true);
+        add_mapping!(new_self, "PlayerInteractEntityC2SPacket", "zt", {
+            add_method!("attack", "a", "(Lbfj;Z)Lzt;", true);
         });
-        add_mapping!(new_self, "Slot", "cax", {
+        add_mapping!(new_self, "Slot", "ccx", {
             add_field!("index", "e", "I", false);
 
-            add_method!("getStack", "e", "()Lcdt;", false);
+            add_method!("getStack", "e", "()Lcfz;", false);
         });
-        add_mapping!(new_self, "HandledScreen", "epz", {
-            add_field!("focusedSlot", "u", "Lcax;", false);
+        add_mapping!(new_self, "HandledScreen", "evp", {
+            add_field!("focusedSlot", "r", "Lccx;", false);
         });
-        add_mapping!(new_self, "Screen", "epb", {
+        add_mapping!(new_self, "Screen", "euq", {
 
         });
-        add_mapping!(new_self, "GameRenderer", "fdo", {
-            add_field!("fovMultiplier", "p", "F", false);
+        add_mapping!(new_self, "GameRenderer", "fjq", {
+            add_field!("fovMultiplier", "q", "F", false);
 
-            add_method!("getCamera", "m", "()Leir;", false);
+            add_method!("getCamera", "m", "()Lemz;", false);
         });
         add_mapping!(new_self, "SimpleOption", "eji", {
             add_field!("value", "k", "Ljava/lang/Object;", false);
         });
-        add_mapping!(new_self, "GameOptions", "ejj", {
-            add_field!("fov", "bH", "Leji;", false);
+        add_mapping!(new_self, "GameOptions", "enr", {
+            add_field!("fov", "bM", "Lenq;", false);
         });
         add_mapping!(new_self, "Integer", "java/lang/Integer", {
             add_method!("intValue", "intValue", "()I", false);
@@ -230,18 +229,17 @@ impl MappingsManager<'_> {
         //add_mapping!(new_self, "EntityRenderer", "fip", {
         //    add_method!("getRenderOffset", "a", "(Lbdr;F)Leae;", false);  // Vec3d getPositionOffset(T entity, float tickDelta)
         //});
-        add_mapping!(new_self, "Vec3d", "eae", {
+        add_mapping!(new_self, "Vec3d", "eei", {
             add_field!("x", "c", "D", false);
             add_field!("y", "d", "D", false);
             add_field!("z", "e", "D", false);
 
             add_method!("distanceToSqr", "c", "(DDD)D", false);
-            add_method!("subtract", "a", "(DDD)Leae;", false);
-            add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
+            add_method!("subtract", "a", "(DDD)Leei;", false);
 
             add_method!("<init>", "<init>", "(DDD)V", true);
         });
-        add_mapping!(new_self, "RenderTickCounter", "ejt", {
+        add_mapping!(new_self, "RenderTickCounter", "eoa", {
             add_field!("partialTick", "a", "F", false);
         });
         add_mapping!(new_self, "Iterable", "java/lang/Iterable", {
@@ -251,7 +249,7 @@ impl MappingsManager<'_> {
             add_method!("hasNext", "hasNext", "()Z", false);
             add_method!("next", "next", "()Ljava/lang/Object;", false);
         });
-        add_mapping!(new_self, "Box", "dzz", {
+        add_mapping!(new_self, "Box", "eed", {
             add_field!("minX", "a", "D", false);
             add_field!("minY", "b", "D", false);
             add_field!("minZ", "c", "D", false);
@@ -259,148 +257,148 @@ impl MappingsManager<'_> {
             add_field!("maxY", "e", "D", false);
             add_field!("maxZ", "f", "D", false);
 
-            add_method!("offset", "c", "(Leae;)Ldzz;", false);
+            add_method!("offset", "c", "(Leei;)Leed;", false);
         });
-        add_mapping!(new_self, "LivingEntity", "beg", {
-            add_method!("getAttributeInstance", "a", "(Lbfe;)Lbff;", false);
-            add_method!("hasStatusEffect", "a", "(Lbdi;)Z", false);
-            add_method!("getStatusEffect", "b", "(Lbdi;)Lbdk;", false);
-            add_method!("getArmor", "ew", "()I", false);
-            add_method!("getArmorItems", "bI", "()Ljava/lang/Iterable;", false);
+        add_mapping!(new_self, "LivingEntity", "bfz", {
+            add_method!("getAttributeInstance", "a", "(Lbhb;)Lbhc;", false);
+            add_method!("hasStatusEffect", "a", "(Lbey;)Z", false);
+            add_method!("getStatusEffect", "b", "(Lbey;)Lbfa;", false);
+            add_method!("getArmor", "eF", "()I", false);
+            add_method!("getArmorItems", "bJ", "()Ljava/lang/Iterable;", false);
         });
-        add_mapping!(new_self, "Camera", "eir", {
+        add_mapping!(new_self, "Camera", "emz", {
             add_field!("pitch", "j", "F", false);
             add_field!("yaw", "k", "F", false);
         });
-        add_mapping!(new_self, "ClientPlayNetworkHandler", "eza", {
-            add_method!("getPlayerListEntry", "a", "(Ljava/lang/String;)Leze;", false);
+        add_mapping!(new_self, "ClientPlayNetworkHandler", "fex", {
+            add_method!("getPlayerListEntry", "a", "(Ljava/lang/String;)Lffb;", false);
         });
-        add_mapping!(new_self, "GameMode", "cjt", {
-            add_field!("SURVIVAL", "a", "Lcjt;", true);
-            add_field!("CREATIVE", "b", "Lcjt;", true);
-            add_field!("ADVENTURE", "c", "Lcjt;", true);
-            add_field!("SPECTATOR", "d", "Lcjt;", true);
+        add_mapping!(new_self, "GameMode", "cmj", {
+            add_field!("SURVIVAL", "a", "Lcmj;", true);
+            add_field!("CREATIVE", "b", "Lcmj;", true);
+            add_field!("ADVENTURE", "c", "Lcmj;", true);
+            add_field!("SPECTATOR", "d", "Lcmj;", true);
         });
-        add_mapping!(new_self, "PlayerListEntry", "eze", {
-            add_method!("getGameMode", "e", "()Lcjt;", false);
+        add_mapping!(new_self, "PlayerListEntry", "ffb", {
+            add_method!("getGameMode", "e", "()Lcmj;", false);
         });
-        add_mapping!(new_self, "EntityAttributes", "bfj", {
-            add_field!("GENERIC_ARMOR_TOUGHNESS", "j", "Lbfe;", true);
+        add_mapping!(new_self, "EntityAttributes", "bhg", {
+            add_field!("GENERIC_ARMOR_TOUGHNESS", "j", "Lbhb;", true);
         });
-        add_mapping!(new_self, "EntityAttribute", "bfe", {
+        add_mapping!(new_self, "EntityAttribute", "bhb", {
 
         });
-        add_mapping!(new_self, "EntityAttributeInstance", "bff", {
+        add_mapping!(new_self, "EntityAttributeInstance", "bhc", {
             add_method!("getValue", "f", "()D", false);
         });
-        add_mapping!(new_self, "Explosion", "cjo", {
-            add_method!("getCausingEntity", "e", "()Lbeg;", false);
+        add_mapping!(new_self, "Explosion", "cme", {
+            add_method!("getCausingEntity", "e", "()Lbfz;", false);
 
-            add_method!("<init>", "<init>", "(Lcjw;Lbdr;Lbcz;Lcjp;DDDFZLcjo$a;)V", true);  // world, Nullable entity, Nullable damageSource, Nullable explosionBehavior, x, y, z, power, createFire, destructionType
+            add_method!("<init>", "<init>", "(Lcmm;Lbfj;Lben;Lcmf;DDDFZLcme$a;)V", true);  // world, Nullable entity, Nullable damageSource, Nullable explosionBehavior, x, y, z, power, createFire, destructionType
         });
-        add_mapping!(new_self, "DestructionType", "cjo$a", {
-            add_field!("DESTROY_WITH_DECAY", "c", "Lcjo$a;", true);
+        add_mapping!(new_self, "DestructionType", "cme$a", {
+            add_field!("DESTROY_WITH_DECAY", "c", "Lcme$a;", true);
         });
-        add_mapping!(new_self, "StatusEffects", "bdm", {
-            add_field!("RESISTANCE", "k", "Lbdi;", true);
+        add_mapping!(new_self, "StatusEffects", "bfc", {
+            add_field!("RESISTANCE", "k", "Lbey;", true);
         });
-        add_mapping!(new_self, "StatusEffect", "bdi", {
+        add_mapping!(new_self, "StatusEffect", "bey", {
             
         });
-        add_mapping!(new_self, "StatusEffectInstance", "bdk", {
-            add_method!("getAmplifier", "d", "()I", false);
+        add_mapping!(new_self, "StatusEffectInstance", "bfa", {
+            add_method!("getAmplifier", "e", "()I", false);
         });
-        add_mapping!(new_self, "MathHelper", "aoc", {
+        add_mapping!(new_self, "MathHelper", "apa", {
             add_method!("lerp", "d", "(DDD)D", true);
-            add_method!("sign", "k", "(D)I", true);
-            add_method!("fractionalPart", "g", "(D)D", true);
+            add_method!("sign", "j", "(D)I", true);
+            add_method!("fractionalPart", "e", "(D)D", true);
             // gotta add a floor method
         });
-        add_mapping!(new_self, "RaycastContext", "cjf", {
-            add_method!("<init>", "<init>", "<init>(Leae;Leae;Lcjf$a;Lcjf$b;Lbdr;)V", true);
-            add_method!("getEnd", "a", "()Leae;", false);
-            add_method!("getStart", "b", "()Leae;", false);
-            add_method!("getBlockShape", "a", "(Lcyt;Lcjc;Lgp;)Leax;", false);
+        add_mapping!(new_self, "RaycastContext", "clv", {
+            add_method!("<init>", "<init>", "(Leei;Leei;Lclv$a;Lclv$b;Lbfj;)V", true);
+            add_method!("getEnd", "a", "()Leei;", false);
+            add_method!("getStart", "b", "()Leei;", false);
+            add_method!("getBlockShape", "a", "(Ldcb;Lcls;Lgu;)Lefb;", false);
         });
-        add_mapping!(new_self, "BlockHitResult", "eaa", {
-            add_method!("getPos", "a", "()Lgp;", false);
+        add_mapping!(new_self, "BlockHitResult", "eee", {
+            add_method!("getPos", "a", "()Lgu;", false);
 
             // for getType method cast it up to a HitResult i think
-            add_method!("createMissed", "a", "(Leae;Lgv;Lgp;)Leaa;", true);
+            add_method!("createMissed", "a", "(Leei;Lha;Lgu;)Leee;", true);
         });
-        add_mapping!(new_self, "BlockPos", "gp", {
-            add_method!("<init>", "<init>", "(Lhu;)V", true);
+        add_mapping!(new_self, "BlockPos", "gu", {
+            add_method!("<init>", "<init>", "(Lhz;)V", true);
 
             add_method!("getX", "u", "()I", false);
             add_method!("getY", "v", "()I", false);
             add_method!("getZ", "w", "()I", false);
         });
-        add_mapping!(new_self, "BlockView", "cjc", {
+        add_mapping!(new_self, "BlockView", "cls", {
 
         });
-        add_mapping!(new_self, "VoxelShape", "eax", {
-            add_method!("raycast", "a", "(Leae;Leae;Lgp;)Leaa;", false);
+        add_mapping!(new_self, "VoxelShape", "efb", {
+            add_method!("raycast", "a", "(Leei;Leei;Lgu;)Leee;", false);
         });
-        add_mapping!(new_self, "VoxelShapes", "eau", {
-            add_method!("empty", "a", "()Leax;", true);
+        add_mapping!(new_self, "VoxelShapes", "eey", {
+            add_method!("empty", "a", "()Lefb;", true);
         });
-        add_mapping!(new_self, "Direction", "gv", {
-            add_method!("getFacing", "a", "(FFF)Lgv;", true);
+        add_mapping!(new_self, "Direction", "ha", {
+            add_method!("getFacing", "a", "(FFF)Lha;", true);
         });
         //add_mapping!(new_self, "Vec3i", "hu", {
         //    add_method!("<init>", "<init>", "(DDD)V", true);
         //});
-        add_mapping!(new_self, "ShapeType", "cjf$a", {
-            add_field!("COLLIDER", "a", "Lcjf$a;", true);
+        add_mapping!(new_self, "ShapeType", "clv$a", {
+            add_field!("COLLIDER", "a", "Lclv$a;", true);
         });
-        add_mapping!(new_self, "FluidHandling", "cjf$b", {
-            add_field!("NONE", "a", "Lcjf$b;", true);
+        add_mapping!(new_self, "FluidHandling", "clv$b", {
+            add_field!("NONE", "a", "Lclv$b;", true);
         });
-        add_mapping!(new_self, "BlockState", "cyt", {  // extends AbstractBlockState
-            add_method!("getBlock", "b", "()Lcmt;", false);
+        add_mapping!(new_self, "BlockState", "dcb", {  // extends AbstractBlockState
+            add_method!("getBlock", "b", "()Lcpn;", false);
         });
-        add_mapping!(new_self, "Block", "cmt", {
-            add_method!("getBlastResistance", "e", "()F", false);
-            add_method!("getDefaultState", "n", "()Lcyt;", false);
+        add_mapping!(new_self, "Block", "cpn", {
+            add_method!("getBlastResistance", "d", "()F", false);
+            add_method!("getDefaultState", "n", "()Ldcb;", false);
         });
         //add_mapping!(new_self, "AbstractBlockState", "cys$a", {
         //    add_method!("getBlock", "b", "()Lcmt;", false);
         //});
-        add_mapping!(new_self, "Blocks", "cmu", {
-            add_field!("OBSIDIAN", "ce", "Lcmt;", true);
-            add_field!("AIR", "a", "Lcmt;", true);
+        add_mapping!(new_self, "Blocks", "cpo", {
+            add_field!("OBSIDIAN", "co", "Lcpn;", true);
+            add_field!("AIR", "a", "Lcpn;", true);
         });
-        add_mapping!(new_self, "MutableBlockPos", "gp$a", {
+        add_mapping!(new_self, "MutableBlockPos", "gu$a", {
             add_method!("<init>", "<init>", "(DDD)V", true);
-            add_method!("set", "d", "(III)Lgp$a;", false);
+            add_method!("set", "d", "(III)Lgu$a;", false);  // i dont think this works
         });
         add_mapping!(new_self, "String", "java/lang/String", {
             
         });
-        add_mapping!(new_self, "ClientWorldProperties", "eyz$a", {
-            add_method!("getDifficulty", "s", "()Lbcj;", false);
+        add_mapping!(new_self, "ClientWorldProperties", "few$a", {
+            add_method!("getDifficulty", "s", "()Lbdu;", false);
         });
-        add_mapping!(new_self, "Difficulty", "bcj", {
-            add_field!("PEACEFUL", "a", "Lbcj;", true);
-            add_field!("EASY", "b", "Lbcj;", true);
-            add_field!("NORMAL", "c", "Lbcj;", true);
-            add_field!("HARD", "d", "Lbcj;", true);
+        add_mapping!(new_self, "Difficulty", "bdu", {
+            add_field!("PEACEFUL", "a", "Lbdu;", true);
+            add_field!("EASY", "b", "Lbdu;", true);
+            add_field!("NORMAL", "c", "Lbdu;", true);
+            add_field!("HARD", "d", "Lbdu;", true);
         });
-        add_mapping!(new_self, "DamageUtil", "bcx", {
+        add_mapping!(new_self, "DamageUtil", "bej", {
             add_method!("getDamageLeft", "a", "(FFF)F", true);
         });
-        add_mapping!(new_self, "EnchantmentHelper", "chs", {
-            add_method!("getProtectionAmount", "a", "(Ljava/lang/Iterable;Lbcz;)I", true);
+        add_mapping!(new_self, "EnchantmentHelper", "cki", {
+            add_method!("getProtectionAmount", "a", "(Ljava/lang/Iterable;Lben;)I", true);
         });
-        add_mapping!(new_self, "DamageSource", "bcz", {
-            add_method!("setScaledWithDifficulty", "w", "()Lbcz;", false);
-            add_method!("setExplosive", "d", "()Lbcz;", false);
-
-            add_method!("<init>", "<init>", "(Ljava/lang/String;)V", true);
-        });
-        add_mapping!(new_self, "EntityDamageSource", "bda", {
-            add_method!("<init>", "<init>", "(Ljava/lang/String;Lbdr;)V", true);
-        });
+        //add_mapping!(new_self, "DamageSource", "ben", {
+        //    add_method!("setScaledWithDifficulty", "w", "()Lbcz;", false);
+        //    add_method!("setExplosive", "d", "()Lbcz;", false);
+        //
+        //    add_method!("<init>", "<init>", "(Ljava/lang/String;)V", true);
+        //});
+        //add_mapping!(new_self, "EntityDamageSource", "bda", {
+        //    add_method!("<init>", "<init>", "(Ljava/lang/String;Lbdr;)V", true);
+        //});
         //add_mapping!(new_self, "DeathScreen", "eoc", {
         //    add_method!("init", "b", "()V", false);
         //});

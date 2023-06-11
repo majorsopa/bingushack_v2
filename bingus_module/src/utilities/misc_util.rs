@@ -1555,6 +1555,7 @@ pub fn blast_prot_reduction<'a>(
 }
 
 pub fn explosion_replacement<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, explosion: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    unimplemented!();
     let attacker_living_entity = if !env.is_same_object(explosion.get_object().unwrap(), JObject::null()).unwrap() {
         let causing_living_entity = mappings_manager.get("LivingEntity").unwrap();
         apply_object!(
