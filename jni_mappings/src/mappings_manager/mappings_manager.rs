@@ -75,6 +75,8 @@ impl MappingsManager<'_> {
             add_method!("doAttack", "bj", "()Z", false);
             add_method!("getNetworkHandler", "I", "()Lfex;", false);
             add_method!("handleBlockBreaking", "g", "(Z)V", false);
+            add_method!("startAttack", "bj", "()Z", false);
+            add_method!("continueAttack", "g", "(Z)V", false);
 
             add_method!("getInstance", "N", "()Lenn;", true);
         });

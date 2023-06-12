@@ -94,12 +94,12 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
     }
 
 
-    message_box("injected");
+    message_box("injecting");
 
 
 
     let hwnd = match get_hwnd(
-        &["Minecraft 1.19.4", "Minecraft 1.19.4 - Multiplayer (3rd-party Server)", "Minecraft 1.19.4 - Singleplayer"]
+        &["Minecraft 1.20", "Minecraft 1.20 - Multiplayer (3rd-party Server)", "Minecraft 1.20 - Singleplayer"]
     ) {
         Some(hwnd) => hwnd,
         None => return exit_thread!(base),

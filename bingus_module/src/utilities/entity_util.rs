@@ -60,3 +60,22 @@ pub fn get_entity_id<'a>(env: JNIEnv<'a>, entity: &'a ClassMapping<'a>) -> i32 {
         &[]
     ).unwrap().i().unwrap()
 }
+
+pub fn do_attack<'a>(env: JNIEnv<'a>, minecraft_client: &'a ClassMapping<'a>) {
+    let flag = call_method_or_get_field!(
+        env,
+        minecraft_client,
+        "startAttack",
+        false,
+        &[]
+    ).unwrap();
+    call_method_or_get_field!(
+        env,
+        minecraft_client,
+        "continueAttack",
+        false,
+        &[
+            flag
+        ]
+    ).unwrap();
+}
