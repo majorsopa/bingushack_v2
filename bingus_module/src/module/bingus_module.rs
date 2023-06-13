@@ -8,7 +8,7 @@ pub enum BingusModule {
     TotemAssist,
     Triggerbot,
     //Chams,
-    //Esp,
+    Esp,
 }
 
 pub fn populate_modules() -> Vec<BingusModule> {
@@ -18,7 +18,7 @@ pub fn populate_modules() -> Vec<BingusModule> {
     modules.push(TotemAssist::new().into());
     modules.push(Triggerbot::new().into());
     //modules.push(Chams::new().into());
-    //modules.push(Esp::new().into());
+    modules.push(Esp::new().into());
 
     modules
 }

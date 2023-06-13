@@ -72,6 +72,7 @@ impl MappingsManager<'_> {
             add_field!("renderTickCounter", "R", "Leoa;", false);
             add_field!("crosshairPickEntity", "v", "Lbfj;", false);
             add_field!("hitResult", "w", "Leeg;", false);
+            add_field!("renderBuffers", "S", "Lfkd;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bj", "()Z", false);
@@ -418,6 +419,16 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "EndCrystalEntity", "bua", {
             
+        });
+        add_mapping!(new_self, "GuiGraphics", "eox", {
+            add_method!("renderOutline", "b", "(IIIII)V", false);
+            add_method!("<init>", "<init>", "(Lenn;Lfjx$a;)V", true);  // buh
+        });
+        add_mapping!(new_self, "RenderBuffers", "fkd", {
+            add_method!("bufferSource", "b", "()Lfjx$a;", false);
+        });
+        add_mapping!(new_self, "BufferSource", "fjx$a", {
+
         });
 
         new_self

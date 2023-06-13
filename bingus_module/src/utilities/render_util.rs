@@ -115,3 +115,51 @@ pub fn get_pitch_and_yaw<'a>(env: JNIEnv<'a>, camera: &'a ClassMapping) -> [f32;
 
     [pitch, yaw]
 }
+
+pub fn render_outline<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping<'a>, xy: [i32; 2], width: i32, height: i32, color: i32) {
+    let gui_graphics = make_gui_graphics(env, mappings_manager, minecraft_client);
+    call_method_or_get_field!(
+        env,
+        gui_graphics,
+        "renderOutline",
+        false,
+        &[
+            JValue::Int(xy[0]),
+            JValue::Int(xy[1]),
+            JValue::Int(width),
+            JValue::Int(height),
+            JValue::Int(color)
+        ]
+    ).unwrap();
+}
+
+pub fn make_gui_graphics<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping<'a>) -> &'a ClassMapping<'a> {
+    let render_buffers = mappings_manager.get("RenderBuffers").unwrap();
+    apply_object!(
+        render_buffers,
+        call_method_or_get_field!(env, minecraft_client, "renderBuffers", false).unwrap().l().unwrap()
+    );
+
+    let buffer_source = mappings_manager.get("BufferSource").unwrap();
+    apply_object!(
+        buffer_source,
+        call_method_or_get_field!(env, render_buffers, "bufferSource", false, &[]).unwrap().l().unwrap()
+    );
+
+    let gui_graphics = mappings_manager.get("GuiGraphics").unwrap();
+    apply_object!(
+        gui_graphics,
+        call_method_or_get_field!(
+            ctor
+            env,
+            gui_graphics,
+            "<init>",
+            &[
+                JValue::Object(minecraft_client.get_object().unwrap()),
+                JValue::Object(buffer_source.get_object().unwrap())
+            ]
+        ).unwrap()
+    );
+
+    gui_graphics
+}

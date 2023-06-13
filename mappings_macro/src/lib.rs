@@ -41,6 +41,17 @@ macro_rules! call_method_or_get_field {
             )
         }
     }};
+
+    // constructors only!
+    (ctor $env:expr, $cm:expr, $method_name:expr, $method_args:expr) => {{
+        let method = $cm.get_method($method_name, true).unwrap();
+
+        $env.new_object(
+            $cm.get_class(),
+            method.get_sig(),
+            $method_args,
+        )
+    }};
 }
 
 // puts a jni JObject into a ClassMapping
