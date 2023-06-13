@@ -68,10 +68,11 @@ fn on_toggle(env: JNIEnv) {
 fn on_class_file_load(event: ClassFileLoadEvent) -> Option<Vec<u8>> {
     match &*event.class_name {
         "fjr" => {
-            let bytes = match unsafe { FJR_CHANGED } {  // 202,254,186,190 == 0xCAFEBABE
-                true => Vec::from(include_bytes!("fjr_og.class").as_slice()),
-                false => Vec::from(include_bytes!("fjr_modded.class").as_slice()),
-            };
+            //let bytes = match unsafe { FJR_CHANGED } {  // 202,254,186,190 == 0xCAFEBABE
+            //    true => Vec::from(include_bytes!("fjr_og.class").as_slice()),
+            //    false => Vec::from(include_bytes!("fjr_modded.class").as_slice()),
+            //};
+            let bytes = vec![];
             unsafe { FJR_CHANGED = !FJR_CHANGED; }
             Some(bytes)
         },

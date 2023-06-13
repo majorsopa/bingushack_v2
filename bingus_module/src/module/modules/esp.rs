@@ -1,7 +1,5 @@
 use crate::crate_prelude::*;
 
-// todo remove pixels and tao
-
 fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     let minecraft_client = get_minecraft_client(env, mappings_manager);
     let player = match get_player_checked(env, mappings_manager, minecraft_client) {

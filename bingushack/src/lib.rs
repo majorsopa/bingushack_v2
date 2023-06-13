@@ -127,6 +127,18 @@ unsafe extern "system" fn main_loop(base: LPVOID) -> u32 {
     exit_thread!(base)
 }
 
+// copied in bingus_client because im lazy i guess
+unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {
+    for window_name in window_names {
+        let window_name = CString::new(*window_name).unwrap();
+        let hwnd = FindWindowA(null_mut(), window_name.as_ptr());
+        if !hwnd.is_null() {
+            return Some(hwnd);
+        }
+    }
+    None
+}
+
 
 
 #[no_mangle]
@@ -157,20 +169,6 @@ pub extern "stdcall" fn DllMain(
         }
         _ => true as i32, // it went a-ok because we dont know what happened so lol fuck off
     }
-}
-
-
-
-// copied in bingus_client because im lazy i guess
-unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND> {
-    for window_name in window_names {
-        let window_name = CString::new(*window_name).unwrap();
-        let hwnd = FindWindowA(null_mut(), window_name.as_ptr());
-        if !hwnd.is_null() {
-            return Some(hwnd);
-        }
-    }
-    None
 }
 
 
