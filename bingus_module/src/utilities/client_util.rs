@@ -61,21 +61,58 @@ pub fn facing_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager,
     env.is_same_object(hit_result_type.get_object().unwrap(), entity_hit_result_field_object).unwrap()
 }
 
-pub fn get_targeted_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> Option<&'a ClassMapping<'a>> {
-    let targeted_entity = mappings_manager.get("Entity").unwrap();
+
+pub fn get_targeted_entity<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, must_be_living: bool) -> Option<&'a ClassMapping<'a>> {
+    // make sure the object in instanceof is not null
+    let ray_trace = mappings_manager.get("HitResult").unwrap();
     apply_object!(
-        targeted_entity,
+        ray_trace,
         call_method_or_get_field!(
             env,
             minecraft_client,
-            "targetedEntity",
+            "crosshairTarget",
             false
         ).unwrap().l().unwrap()
     );
-    if env.is_same_object(targeted_entity.get_object().unwrap(), JObject::null()).unwrap() {
-        None
+
+    if env.is_same_object(ray_trace.get_object().unwrap(), JObject::null()).unwrap() {
+        return None;
+    }
+
+    if !env.is_instance_of(ray_trace.get_object().unwrap(), mappings_manager.get("EntityHitResult").unwrap().get_class()).unwrap() {
+        return None;
+    }
+
+    let ray_trace_entity = mappings_manager.get("EntityHitResult").unwrap();
+    apply_object!(
+        ray_trace_entity,
+        ray_trace.get_object().unwrap()
+    );
+
+    let entity = mappings_manager.get("Entity").unwrap();
+    apply_object!(
+        entity,
+        call_method_or_get_field!(
+            env,
+            ray_trace_entity,
+            "getEntity",
+            false,
+            &[]
+        ).unwrap().l().unwrap()
+    );
+
+    if env.is_same_object(entity.get_object().unwrap(), JObject::null()).unwrap() {
+        return None;
+    }
+
+    if must_be_living {
+        if env.is_instance_of(entity.get_object().unwrap(), mappings_manager.get("LivingEntity").unwrap().get_class()).unwrap() {
+            return Some(entity);
+        } else {
+            return None;
+        }
     } else {
-        Some(targeted_entity)
+        return Some(entity);
     }
 }
 

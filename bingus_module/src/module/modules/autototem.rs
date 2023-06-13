@@ -69,26 +69,22 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
         // swap totem to offhand
         if !found_totem_slots.is_empty() {
-            if *autototem.hotbar_only.0.get_bool() {
-                let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
-                if let Some(hotbar_totem) = hotbar_totem {
-                    let hotbar_totem = *hotbar_totem;
+            let hotbar_totem = found_totem_slots.iter().find(|&&slot| slot < 9);
+            if let Some(hotbar_totem) = hotbar_totem {
+                let hotbar_totem = *hotbar_totem;
 
-                    if autototem.hotbar_swap_prev_slot.is_none() {
-                        autototem.hotbar_swap_prev_slot = Some((get_selected_slot(env, inventory), false));
-                        set_selected_slot(env, inventory, hotbar_totem);
+                if autototem.hotbar_swap_prev_slot.is_none() {
+                    autototem.hotbar_swap_prev_slot = Some((get_selected_slot(env, inventory), false));
+                    set_selected_slot(env, inventory, hotbar_totem);
+                    return;
+                } else {
+                    let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
+                    if !swapped {
+                        swap_offhand_hotkey(env, mappings_manager, minecraft_client);
+                        autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
                         return;
-                    } else {
-                        let (prev_slot, swapped) = autototem.hotbar_swap_prev_slot.unwrap();
-                        if !swapped {
-                            swap_offhand_handled(env, mappings_manager, minecraft_client, player, hotbar_totem);
-                            autototem.hotbar_swap_prev_slot = Some((prev_slot, true));
-                            return;
-                        }
                     }
                 }
-            } else {
-                swap_offhand_handled(env, mappings_manager, minecraft_client, player, found_totem_slots[0]);
             }
         }
     }
@@ -103,10 +99,9 @@ fn tick(autototem: &mut Autototem, env: JNIEnv, mappings_manager: &MappingsManag
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting, hotbar_only]")]
+#[bingus_module(name = "Autototem", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[delay_setting]")]
 pub struct Autototem {
     delay_setting: (BingusSetting, &'static str, Option<[f32; 2]>),
-    hotbar_only: (BingusSetting, &'static str, Option<[f32; 2]>),
     randomly_chosen_time: Option<u128>,
     time_since_lost_totem: Option<SystemTime>,
     hotbar_swap_prev_slot: Option<(i32, bool)>,
@@ -116,7 +111,6 @@ impl MakeNewBingusModule for Autototem {
     fn new() -> Self {
         Self {
             delay_setting: (BingusSetting::RangeSetting([100.0, 250.0].into()), "delay (ms)", Some([1.0, 1500.0])),
-            hotbar_only: (BingusSetting::BoolSetting(true.into()), "hotbar only", None),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
             hotbar_swap_prev_slot: None,

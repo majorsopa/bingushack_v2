@@ -70,6 +70,8 @@ impl MappingsManager<'_> {
             add_field!("gameRenderer", "j", "Lfjq;", false);
             add_field!("options", "m", "Lenr;", false);
             add_field!("renderTickCounter", "R", "Leoa;", false);
+            add_field!("crosshairPickEntity", "v", "Lbfj;", false);
+            add_field!("hitResult", "w", "Leeg;", false);
 
             add_method!("getTickDelta", "av", "()F", false);
             add_method!("doAttack", "bj", "()Z", false);
@@ -187,6 +189,7 @@ impl MappingsManager<'_> {
         });
         add_mapping!(new_self, "GameOptions", "enr", {
             add_field!("fov", "bM", "Lenq;", false);
+            add_field!("keySwapOffhand", "F", "Lenl;", false);
         });
         add_mapping!(new_self, "Integer", "java/lang/Integer", {
             add_method!("intValue", "intValue", "()I", false);
@@ -404,6 +407,15 @@ impl MappingsManager<'_> {
         //add_mapping!(new_self, "DeathScreen", "eoc", {
         //    add_method!("init", "b", "()V", false);
         //});
+        add_mapping!(new_self, "KeyMapping", "enl", {
+            add_field!("clickCount", "q", "I", false);
+        });
+        add_mapping!(new_self, "HitResult", "eeg", {
+
+        });
+        add_mapping!(new_self, "EntityHitResult", "eef", {
+            add_method!("getEntity", "a", "()Lbfj;", false);
+        });
 
         new_self
     }

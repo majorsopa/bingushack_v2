@@ -10,9 +10,9 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         None => return,
     };
 
+    let must_be_living = *triggerbot.must_be_living.0.get_bool();
 
-
-    let targeted_entity = match get_targeted_entity(env, mappings_manager, minecraft_client) {
+    let targeted_entity = match get_targeted_entity(env, mappings_manager, minecraft_client, must_be_living) {
         Some(targeted_entity) => targeted_entity,
         None => return,
     };
@@ -29,7 +29,7 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
-    if *triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, targeted_entity) != 0 {
+    if must_be_living && *triggerbot.wait_for_damage_tick.0.get_bool() && get_damage_tick(env, targeted_entity) != 0 {
         return;
     }
 
@@ -52,11 +52,12 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Triggerbot", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item]")]
+#[bingus_module(name = "Triggerbot", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item, must_be_living]")]
 pub struct Triggerbot {
     wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
     wait_for_damage_tick: (BingusSetting, &'static str, Option<[f32; 2]>),
     stop_while_using_item: (BingusSetting, &'static str, Option<[f32; 2]>),
+    must_be_living: (BingusSetting, &'static str, Option<[f32; 2]>),
     last_attack: Option<SystemTime>,
 }
 
@@ -66,6 +67,7 @@ impl MakeNewBingusModule for Triggerbot {
             wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for cooldown", None),
             wait_for_damage_tick: (BingusSetting::BoolSetting(true.into()), "wait for damage tick", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
+            must_be_living: (BingusSetting::BoolSetting(true.into()), "must be living (turn off for end crystals)", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             last_attack: None,

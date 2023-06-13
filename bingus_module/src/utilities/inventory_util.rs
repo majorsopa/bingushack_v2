@@ -57,6 +57,7 @@ pub fn swap_slots<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, mi
     click_slot(env, player, interaction_manager, sync_id, to_index, from_index, pickup_slot_action);
 }
 
+/*
 pub fn swap_offhand_handled<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping, player: &'a ClassMapping, slot: i32) {
     let interaction_manager = get_interaction_manager(env, mappings_manager, minecraft_client);
 
@@ -81,6 +82,12 @@ pub fn swap_offhand_handled<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsM
         // put down
         click_slot(env, player, interaction_manager, sync_id, 45, 0, pickup_slot_action);
     }
+}
+*/
+
+pub fn swap_offhand_hotkey<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) {
+    let offhand_key_mapping = get_key_swap_offhand_mapping(env, mappings_manager, minecraft_client);
+    click_key_mapping(env, mappings_manager, offhand_key_mapping);
 }
 
 pub fn get_focused_slot_checked<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, handled_screen: &'a ClassMapping) -> Option<&'a ClassMapping<'a>> {
@@ -113,4 +120,12 @@ pub fn shift_click_slot<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManag
     ).unwrap();
 
     click_slot(env, player, interaction_manager, sync_id, slot, 0, quick_move_slot_action);
+}
+
+pub fn get_key_swap_offhand_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, minecraft_client: &'a ClassMapping) -> &'a ClassMapping<'a> {
+    let key_binding = mappings_manager.get("KeyMapping").unwrap();
+    let options = get_game_options(env, mappings_manager, minecraft_client);
+    let key_swap_offhand = call_method_or_get_field!(env, options, "keySwapOffhand", false).unwrap().l().unwrap();
+    apply_object!(key_binding, key_swap_offhand);
+    key_binding
 }

@@ -1638,3 +1638,15 @@ pub fn _explosion_replacement_living_entity<'a>(env: JNIEnv<'a>, mappings_manage
 
     damage_source
 }
+
+
+pub fn click_key_mapping<'a>(env: JNIEnv<'a>, mappings_manager: &'a MappingsManager, key_mapping: &'a ClassMapping) {
+    let click_count = call_method_or_get_field!(
+        env,
+        key_mapping,
+        "clickCount",
+        false
+    ).unwrap().i().unwrap() + 1;
+    let sig_holder = mappings_manager.get("KeyMapping").unwrap().get_field("clickCount", false).unwrap();
+    env.set_field(key_mapping.get_object().unwrap(), sig_holder.get_name(), sig_holder.get_sig(), JValue::Int(click_count)).unwrap();
+}

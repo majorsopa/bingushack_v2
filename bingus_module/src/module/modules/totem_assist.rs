@@ -116,7 +116,7 @@ pub struct TotemAssist {
 impl MakeNewBingusModule for TotemAssist {
     fn new() -> Self {
         Self {
-            delay_setting: (BingusSetting::RangeSetting([30.0, 45.0].into()), "delay (ms)", Some([1.0, 120.0])),
+            delay_setting: (BingusSetting::RangeSetting([90.0, 120.0].into()), "delay (ms)", Some([50.0, 200.0])),
             fill_hotbar: (BingusSetting::BoolSetting(true.into()), "fill hotbar", None),
             randomly_chosen_time: None,
             time_since_lost_totem: None,
