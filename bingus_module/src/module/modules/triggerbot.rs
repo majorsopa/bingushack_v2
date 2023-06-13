@@ -21,10 +21,6 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
-    if *triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
-        return;
-    }
-
     if *triggerbot.stop_while_using_item.0.get_bool() && is_using_item(env, player) {
         return;
     }
@@ -33,6 +29,17 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
         return;
     }
 
+    if *triggerbot.crystal_dont_wait_for_cooldown.0.get_bool() {
+        if !env.is_instance_of(targeted_entity.get_object().unwrap(), mappings_manager.get("EndCrystalEntity").unwrap().get_class()).unwrap() {
+            if *triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
+                return;
+            }
+        }
+    } else {
+        if *triggerbot.wait_for_cooldown.0.get_bool() && get_attack_cooldown_progress(env, player, get_tick_delta(env, minecraft_client)) != 1.0 {
+            return;
+        }
+    }
 
 
     if triggerbot.last_attack.is_none() {
@@ -52,9 +59,14 @@ fn tick(triggerbot: &mut Triggerbot, env: JNIEnv, mappings_manager: &MappingsMan
 
 #[derive(BingusModuleTrait)]
 #[add_bingus_fields]
-#[bingus_module(name = "Triggerbot", tick_method = "tick(self, _env, _mappings_manager)", settings_list_fields = "[wait_for_cooldown, wait_for_damage_tick, stop_while_using_item, must_be_living]")]
+#[bingus_module(
+    name = "Triggerbot",
+    tick_method = "tick(self, _env, _mappings_manager)",
+    settings_list_fields = "[wait_for_cooldown, crystal_dont_wait_for_cooldown, wait_for_damage_tick, stop_while_using_item, must_be_living]"
+)]
 pub struct Triggerbot {
     wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
+    crystal_dont_wait_for_cooldown: (BingusSetting, &'static str, Option<[f32; 2]>),
     wait_for_damage_tick: (BingusSetting, &'static str, Option<[f32; 2]>),
     stop_while_using_item: (BingusSetting, &'static str, Option<[f32; 2]>),
     must_be_living: (BingusSetting, &'static str, Option<[f32; 2]>),
@@ -64,10 +76,11 @@ pub struct Triggerbot {
 impl MakeNewBingusModule for Triggerbot {
     fn new() -> Self {
         Self {
-            wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for cooldown", None),
+            wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "wait for mob cooldowns", None),
+            crystal_dont_wait_for_cooldown: (BingusSetting::BoolSetting(true.into()), "don't wait for cooldowns on crystals", None),
             wait_for_damage_tick: (BingusSetting::BoolSetting(true.into()), "wait for damage tick", None),
             stop_while_using_item: (BingusSetting::BoolSetting(true.into()), "stop while using item", None),
-            must_be_living: (BingusSetting::BoolSetting(true.into()), "must be living (turn off for end crystals)", None),
+            must_be_living: (BingusSetting::BoolSetting(false.into()), "must be living (turn off for end crystals)", None),
             __enabled_bool_setting: (BingusSetting::BoolSetting(false.into()), "enabled", None),
             __keybind_setting: (BingusSetting::KeySetting(String::from("").into()), "keybind", None),
             last_attack: None,

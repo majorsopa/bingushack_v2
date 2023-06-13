@@ -416,6 +416,9 @@ impl MappingsManager<'_> {
         add_mapping!(new_self, "EntityHitResult", "eef", {
             add_method!("getEntity", "a", "()Lbfj;", false);
         });
+        add_mapping!(new_self, "EndCrystalEntity", "bua", {
+            
+        });
 
         new_self
     }

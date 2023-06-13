@@ -1,18 +1,21 @@
-use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString};
-use bingus_client::{run_client};
+use std::{ptr::null_mut, time::Duration, thread::sleep, ffi::CString, sync::{Once, atomic::AtomicPtr}};
+use bingus_client::{run_client, MODULES};
 
+use bingus_module::prelude::BingusModuleTrait;
+use once_cell::sync::OnceCell;
 use webhook::client::{WebhookResult, WebhookClient};
 
+use widestring::WideCString;
 use winapi::{
-    shared::{minwindef::{DWORD, HINSTANCE, LPVOID}},
+    shared::{minwindef::{DWORD, HINSTANCE, LPVOID, HMODULE}, windef::{HDC, HGLRC__}},
     um::{
         handleapi::CloseHandle,
-        libloaderapi::{FreeLibraryAndExitThread},
+        libloaderapi::{FreeLibraryAndExitThread, GetModuleHandleW, GetProcAddress},
         processthreadsapi::CreateThread,
-        winnt::{DLL_PROCESS_ATTACH},
+        winnt::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH},
         winuser::{
             FindWindowA, GetForegroundWindow, MessageBoxA, MB_OK, VK_DOWN, GetAsyncKeyState, VK_RIGHT
-        },
+        }, wingdi::{wglGetCurrentContext, wglCreateContext, wglMakeCurrent, wglGetProcAddress},
     },
 };
 
@@ -134,6 +137,7 @@ pub extern "stdcall" fn DllMain(
 ) -> i32 {
     match fdw_reason {
         DLL_PROCESS_ATTACH => {
+            crochet::enable!(swapbuffers_hook).expect("failed to enable swapbuffers hook");
             unsafe {
                 let bingus_thread = CreateThread(
                     null_mut(),
@@ -145,6 +149,10 @@ pub extern "stdcall" fn DllMain(
                 );
                 CloseHandle(bingus_thread);
             }
+            true as i32
+        }
+        DLL_PROCESS_DETACH => {
+            crochet::disable!(swapbuffers_hook).expect("failed to disable swapbuffers hook");
             true as i32
         }
         _ => true as i32, // it went a-ok because we dont know what happened so lol fuck off
@@ -163,4 +171,65 @@ unsafe fn get_hwnd(window_names: &[&str]) -> Option<winapi::shared::windef::HWND
         }
     }
     None
+}
+
+
+
+static FIRST_RENDER: Once = Once::new();
+static mut NEW_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
+static mut OLD_CONTEXT: OnceCell<AtomicPtr<HGLRC__>> = OnceCell::new();
+
+
+#[crochet::hook("opengl32.dll", "wglSwapBuffers")]
+fn swapbuffers_hook(hdc: HDC) -> winapi::ctypes::c_int {
+    FIRST_RENDER.call_once(|| {
+        // initialize opengl shit
+        unsafe {
+            let _ = OLD_CONTEXT.get_or_init(|| AtomicPtr::new(wglGetCurrentContext()));
+            let _ = NEW_CONTEXT.get_or_init(|| AtomicPtr::new(wglCreateContext(hdc)));
+
+            let local_new_context = NEW_CONTEXT.get_mut().unwrap();
+            wglMakeCurrent(hdc, *local_new_context.get_mut());
+        }
+
+        let opengl32_module: HMODULE;
+        let opengl32_str = WideCString::from_str("opengl32.dll").unwrap();
+
+        unsafe {
+            opengl32_module = GetModuleHandleW(opengl32_str.as_ptr());
+        }
+        if opengl32_module == null_mut() {
+            message_box("opengl32.dll not found. what the fuck did you do??");
+        }
+
+        gl::load_with(|s| unsafe {
+            let gl_fn_cstr = CString::new(s).unwrap();
+            let gl_fn_cstr_ptr = gl_fn_cstr.as_ptr();  // this is unneeded
+            let check = wglGetProcAddress(gl_fn_cstr_ptr);
+            if check == null_mut() {
+                GetProcAddress(opengl32_module, gl_fn_cstr_ptr)
+            } else {
+                check
+            }
+        } as *const _);
+    });
+
+    if let Some(modules) = MODULES.get() {
+        unsafe {
+            let local_new_context = NEW_CONTEXT.get_mut().unwrap();
+            wglMakeCurrent(hdc, *local_new_context.get_mut());  // might be bad?
+        }
+        for module in modules.lock().unwrap().iter_mut() {
+            if *module.get_enabled().0.get_bool() {
+                module.render();
+            }
+        }
+    }
+
+    unsafe {
+        let local_old_context = OLD_CONTEXT.get_mut().unwrap();
+        wglMakeCurrent(hdc, *local_old_context.get_mut());  // might be bad?
+    }
+
+    call_original!(hdc)
 }
