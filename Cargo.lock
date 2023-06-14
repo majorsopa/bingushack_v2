@@ -184,6 +184,7 @@ version = "0.1.0"
 dependencies = [
  "bingus_setting",
  "enum_dispatch",
+ "gl",
  "jni",
  "jni_mappings",
  "jvmti",

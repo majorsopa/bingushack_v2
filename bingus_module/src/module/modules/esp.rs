@@ -77,17 +77,64 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
     //send_chat_message(env, mappings_manager, player, &format!("{rects:#?}"));
 }
 
-fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
-    let minecraft_client = get_minecraft_client(env, mappings_manager);
-    render_outline(
-        env,
-        mappings_manager,
-        minecraft_client,
-        [0, 0],
-        20,
-        20,
-        200
-    );
+fn render(esp: &mut Esp) {
+    //let minecraft_client = get_minecraft_client(env, mappings_manager);  // crashes
+    //render_outline(
+    //    env,
+    //    mappings_manager,
+    //    minecraft_client,
+    //    [0, 0],
+    //    20,
+    //    20,
+    //    200
+    //);
+
+    draw_triangle();
+}
+
+// I LOVE LACKSAL AND GITHUB COPILOT (in that order)
+fn draw_triangle() {
+    let mut vertex_array_id = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut vertex_array_id);
+        gl::BindVertexArray(vertex_array_id);
+    }
+
+    let g_vertex_buffer_data = [
+        -1.0, -1.0, 0.0,
+        1.0, -1.0, 0.0,
+        0.0,  1.0, 0.0,
+    ];
+
+    let mut vertex_buffer = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut vertex_buffer);
+        gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (g_vertex_buffer_data.len() * std::mem::size_of::<f32>()) as isize,
+            g_vertex_buffer_data.as_ptr() as *const _,
+            gl::STATIC_DRAW
+        );
+    }
+
+    unsafe {
+        gl::EnableVertexAttribArray(0);
+        gl::BindBuffer(gl::ARRAY_BUFFER, vertex_buffer);
+        gl::VertexAttribPointer(
+            0,
+            3,
+            gl::FLOAT,
+            gl::FALSE,
+            0,
+            std::ptr::null()
+        );
+    }
+
+    unsafe {
+        gl::DrawArrays(gl::TRIANGLES, 0, 3);
+        gl::DisableVertexAttribArray(0);
+    }
 }
 
 
@@ -96,7 +143,7 @@ fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
 #[bingus_module(
     name = "ESP (doesn't work)",
     tick_method = "tick(self, _env, _mappings_manager)",
-    render_method = "render(self, _env, _mappings_manager)",
+    render_method = "render(self)",
 )]
 pub struct Esp {
     rects: Vec<[f32; 4]>,
