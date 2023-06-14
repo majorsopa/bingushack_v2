@@ -75,6 +75,10 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         });
     }
     //send_chat_message(env, mappings_manager, player, &format!("{rects:#?}"));
+}
+
+fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
+    let minecraft_client = get_minecraft_client(env, mappings_manager);
     render_outline(
         env,
         mappings_manager,
@@ -84,10 +88,6 @@ fn tick(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
         20,
         200
     );
-}
-
-fn render(esp: &mut Esp, env: JNIEnv, mappings_manager: &MappingsManager) {
-    
 }
 
 
